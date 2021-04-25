@@ -1,0 +1,50 @@
+<div *ngIf="event" class="details">
+    <h1 class="details__title">event</h1>
+    <!-- insertion point for fields specific code -->
+    <!-- -->
+    <div class="details__item">
+        <form>
+            <mat-form-field>
+                <mat-label>Name</mat-label>
+                <input name="" [ngModelOptions]="{standalone: true}" matInput [(ngModel)]="event.Name">
+            </mat-form-field>
+        </form>
+    </div>
+    <!-- -->
+    <div class="details__item">
+        <mat-grid-list cols="3" rowHeight="4:1">
+            <mat-grid-tile>
+                <form>
+                    <mat-form-field class="details_hours_width">
+                        <mat-label>Duration Hours</mat-label>
+                        <input type="number" [ngModelOptions]="{standalone: true}" matInput
+                            [(ngModel)]="Duration_Hours">
+                    </mat-form-field>
+                </form>
+            </mat-grid-tile>
+            <mat-grid-tile>
+                <form>
+                    <mat-form-field class="details_minutes_width">
+                        <mat-label>Duration Minutes</mat-label>
+                        <input type="number" [ngModelOptions]="{standalone: true}" matInput
+                            [(ngModel)]="Duration_Minutes">
+                    </mat-form-field>
+                </form>
+            </mat-grid-tile>
+            <mat-grid-tile>
+                <form>
+                    <mat-form-field class="details_seconds_width">
+                        <mat-label>Duration Seconds</mat-label>
+                        <input type="number" [ngModelOptions]="{standalone: true}" matInput
+                            [(ngModel)]="Duration_Seconds">
+                    </mat-form-field>
+                </form>
+            </mat-grid-tile>
+        </mat-grid-list>
+    </div>
+    <div class="details__save">
+        <button mat-raised-button color="primary" (click)="save()">
+			Save event
+		</button>
+    </div>
+</div>
