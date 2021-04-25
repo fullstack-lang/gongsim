@@ -1,4 +1,4 @@
-A gong stack for editing UML diagrams of gong code
+A gong stack for developping simulations
 
 ### compile application
 > cd ng; npm i; ng build;
@@ -12,4 +12,3 @@ at the root of the repository (requires go >= 1.16)
 
 launch browser on http://localhost:8080
 
-![result](gongdoc.png)
