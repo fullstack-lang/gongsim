@@ -31,6 +31,10 @@ import { SplitterComponent } from './splitter/splitter.component'
 import { SidebarComponent } from './sidebar/sidebar.component';
 
 // insertion point for imports 
+import { DummyAgentsTableComponent } from './dummyagents-table/dummyagents-table.component'
+import { DummyAgentDetailComponent } from './dummyagent-detail/dummyagent-detail.component'
+import { DummyAgentPresentationComponent } from './dummyagent-presentation/dummyagent-presentation.component'
+
 import { EnginesTableComponent } from './engines-table/engines-table.component'
 import { EngineDetailComponent } from './engine-detail/engine-detail.component'
 import { EnginePresentationComponent } from './engine-presentation/engine-presentation.component'
@@ -55,6 +59,10 @@ import { UpdateStatePresentationComponent } from './updatestate-presentation/upd
 @NgModule({
 	declarations: [
 		// insertion point for declarations 
+		DummyAgentsTableComponent,
+		DummyAgentDetailComponent,
+		DummyAgentPresentationComponent,
+
 		EnginesTableComponent,
 		EngineDetailComponent,
 		EnginePresentationComponent,
@@ -109,6 +117,10 @@ import { UpdateStatePresentationComponent } from './updatestate-presentation/upd
 	],
 	exports: [
 		// insertion point for declarations 
+		DummyAgentsTableComponent,
+		DummyAgentDetailComponent,
+		DummyAgentPresentationComponent,
+
 		EnginesTableComponent,
 		EngineDetailComponent,
 		EnginePresentationComponent,

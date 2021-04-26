@@ -4,6 +4,9 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, combineLatest } from 'rxjs';
 
 // insertion point sub template for services imports 
+import { DummyAgentDB } from './dummyagent-db'
+import { DummyAgentService } from './dummyagent.service'
+
 import { EngineDB } from './engine-db'
 import { EngineService } from './engine.service'
 
@@ -22,6 +25,9 @@ import { UpdateStateService } from './updatestate.service'
 
 // FrontRepo stores all instances in a front repository (design pattern repository)
 export class FrontRepo { // insertion point sub template 
+  DummyAgents_array = new Array<DummyAgentDB>(); // array of repo instances
+  DummyAgents = new Map<number, DummyAgentDB>(); // map of repo instances
+  DummyAgents_batch = new Map<number, DummyAgentDB>(); // same but only in last GET (for finding repo instances to delete)
   Engines_array = new Array<EngineDB>(); // array of repo instances
   Engines = new Map<number, EngineDB>(); // map of repo instances
   Engines_batch = new Map<number, EngineDB>(); // same but only in last GET (for finding repo instances to delete)
@@ -71,6 +77,7 @@ export class FrontRepoService {
 
   constructor(
     private http: HttpClient, // insertion point sub template 
+    private dummyagentService: DummyAgentService,
     private engineService: EngineService,
     private eventService: EventService,
     private gongsimcommandService: GongsimCommandService,
@@ -80,12 +87,14 @@ export class FrontRepoService {
 
   // typing of observable can be messy in typescript. Therefore, one force the type
   observableFrontRepo: [ // insertion point sub template 
+    Observable<DummyAgentDB[]>,
     Observable<EngineDB[]>,
     Observable<EventDB[]>,
     Observable<GongsimCommandDB[]>,
     Observable<GongsimStatusDB[]>,
     Observable<UpdateStateDB[]>,
   ] = [ // insertion point sub template 
+      this.dummyagentService.getDummyAgents(),
       this.engineService.getEngines(),
       this.eventService.getEvents(),
       this.gongsimcommandService.getGongsimCommands(),
@@ -106,6 +115,7 @@ export class FrontRepoService {
           this.observableFrontRepo
         ).subscribe(
           ([ // insertion point sub template for declarations 
+            dummyagents_,
             engines_,
             events_,
             gongsimcommands_,
@@ -114,6 +124,8 @@ export class FrontRepoService {
           ]) => {
             // Typing can be messy with many items. Therefore, type casting is necessary here
             // insertion point sub template for type casting 
+            var dummyagents: DummyAgentDB[]
+            dummyagents = dummyagents_
             var engines: EngineDB[]
             engines = engines_
             var events: EventDB[]
@@ -128,6 +140,27 @@ export class FrontRepoService {
             // 
             // First Step: init map of instances
             // insertion point sub template for init 
+            // init the array
+            FrontRepoSingloton.DummyAgents_array = dummyagents
+
+            // clear the map that counts DummyAgent in the GET
+            FrontRepoSingloton.DummyAgents_batch.clear()
+            
+            dummyagents.forEach(
+              dummyagent => {
+                FrontRepoSingloton.DummyAgents.set(dummyagent.ID, dummyagent)
+                FrontRepoSingloton.DummyAgents_batch.set(dummyagent.ID, dummyagent)
+              }
+            )
+            
+            // clear dummyagents that are absent from the batch
+            FrontRepoSingloton.DummyAgents.forEach(
+              dummyagent => {
+                if (FrontRepoSingloton.DummyAgents_batch.get(dummyagent.ID) == undefined) {
+                  FrontRepoSingloton.DummyAgents.delete(dummyagent.ID)
+                }
+              }
+            )
             // init the array
             FrontRepoSingloton.Engines_array = engines
 
@@ -237,6 +270,20 @@ export class FrontRepoService {
             // 
             // Second Step: redeem pointers between instances (thanks to maps in the First Step)
             // insertion point sub template for redeem 
+            dummyagents.forEach(
+              dummyagent => {
+                // insertion point sub sub template for ONE-/ZERO-ONE associations pointers redeeming
+                // insertion point for pointer field Engine redeeming
+                {
+                  let _engine = FrontRepoSingloton.Engines.get(dummyagent.EngineID.Int64)
+                  if (_engine) {
+                    dummyagent.Engine = _engine
+                  }
+                }
+
+                // insertion point for redeeming ONE-MANY associations
+              }
+            )
             engines.forEach(
               engine => {
                 // insertion point sub sub template for ONE-/ZERO-ONE associations pointers redeeming
@@ -282,6 +329,64 @@ export class FrontRepoService {
   }
 
   // insertion point for pull per struct 
+
+  // DummyAgentPull performs a GET on DummyAgent of the stack and redeem association pointers 
+  DummyAgentPull(): Observable<FrontRepo> {
+    return new Observable<FrontRepo>(
+      (observer) => {
+        combineLatest([
+          this.dummyagentService.getDummyAgents()
+        ]).subscribe(
+          ([ // insertion point sub template 
+            dummyagents,
+          ]) => {
+            // init the array
+            FrontRepoSingloton.DummyAgents_array = dummyagents
+
+            // clear the map that counts DummyAgent in the GET
+            FrontRepoSingloton.DummyAgents_batch.clear()
+
+            // 
+            // First Step: init map of instances
+            // insertion point sub template 
+            dummyagents.forEach(
+              dummyagent => {
+                FrontRepoSingloton.DummyAgents.set(dummyagent.ID, dummyagent)
+                FrontRepoSingloton.DummyAgents_batch.set(dummyagent.ID, dummyagent)
+
+                // insertion point for redeeming ONE/ZERO-ONE associations 
+                // insertion point for pointer field Engine redeeming
+                {
+                  let _engine = FrontRepoSingloton.Engines.get(dummyagent.EngineID.Int64)
+                  if (_engine) {
+                    dummyagent.Engine = _engine
+                  }
+                }
+
+                // insertion point for redeeming ONE-MANY associations 
+              }
+            )
+
+            // clear dummyagents that are absent from the GET
+            FrontRepoSingloton.DummyAgents.forEach(
+              dummyagent => {
+                if (FrontRepoSingloton.DummyAgents_batch.get(dummyagent.ID) == undefined) {
+                  FrontRepoSingloton.DummyAgents.delete(dummyagent.ID)
+                }
+              }
+            )
+
+            // 
+            // Second Step: redeem pointers between instances (thanks to maps in the First Step)
+            // insertion point sub template 
+
+            // hand over control flow to observer
+            observer.next(FrontRepoSingloton)
+          }
+        )
+      }
+    )
+  }
 
   // EnginePull performs a GET on Engine of the stack and redeem association pointers 
   EnginePull(): Observable<FrontRepo> {
@@ -540,18 +645,21 @@ export class FrontRepoService {
 }
 
 // insertion point for get unique ID per struct 
-export function getEngineUniqueID(id: number): number {
+export function getDummyAgentUniqueID(id: number): number {
   return 31 * id
 }
-export function getEventUniqueID(id: number): number {
+export function getEngineUniqueID(id: number): number {
   return 37 * id
 }
-export function getGongsimCommandUniqueID(id: number): number {
+export function getEventUniqueID(id: number): number {
   return 41 * id
 }
-export function getGongsimStatusUniqueID(id: number): number {
+export function getGongsimCommandUniqueID(id: number): number {
   return 43 * id
 }
-export function getUpdateStateUniqueID(id: number): number {
+export function getGongsimStatusUniqueID(id: number): number {
   return 47 * id
+}
+export function getUpdateStateUniqueID(id: number): number {
+  return 53 * id
 }

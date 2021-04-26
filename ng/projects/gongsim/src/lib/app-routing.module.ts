@@ -2,6 +2,10 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
 // insertion point for imports
+import { DummyAgentsTableComponent } from './dummyagents-table/dummyagents-table.component'
+import { DummyAgentDetailComponent } from './dummyagent-detail/dummyagent-detail.component'
+import { DummyAgentPresentationComponent } from './dummyagent-presentation/dummyagent-presentation.component'
+
 import { EnginesTableComponent } from './engines-table/engines-table.component'
 import { EngineDetailComponent } from './engine-detail/engine-detail.component'
 import { EnginePresentationComponent } from './engine-presentation/engine-presentation.component'
@@ -24,6 +28,13 @@ import { UpdateStatePresentationComponent } from './updatestate-presentation/upd
 
 
 const routes: Routes = [ // insertion point for routes declarations
+	{ path: 'dummyagents', component: DummyAgentsTableComponent, outlet: 'table' },
+	{ path: 'dummyagent-adder', component: DummyAgentDetailComponent, outlet: 'editor' },
+	{ path: 'dummyagent-adder/:id/:association', component: DummyAgentDetailComponent, outlet: 'editor' },
+	{ path: 'dummyagent-detail/:id', component: DummyAgentDetailComponent, outlet: 'editor' },
+	{ path: 'dummyagent-presentation/:id', component: DummyAgentPresentationComponent, outlet: 'presentation' },
+	{ path: 'dummyagent-presentation-special/:id', component: DummyAgentPresentationComponent, outlet: 'dummyagentpres' },
+
 	{ path: 'engines', component: EnginesTableComponent, outlet: 'table' },
 	{ path: 'engine-adder', component: EngineDetailComponent, outlet: 'editor' },
 	{ path: 'engine-adder/:id/:association', component: EngineDetailComponent, outlet: 'editor' },

@@ -8,6 +8,8 @@ import { FrontRepoService, FrontRepo } from '../front-repo.service'
 import { CommitNbService } from '../commitnb.service'
 
 // insertion point for per struct import code
+import { DummyAgentService } from '../dummyagent.service'
+import { getDummyAgentUniqueID } from '../front-repo.service'
 import { EngineService } from '../engine.service'
 import { getEngineUniqueID } from '../front-repo.service'
 import { EventService } from '../event.service'
@@ -150,6 +152,7 @@ export class SidebarComponent implements OnInit {
     private commitNbService: CommitNbService,
 
     // insertion point for per struct service declaration
+    private dummyagentService: DummyAgentService,
     private engineService: EngineService,
     private eventService: EventService,
     private gongsimcommandService: GongsimCommandService,
@@ -161,6 +164,14 @@ export class SidebarComponent implements OnInit {
     this.refresh()
 
     // insertion point for per struct observable for refresh trigger
+    // observable for changes in structs
+    this.dummyagentService.DummyAgentServiceChanged.subscribe(
+      message => {
+        if (message == "post" || message == "update" || message == "delete") {
+          this.refresh()
+        }
+      }
+    )
     // observable for changes in structs
     this.engineService.EngineServiceChanged.subscribe(
       message => {
@@ -226,6 +237,71 @@ export class SidebarComponent implements OnInit {
       this.gongNodeTree = new Array<GongNode>();
 
       // insertion point for per struct tree construction
+      /**
+      * fill up the DummyAgent part of the mat tree
+      */
+      let dummyagentGongNodeStruct: GongNode = {
+        name: "DummyAgent",
+        type: GongNodeType.STRUCT,
+        id: 0,
+        uniqueIdPerStack: 13 * nonInstanceNodeId,
+        structName: "DummyAgent",
+        associatedStructName: "",
+        children: new Array<GongNode>()
+      }
+      nonInstanceNodeId = nonInstanceNodeId + 1
+      this.gongNodeTree.push(dummyagentGongNodeStruct)
+
+      this.frontRepo.DummyAgents_array.forEach(
+        dummyagentDB => {
+          let dummyagentGongNodeInstance: GongNode = {
+            name: dummyagentDB.Name,
+            type: GongNodeType.INSTANCE,
+            id: dummyagentDB.ID,
+            uniqueIdPerStack: getDummyAgentUniqueID(dummyagentDB.ID),
+            structName: "DummyAgent",
+            associatedStructName: "",
+            children: new Array<GongNode>()
+          }
+          dummyagentGongNodeStruct.children.push(dummyagentGongNodeInstance)
+
+          // insertion point for per field code
+          /**
+          * let append a node for the association Engine
+          */
+          let EngineGongNodeAssociation: GongNode = {
+            name: "(Engine) Engine",
+            type: GongNodeType.ONE__ZERO_ONE_ASSOCIATION,
+            id: dummyagentDB.ID,
+            uniqueIdPerStack: 17 * nonInstanceNodeId,
+            structName: "DummyAgent",
+            associatedStructName: "",
+            children: new Array<GongNode>()
+          }
+          nonInstanceNodeId = nonInstanceNodeId + 1
+          dummyagentGongNodeInstance.children.push(EngineGongNodeAssociation)
+
+          /**
+            * let append a node for the instance behind the asssociation Engine
+            */
+          if (dummyagentDB.Engine != undefined) {
+            let dummyagentGongNodeInstance_Engine: GongNode = {
+              name: dummyagentDB.Engine.Name,
+              type: GongNodeType.INSTANCE,
+              id: dummyagentDB.Engine.ID,
+              uniqueIdPerStack: // godel numbering (thank you kurt)
+                3 * getDummyAgentUniqueID(dummyagentDB.ID)
+                + 5 * getEngineUniqueID(dummyagentDB.Engine.ID),
+              structName: "Engine",
+              associatedStructName: "",
+              children: new Array<GongNode>()
+            }
+            EngineGongNodeAssociation.children.push(dummyagentGongNodeInstance_Engine)
+          }
+
+        }
+      )
+
       /**
       * fill up the Engine part of the mat tree
       */

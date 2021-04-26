@@ -12,6 +12,13 @@ export * from './lib/front-repo.service'
 export * from './lib/commitnb.service'
 
 
+export * from './lib/dummyagent-detail/dummyagent-detail.component'
+export * from './lib/dummyagent-presentation/dummyagent-presentation.component'
+export * from './lib/dummyagents-table/dummyagents-table.component'
+export * from './lib/dummyagent-db'
+export * from './lib/dummyagent-api'
+export * from './lib/dummyagent.service'
+
 export * from './lib/engine-detail/engine-detail.component'
 export * from './lib/engine-presentation/engine-presentation.component'
 export * from './lib/engines-table/engines-table.component'

@@ -12,6 +12,8 @@ var __member __void
 // StageStruct enables storage of staged instances
 // swagger:ignore
 type StageStruct struct { // insertion point for definition of arrays registering instances
+	DummyAgents map[*DummyAgent]struct{}
+
 	Engines map[*Engine]struct{}
 
 	Events map[*Event]struct{}
@@ -33,6 +35,8 @@ type BackRepoInterface interface {
 	Commit(stage *StageStruct)
 	Checkout(stage *StageStruct)
 	// insertion point for Commit and Checkout signatures
+	CommitDummyAgent(dummyagent *DummyAgent)
+	CheckoutDummyAgent(dummyagent *DummyAgent)
 	CommitEngine(engine *Engine)
 	CheckoutEngine(engine *Engine)
 	CommitEvent(event *Event)
@@ -48,6 +52,8 @@ type BackRepoInterface interface {
 
 // swagger:ignore instructs the gong compiler (gongc) to avoid this particular struct
 var Stage StageStruct = StageStruct{ // insertion point for array initiatialisation
+	DummyAgents: make(map[*DummyAgent]struct{}, 0),
+
 	Engines: make(map[*Engine]struct{}, 0),
 
 	Events: make(map[*Event]struct{}, 0),
@@ -73,6 +79,105 @@ func (stage *StageStruct) Checkout() {
 }
 
 // insertion point for cumulative sub template with model space calls
+func (stage *StageStruct) getDummyAgentOrderedStructWithNameField() []*DummyAgent {
+	// have alphabetical order generation
+	dummyagentOrdered := []*DummyAgent{}
+	for dummyagent := range stage.DummyAgents {
+		dummyagentOrdered = append(dummyagentOrdered, dummyagent)
+	}
+	sort.Slice(dummyagentOrdered[:], func(i, j int) bool {
+		return dummyagentOrdered[i].Name < dummyagentOrdered[j].Name
+	})
+	return dummyagentOrdered
+}
+
+// Stage puts dummyagent to the model stage
+func (dummyagent *DummyAgent) Stage() *DummyAgent {
+	Stage.DummyAgents[dummyagent] = __member
+	return dummyagent
+}
+
+// Unstage removes dummyagent off the model stage
+func (dummyagent *DummyAgent) Unstage() *DummyAgent {
+	delete(Stage.DummyAgents, dummyagent)
+	return dummyagent
+}
+
+// commit dummyagent to the back repo (if it is already staged)
+func (dummyagent *DummyAgent) Commit() *DummyAgent {
+	if _, ok := Stage.DummyAgents[dummyagent]; ok {
+		if Stage.BackRepo != nil {
+			Stage.BackRepo.CommitDummyAgent(dummyagent)
+		}
+	}
+	return dummyagent
+}
+
+// Checkout dummyagent to the back repo (if it is already staged)
+func (dummyagent *DummyAgent) Checkout() *DummyAgent {
+	if _, ok := Stage.DummyAgents[dummyagent]; ok {
+		if Stage.BackRepo != nil {
+			Stage.BackRepo.CheckoutDummyAgent(dummyagent)
+		}
+	}
+	return dummyagent
+}
+
+//
+// Legacy, to be deleted
+//
+
+// StageCopy appends a copy of dummyagent to the model stage
+func (dummyagent *DummyAgent) StageCopy() *DummyAgent {
+	_dummyagent := new(DummyAgent)
+	*_dummyagent = *dummyagent
+	_dummyagent.Stage()
+	return _dummyagent
+}
+
+// StageAndCommit appends dummyagent to the model stage and commit to the orm repo
+func (dummyagent *DummyAgent) StageAndCommit() *DummyAgent {
+	dummyagent.Stage()
+	if Stage.AllModelsStructCreateCallback != nil {
+		Stage.AllModelsStructCreateCallback.CreateORMDummyAgent(dummyagent)
+	}
+	return dummyagent
+}
+
+// DeleteStageAndCommit appends dummyagent to the model stage and commit to the orm repo
+func (dummyagent *DummyAgent) DeleteStageAndCommit() *DummyAgent {
+	dummyagent.Unstage()
+	DeleteORMDummyAgent(dummyagent)
+	return dummyagent
+}
+
+// StageCopyAndCommit appends a copy of dummyagent to the model stage and commit to the orm repo
+func (dummyagent *DummyAgent) StageCopyAndCommit() *DummyAgent {
+	_dummyagent := new(DummyAgent)
+	*_dummyagent = *dummyagent
+	_dummyagent.Stage()
+	if Stage.AllModelsStructCreateCallback != nil {
+		Stage.AllModelsStructCreateCallback.CreateORMDummyAgent(dummyagent)
+	}
+	return _dummyagent
+}
+
+// CreateORMDummyAgent enables dynamic staging of a DummyAgent instance
+func CreateORMDummyAgent(dummyagent *DummyAgent) {
+	dummyagent.Stage()
+	if Stage.AllModelsStructCreateCallback != nil {
+		Stage.AllModelsStructCreateCallback.CreateORMDummyAgent(dummyagent)
+	}
+}
+
+// DeleteORMDummyAgent enables dynamic staging of a DummyAgent instance
+func DeleteORMDummyAgent(dummyagent *DummyAgent) {
+	dummyagent.Unstage()
+	if Stage.AllModelsStructDeleteCallback != nil {
+		Stage.AllModelsStructDeleteCallback.DeleteORMDummyAgent(dummyagent)
+	}
+}
+
 func (stage *StageStruct) getEngineOrderedStructWithNameField() []*Engine {
 	// have alphabetical order generation
 	engineOrdered := []*Engine{}
@@ -570,6 +675,7 @@ func DeleteORMUpdateState(updatestate *UpdateState) {
 
 // swagger:ignore
 type AllModelsStructCreateInterface interface { // insertion point for Callbacks on creation
+	CreateORMDummyAgent(DummyAgent *DummyAgent)
 	CreateORMEngine(Engine *Engine)
 	CreateORMEvent(Event *Event)
 	CreateORMGongsimCommand(GongsimCommand *GongsimCommand)
@@ -578,6 +684,7 @@ type AllModelsStructCreateInterface interface { // insertion point for Callbacks
 }
 
 type AllModelsStructDeleteInterface interface { // insertion point for Callbacks on deletion
+	DeleteORMDummyAgent(DummyAgent *DummyAgent)
 	DeleteORMEngine(Engine *Engine)
 	DeleteORMEvent(Event *Event)
 	DeleteORMGongsimCommand(GongsimCommand *GongsimCommand)
@@ -586,6 +693,7 @@ type AllModelsStructDeleteInterface interface { // insertion point for Callbacks
 }
 
 func (stage *StageStruct) Reset() { // insertion point for array reset
+	stage.DummyAgents = make(map[*DummyAgent]struct{}, 0)
 	stage.Engines = make(map[*Engine]struct{}, 0)
 	stage.Events = make(map[*Event]struct{}, 0)
 	stage.GongsimCommands = make(map[*GongsimCommand]struct{}, 0)
@@ -594,6 +702,7 @@ func (stage *StageStruct) Reset() { // insertion point for array reset
 }
 
 func (stage *StageStruct) Nil() { // insertion point for array nil
+	stage.DummyAgents = nil
 	stage.Engines = nil
 	stage.Events = nil
 	stage.GongsimCommands = nil

@@ -9,6 +9,8 @@ import (
 // BackRepoStruct supports callback functions
 type BackRepoStruct struct {
 	// insertion point for per struct back repo declarations
+	BackRepoDummyAgent BackRepoDummyAgentStruct
+
 	BackRepoEngine BackRepoEngineStruct
 
 	BackRepoEvent BackRepoEventStruct
@@ -34,6 +36,7 @@ func (backRepo *BackRepoStruct) IncrementCommitNb() uint {
 // Init the BackRepoStruct inner variables and link to the database
 func (backRepo *BackRepoStruct) Init(db *gorm.DB) {
 	// insertion point for per struct back repo declarations
+	backRepo.BackRepoDummyAgent.Init(db)
 	backRepo.BackRepoEngine.Init(db)
 	backRepo.BackRepoEvent.Init(db)
 	backRepo.BackRepoGongsimCommand.Init(db)
@@ -46,6 +49,7 @@ func (backRepo *BackRepoStruct) Init(db *gorm.DB) {
 // Commit the BackRepoStruct inner variables and link to the database
 func (backRepo *BackRepoStruct) Commit(stage *models.StageStruct) {
 	// insertion point for per struct back repo phase one commit
+	backRepo.BackRepoDummyAgent.CommitPhaseOne(stage)
 	backRepo.BackRepoEngine.CommitPhaseOne(stage)
 	backRepo.BackRepoEvent.CommitPhaseOne(stage)
 	backRepo.BackRepoGongsimCommand.CommitPhaseOne(stage)
@@ -53,6 +57,7 @@ func (backRepo *BackRepoStruct) Commit(stage *models.StageStruct) {
 	backRepo.BackRepoUpdateState.CommitPhaseOne(stage)
 
 	// insertion point for per struct back repo phase two commit
+	backRepo.BackRepoDummyAgent.CommitPhaseTwo(backRepo)
 	backRepo.BackRepoEngine.CommitPhaseTwo(backRepo)
 	backRepo.BackRepoEvent.CommitPhaseTwo(backRepo)
 	backRepo.BackRepoGongsimCommand.CommitPhaseTwo(backRepo)
@@ -65,6 +70,7 @@ func (backRepo *BackRepoStruct) Commit(stage *models.StageStruct) {
 // Checkout the database into the stage
 func (backRepo *BackRepoStruct) Checkout(stage *models.StageStruct) {
 	// insertion point for per struct back repo phase one commit
+	backRepo.BackRepoDummyAgent.CheckoutPhaseOne()
 	backRepo.BackRepoEngine.CheckoutPhaseOne()
 	backRepo.BackRepoEvent.CheckoutPhaseOne()
 	backRepo.BackRepoGongsimCommand.CheckoutPhaseOne()
@@ -72,6 +78,7 @@ func (backRepo *BackRepoStruct) Checkout(stage *models.StageStruct) {
 	backRepo.BackRepoUpdateState.CheckoutPhaseOne()
 
 	// insertion point for per struct back repo phase two commit
+	backRepo.BackRepoDummyAgent.CheckoutPhaseTwo(backRepo)
 	backRepo.BackRepoEngine.CheckoutPhaseTwo(backRepo)
 	backRepo.BackRepoEvent.CheckoutPhaseTwo(backRepo)
 	backRepo.BackRepoGongsimCommand.CheckoutPhaseTwo(backRepo)

@@ -1,0 +1,38 @@
+<div *ngIf="dummyagent" class="details">
+    <h1 class="details__title">dummyagent</h1>
+    <!-- insertion point for fields specific code -->
+    <!-- -->
+    <div class="details__item">
+        <form>
+            <mat-form-field>
+                <mat-label>TechName</mat-label>
+                <input name="" [ngModelOptions]="{standalone: true}" matInput [(ngModel)]="dummyagent.TechName">
+            </mat-form-field>
+        </form>
+    </div>
+    <div class="details__item">
+        <mat-form-field>
+            <mat-label>Engine</mat-label>
+            <mat-select [(ngModel)]="dummyagent.Engine">
+                <mat-option>None</mat-option>
+                <mat-option *ngFor="let engine of frontRepo.Engines_array" [value]="engine">
+                    {{engine.Name}}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div>
+    <!-- -->
+    <div class="details__item">
+        <form>
+            <mat-form-field>
+                <mat-label>Name</mat-label>
+                <input name="" [ngModelOptions]="{standalone: true}" matInput [(ngModel)]="dummyagent.Name">
+            </mat-form-field>
+        </form>
+    </div>
+    <div class="details__save">
+        <button mat-raised-button color="primary" (click)="save()">
+			Save dummyagent
+		</button>
+    </div>
+</div>
