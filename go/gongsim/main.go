@@ -15,8 +15,9 @@ import (
 )
 
 var (
-	logDBFlag  = flag.Bool("logDB", false, "log mode for db")
-	logGINFlag = flag.Bool("logGIN", false, "log mode for gin")
+	logDBFlag         = flag.Bool("logDB", false, "log mode for db")
+	logGINFlag        = flag.Bool("logGIN", false, "log mode for gin")
+	clientControlFlag = flag.Bool("client-control", false, "if true, engine waits for API calls")
 )
 
 func main() {
