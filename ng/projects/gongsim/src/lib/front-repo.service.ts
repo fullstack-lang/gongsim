@@ -161,6 +161,18 @@ export class FrontRepoService {
                 }
               }
             )
+            
+            // sort DummyAgents_array array
+            FrontRepoSingloton.DummyAgents_array.sort((t1, t2) => {
+              if (t1.Name > t2.Name) {
+                return 1;
+              }
+              if (t1.Name < t2.Name) {
+                return -1;
+              }
+              return 0;
+            });
+            
             // init the array
             FrontRepoSingloton.Engines_array = engines
 
@@ -182,6 +194,18 @@ export class FrontRepoService {
                 }
               }
             )
+            
+            // sort Engines_array array
+            FrontRepoSingloton.Engines_array.sort((t1, t2) => {
+              if (t1.Name > t2.Name) {
+                return 1;
+              }
+              if (t1.Name < t2.Name) {
+                return -1;
+              }
+              return 0;
+            });
+            
             // init the array
             FrontRepoSingloton.Events_array = events
 
@@ -203,6 +227,18 @@ export class FrontRepoService {
                 }
               }
             )
+            
+            // sort Events_array array
+            FrontRepoSingloton.Events_array.sort((t1, t2) => {
+              if (t1.Name > t2.Name) {
+                return 1;
+              }
+              if (t1.Name < t2.Name) {
+                return -1;
+              }
+              return 0;
+            });
+            
             // init the array
             FrontRepoSingloton.GongsimCommands_array = gongsimcommands
 
@@ -224,6 +260,18 @@ export class FrontRepoService {
                 }
               }
             )
+            
+            // sort GongsimCommands_array array
+            FrontRepoSingloton.GongsimCommands_array.sort((t1, t2) => {
+              if (t1.Name > t2.Name) {
+                return 1;
+              }
+              if (t1.Name < t2.Name) {
+                return -1;
+              }
+              return 0;
+            });
+            
             // init the array
             FrontRepoSingloton.GongsimStatuss_array = gongsimstatuss
 
@@ -245,6 +293,18 @@ export class FrontRepoService {
                 }
               }
             )
+            
+            // sort GongsimStatuss_array array
+            FrontRepoSingloton.GongsimStatuss_array.sort((t1, t2) => {
+              if (t1.Name > t2.Name) {
+                return 1;
+              }
+              if (t1.Name < t2.Name) {
+                return -1;
+              }
+              return 0;
+            });
+            
             // init the array
             FrontRepoSingloton.UpdateStates_array = updatestates
 
@@ -266,6 +326,18 @@ export class FrontRepoService {
                 }
               }
             )
+            
+            // sort UpdateStates_array array
+            FrontRepoSingloton.UpdateStates_array.sort((t1, t2) => {
+              if (t1.Name > t2.Name) {
+                return 1;
+              }
+              if (t1.Name < t2.Name) {
+                return -1;
+              }
+              return 0;
+            });
+            
 
             // 
             // Second Step: redeem pointers between instances (thanks to maps in the First Step)

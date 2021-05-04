@@ -252,6 +252,16 @@ export class SidebarComponent implements OnInit {
       nonInstanceNodeId = nonInstanceNodeId + 1
       this.gongNodeTree.push(dummyagentGongNodeStruct)
 
+      this.frontRepo.DummyAgents_array.sort((t1, t2) => {
+        if (t1.Name > t2.Name) {
+          return 1;
+        }
+        if (t1.Name < t2.Name) {
+          return -1;
+        }
+        return 0;
+      });
+
       this.frontRepo.DummyAgents_array.forEach(
         dummyagentDB => {
           let dummyagentGongNodeInstance: GongNode = {
@@ -317,6 +327,16 @@ export class SidebarComponent implements OnInit {
       nonInstanceNodeId = nonInstanceNodeId + 1
       this.gongNodeTree.push(engineGongNodeStruct)
 
+      this.frontRepo.Engines_array.sort((t1, t2) => {
+        if (t1.Name > t2.Name) {
+          return 1;
+        }
+        if (t1.Name < t2.Name) {
+          return -1;
+        }
+        return 0;
+      });
+
       this.frontRepo.Engines_array.forEach(
         engineDB => {
           let engineGongNodeInstance: GongNode = {
@@ -348,6 +368,16 @@ export class SidebarComponent implements OnInit {
       }
       nonInstanceNodeId = nonInstanceNodeId + 1
       this.gongNodeTree.push(eventGongNodeStruct)
+
+      this.frontRepo.Events_array.sort((t1, t2) => {
+        if (t1.Name > t2.Name) {
+          return 1;
+        }
+        if (t1.Name < t2.Name) {
+          return -1;
+        }
+        return 0;
+      });
 
       this.frontRepo.Events_array.forEach(
         eventDB => {
@@ -381,6 +411,16 @@ export class SidebarComponent implements OnInit {
       nonInstanceNodeId = nonInstanceNodeId + 1
       this.gongNodeTree.push(gongsimcommandGongNodeStruct)
 
+      this.frontRepo.GongsimCommands_array.sort((t1, t2) => {
+        if (t1.Name > t2.Name) {
+          return 1;
+        }
+        if (t1.Name < t2.Name) {
+          return -1;
+        }
+        return 0;
+      });
+
       this.frontRepo.GongsimCommands_array.forEach(
         gongsimcommandDB => {
           let gongsimcommandGongNodeInstance: GongNode = {
@@ -413,6 +453,16 @@ export class SidebarComponent implements OnInit {
       nonInstanceNodeId = nonInstanceNodeId + 1
       this.gongNodeTree.push(gongsimstatusGongNodeStruct)
 
+      this.frontRepo.GongsimStatuss_array.sort((t1, t2) => {
+        if (t1.Name > t2.Name) {
+          return 1;
+        }
+        if (t1.Name < t2.Name) {
+          return -1;
+        }
+        return 0;
+      });
+
       this.frontRepo.GongsimStatuss_array.forEach(
         gongsimstatusDB => {
           let gongsimstatusGongNodeInstance: GongNode = {
@@ -444,6 +494,16 @@ export class SidebarComponent implements OnInit {
       }
       nonInstanceNodeId = nonInstanceNodeId + 1
       this.gongNodeTree.push(updatestateGongNodeStruct)
+
+      this.frontRepo.UpdateStates_array.sort((t1, t2) => {
+        if (t1.Name > t2.Name) {
+          return 1;
+        }
+        if (t1.Name < t2.Name) {
+          return -1;
+        }
+        return 0;
+      });
 
       this.frontRepo.UpdateStates_array.forEach(
         updatestateDB => {

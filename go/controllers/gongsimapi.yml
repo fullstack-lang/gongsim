@@ -12,7 +12,8 @@ definitions:
     type: object
     x-go-package: github.com/fullstack-lang/gongsim/go/models
   AgentInterface:
-    description: AgentInterface is the interface that must be followed by part of the simulation
+    description: AgentInterface is the interface that must be followed by part of
+      the simulation
     properties:
       Events:
         description: Events fire next Event
@@ -104,7 +105,8 @@ definitions:
       EngineID:
         $ref: '#/definitions/NullInt64'
       EngineName:
-        description: all gong Struct has a Name field, this enables this data to object field
+        description: all gong Struct has a Name field, this enables this data to object
+          field
         type: string
       Name:
         type: string
@@ -119,7 +121,8 @@ definitions:
     x-go-name: DummyAgentAPI
     x-go-package: github.com/fullstack-lang/gongsim/go/orm
   dummyagentDB:
-    description: 'It incorporates all fields : from the model, from the generated field for the API and the GORM ID'
+    description: 'It incorporates all fields : from the model, from the generated
+      field for the API and the GORM ID'
     properties:
       CreatedAt:
         format: date-time
@@ -130,7 +133,8 @@ definitions:
       EngineID:
         $ref: '#/definitions/NullInt64'
       EngineName:
-        description: all gong Struct has a Name field, this enables this data to object field
+        description: all gong Struct has a Name field, this enables this data to object
+          field
         type: string
       ID:
         format: uint64
@@ -215,7 +219,8 @@ definitions:
     x-go-name: EngineAPI
     x-go-package: github.com/fullstack-lang/gongsim/go/orm
   engineDB:
-    description: 'It incorporates all fields : from the model, from the generated field for the API and the GORM ID'
+    description: 'It incorporates all fields : from the model, from the generated
+      field for the API and the GORM ID'
     properties:
       ControlMode:
         description: control mode.
@@ -306,7 +311,8 @@ definitions:
     x-go-name: EventAPI
     x-go-package: github.com/fullstack-lang/gongsim/go/orm
   eventDB:
-    description: 'It incorporates all fields : from the model, from the generated field for the API and the GORM ID'
+    description: 'It incorporates all fields : from the model, from the generated
+      field for the API and the GORM ID'
     properties:
       CreatedAt:
         format: date-time
@@ -377,7 +383,8 @@ definitions:
     x-go-name: GongsimCommandAPI
     x-go-package: github.com/fullstack-lang/gongsim/go/orm
   gongsimcommandDB:
-    description: 'It incorporates all fields : from the model, from the generated field for the API and the GORM ID'
+    description: 'It incorporates all fields : from the model, from the generated
+      field for the API and the GORM ID'
     properties:
       Command:
         enum:
@@ -474,7 +481,8 @@ definitions:
     x-go-name: GongsimStatusAPI
     x-go-package: github.com/fullstack-lang/gongsim/go/orm
   gongsimstatusDB:
-    description: 'It incorporates all fields : from the model, from the generated field for the API and the GORM ID'
+    description: 'It incorporates all fields : from the model, from the generated
+      field for the API and the GORM ID'
     properties:
       CompletionDate:
         type: string
@@ -549,7 +557,8 @@ definitions:
     x-go-name: UpdateStateAPI
     x-go-package: github.com/fullstack-lang/gongsim/go/orm
   updatestateDB:
-    description: 'It incorporates all fields : from the model, from the generated field for the API and the GORM ID'
+    description: 'It incorporates all fields : from the model, from the generated
+      field for the API and the GORM ID'
     properties:
       CreatedAt:
         format: date-time
@@ -1111,7 +1120,8 @@ responses:
           field Engine is a pointer to another Struct (optional or 0..1)
           This field is generated into another field to enable AS ONE association
       EngineName:
-        description: all gong Struct has a Name field, this enables this data to object field
+        description: all gong Struct has a Name field, this enables this data to object
+          field
         type: string
       ID:
         format: uint64
@@ -1119,7 +1129,8 @@ responses:
       Name:
         type: string
       Name_Data:
-        description: Declation for basic field dummyagentDB.Name {{BasicKind}} (to be completed)
+        description: Declation for basic field dummyagentDB.Name {{BasicKind}} (to
+          be completed)
       TechName:
         type: string
       TechName_Data:
@@ -1147,27 +1158,31 @@ responses:
           - ClientControl
         type: string
       ControlMode_Data:
-        description: Declation for basic field engineDB.ControlMode {{BasicKind}} (to be completed)
+        description: Declation for basic field engineDB.ControlMode {{BasicKind}}
+          (to be completed)
       CreatedAt:
         format: date-time
         type: string
       CurrentTime:
         type: string
       CurrentTime_Data:
-        description: Declation for basic field engineDB.CurrentTime {{BasicKind}} (to be completed)
+        description: Declation for basic field engineDB.CurrentTime {{BasicKind}}
+          (to be completed)
       DeletedAt:
         format: date-time
         type: string
       EndTime:
         type: string
       EndTime_Data:
-        description: Declation for basic field engineDB.EndTime {{BasicKind}} (to be completed)
+        description: Declation for basic field engineDB.EndTime {{BasicKind}} (to
+          be completed)
       Fired:
         description: Fired events
         format: int64
         type: integer
       Fired_Data:
-        description: Declation for basic field engineDB.Fired {{BasicKind}} (to be completed)
+        description: Declation for basic field engineDB.Fired {{BasicKind}} (to be
+          completed)
       ID:
         format: uint64
         type: integer
@@ -1187,7 +1202,8 @@ responses:
         format: double
         type: number
       SecondsSinceStart_Data:
-        description: Declation for basic field engineDB.SecondsSinceStart {{BasicKind}} (to be completed)
+        description: Declation for basic field engineDB.SecondsSinceStart {{BasicKind}}
+          (to be completed)
       Simulation:
         description: |-
           Simulation supportspecific callback
@@ -1197,7 +1213,8 @@ responses:
         format: double
         type: number
       Speed_Data:
-        description: Declation for basic field engineDB.Speed {{BasicKind}} (to be completed)
+        description: Declation for basic field engineDB.Speed {{BasicKind}} (to be
+          completed)
       State:
         description: engine state
         enum:
@@ -1206,7 +1223,8 @@ responses:
           - OVER
         type: string
       State_Data:
-        description: Declation for basic field engineDB.State {{BasicKind}} (to be completed)
+        description: Declation for basic field engineDB.State {{BasicKind}} (to be
+          completed)
       UpdatedAt:
         format: date-time
         type: string
@@ -1252,7 +1270,8 @@ responses:
           Duration is the difference between the current time and the fire time of the
           event. It is handy to compute directly the fire time
       Duration_Data:
-        description: Declation for basic field eventDB.Duration {{BasicKind}} (to be completed)
+        description: Declation for basic field eventDB.Duration {{BasicKind}} (to
+          be completed)
       ID:
         format: uint64
         type: integer
@@ -1305,18 +1324,21 @@ responses:
           - ADVANCE_10_MIN
         type: string
       Command_Data:
-        description: Declation for basic field gongsimcommandDB.Command {{BasicKind}} (to be completed)
+        description: Declation for basic field gongsimcommandDB.Command {{BasicKind}}
+          (to be completed)
       CommandDate:
         type: string
       CommandDate_Data:
-        description: Declation for basic field gongsimcommandDB.CommandDate {{BasicKind}} (to be completed)
+        description: Declation for basic field gongsimcommandDB.CommandDate {{BasicKind}}
+          (to be completed)
       CreatedAt:
         format: date-time
         type: string
       DateSpeedCommand:
         type: string
       DateSpeedCommand_Data:
-        description: Declation for basic field gongsimcommandDB.DateSpeedCommand {{BasicKind}} (to be completed)
+        description: Declation for basic field gongsimcommandDB.DateSpeedCommand {{BasicKind}}
+          (to be completed)
       DeletedAt:
         format: date-time
         type: string
@@ -1339,7 +1361,8 @@ responses:
           - ADVANCE_10_MIN
         type: string
       SpeedCommandType_Data:
-        description: Declation for basic field gongsimcommandDB.SpeedCommandType {{BasicKind}} (to be completed)
+        description: Declation for basic field gongsimcommandDB.SpeedCommandType {{BasicKind}}
+          (to be completed)
       UpdatedAt:
         format: date-time
         type: string
@@ -1357,7 +1380,8 @@ responses:
       CompletionDate:
         type: string
       CompletionDate_Data:
-        description: Declation for basic field gongsimstatusDB.CompletionDate {{BasicKind}} (to be completed)
+        description: Declation for basic field gongsimstatusDB.CompletionDate {{BasicKind}}
+          (to be completed)
       CreatedAt:
         format: date-time
         type: string
@@ -1371,7 +1395,8 @@ responses:
           - ADVANCE_10_MIN
         type: string
       CurrentCommand_Data:
-        description: Declation for basic field gongsimstatusDB.CurrentCommand {{BasicKind}} (to be completed)
+        description: Declation for basic field gongsimstatusDB.CurrentCommand {{BasicKind}}
+          (to be completed)
       CurrentSpeedCommand:
         enum:
         - - PLAY
@@ -1382,7 +1407,8 @@ responses:
           - ADVANCE_10_MIN
         type: string
       CurrentSpeedCommand_Data:
-        description: Declation for basic field gongsimstatusDB.CurrentSpeedCommand {{BasicKind}} (to be completed)
+        description: Declation for basic field gongsimstatusDB.CurrentSpeedCommand
+          {{BasicKind}} (to be completed)
       DeletedAt:
         format: date-time
         type: string
@@ -1398,7 +1424,8 @@ responses:
       SpeedCommandCompletionDate:
         type: string
       SpeedCommandCompletionDate_Data:
-        description: Declation for basic field gongsimstatusDB.SpeedCommandCompletionDate {{BasicKind}} (to be completed)
+        description: Declation for basic field gongsimstatusDB.SpeedCommandCompletionDate
+          {{BasicKind}} (to be completed)
       UpdatedAt:
         format: date-time
         type: string
@@ -1424,7 +1451,8 @@ responses:
           Duration is the difference between the current time and the fire time of the
           event. It is handy to compute directly the fire time
       Duration_Data:
-        description: Declation for basic field updatestateDB.Duration {{BasicKind}} (to be completed)
+        description: Declation for basic field updatestateDB.Duration {{BasicKind}}
+          (to be completed)
       ID:
         format: uint64
         type: integer
@@ -1437,7 +1465,8 @@ responses:
       Period:
         description: Period is the time between two fires of FireTime
       Period_Data:
-        description: Declation for basic field updatestateDB.Period {{BasicKind}} (to be completed)
+        description: Declation for basic field updatestateDB.Period {{BasicKind}}
+          (to be completed)
       UpdatedAt:
         format: date-time
         type: string
