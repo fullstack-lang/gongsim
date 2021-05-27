@@ -6,15 +6,18 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"sort"
 	"time"
 
 	"github.com/jinzhu/gorm"
+
 	"github.com/fullstack-lang/gongsim/go/models"
 )
 
-// dummy variable to have the import database/sql wihthout compile failure id no sql is used
+// dummy variable to have the import declaration wihthout compile failure (even if no code needing this import is generated)
 var dummy_Engine sql.NullBool
 var __Engine_time__dummyDeclaration time.Duration
+var dummy_Engine_sort sort.Float64Slice
 
 // EngineAPI is the input in POST API
 //

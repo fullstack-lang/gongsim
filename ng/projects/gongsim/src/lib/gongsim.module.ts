@@ -22,6 +22,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatTreeModule } from '@angular/material/tree';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 
 import { AngularSplitModule, SplitComponent } from 'angular-split';
 
@@ -32,26 +33,32 @@ import { SidebarComponent } from './sidebar/sidebar.component';
 
 // insertion point for imports 
 import { DummyAgentsTableComponent } from './dummyagents-table/dummyagents-table.component'
+import { DummyAgentSortingComponent } from './dummyagent-sorting/dummyagent-sorting.component'
 import { DummyAgentDetailComponent } from './dummyagent-detail/dummyagent-detail.component'
 import { DummyAgentPresentationComponent } from './dummyagent-presentation/dummyagent-presentation.component'
 
 import { EnginesTableComponent } from './engines-table/engines-table.component'
+import { EngineSortingComponent } from './engine-sorting/engine-sorting.component'
 import { EngineDetailComponent } from './engine-detail/engine-detail.component'
 import { EnginePresentationComponent } from './engine-presentation/engine-presentation.component'
 
 import { EventsTableComponent } from './events-table/events-table.component'
+import { EventSortingComponent } from './event-sorting/event-sorting.component'
 import { EventDetailComponent } from './event-detail/event-detail.component'
 import { EventPresentationComponent } from './event-presentation/event-presentation.component'
 
 import { GongsimCommandsTableComponent } from './gongsimcommands-table/gongsimcommands-table.component'
+import { GongsimCommandSortingComponent } from './gongsimcommand-sorting/gongsimcommand-sorting.component'
 import { GongsimCommandDetailComponent } from './gongsimcommand-detail/gongsimcommand-detail.component'
 import { GongsimCommandPresentationComponent } from './gongsimcommand-presentation/gongsimcommand-presentation.component'
 
 import { GongsimStatussTableComponent } from './gongsimstatuss-table/gongsimstatuss-table.component'
+import { GongsimStatusSortingComponent } from './gongsimstatus-sorting/gongsimstatus-sorting.component'
 import { GongsimStatusDetailComponent } from './gongsimstatus-detail/gongsimstatus-detail.component'
 import { GongsimStatusPresentationComponent } from './gongsimstatus-presentation/gongsimstatus-presentation.component'
 
 import { UpdateStatesTableComponent } from './updatestates-table/updatestates-table.component'
+import { UpdateStateSortingComponent } from './updatestate-sorting/updatestate-sorting.component'
 import { UpdateStateDetailComponent } from './updatestate-detail/updatestate-detail.component'
 import { UpdateStatePresentationComponent } from './updatestate-presentation/updatestate-presentation.component'
 
@@ -60,26 +67,32 @@ import { UpdateStatePresentationComponent } from './updatestate-presentation/upd
 	declarations: [
 		// insertion point for declarations 
 		DummyAgentsTableComponent,
+		DummyAgentSortingComponent,
 		DummyAgentDetailComponent,
 		DummyAgentPresentationComponent,
 
 		EnginesTableComponent,
+		EngineSortingComponent,
 		EngineDetailComponent,
 		EnginePresentationComponent,
 
 		EventsTableComponent,
+		EventSortingComponent,
 		EventDetailComponent,
 		EventPresentationComponent,
 
 		GongsimCommandsTableComponent,
+		GongsimCommandSortingComponent,
 		GongsimCommandDetailComponent,
 		GongsimCommandPresentationComponent,
 
 		GongsimStatussTableComponent,
+		GongsimStatusSortingComponent,
 		GongsimStatusDetailComponent,
 		GongsimStatusPresentationComponent,
 
 		UpdateStatesTableComponent,
+		UpdateStateSortingComponent,
 		UpdateStateDetailComponent,
 		UpdateStatePresentationComponent,
 
@@ -112,32 +125,39 @@ import { UpdateStatePresentationComponent } from './updatestate-presentation/upd
 		MatDialogModule,
 		MatGridListModule,
 		MatTreeModule,
+		DragDropModule,
 
 		AngularSplitModule,
 	],
 	exports: [
 		// insertion point for declarations 
 		DummyAgentsTableComponent,
+		DummyAgentSortingComponent,
 		DummyAgentDetailComponent,
 		DummyAgentPresentationComponent,
 
 		EnginesTableComponent,
+		EngineSortingComponent,
 		EngineDetailComponent,
 		EnginePresentationComponent,
 
 		EventsTableComponent,
+		EventSortingComponent,
 		EventDetailComponent,
 		EventPresentationComponent,
 
 		GongsimCommandsTableComponent,
+		GongsimCommandSortingComponent,
 		GongsimCommandDetailComponent,
 		GongsimCommandPresentationComponent,
 
 		GongsimStatussTableComponent,
+		GongsimStatusSortingComponent,
 		GongsimStatusDetailComponent,
 		GongsimStatusPresentationComponent,
 
 		UpdateStatesTableComponent,
+		UpdateStateSortingComponent,
 		UpdateStateDetailComponent,
 		UpdateStatePresentationComponent,
 
