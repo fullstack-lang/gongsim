@@ -98,7 +98,6 @@ export class EventsTableComponent implements OnInit {
     this.frontRepoService.pull().subscribe(
       frontRepo => {
         this.frontRepo = frontRepo
-        console.log("front repo pull returned")
 
         this.events = this.frontRepo.Events_array;
 
@@ -143,8 +142,6 @@ export class EventsTableComponent implements OnInit {
     this.eventService.deleteEvent(eventID).subscribe(
       event => {
         this.eventService.EventServiceChanged.next("delete")
-
-        console.log("event deleted")
       }
     );
   }
@@ -206,7 +203,6 @@ export class EventsTableComponent implements OnInit {
     // from selection, set event that belong to event through Anarrayofb
     this.selection.selected.forEach(
       event => {
-        console.log("selection ID " + event.ID)
         let ID = +this.dialogData.ID
         event[this.dialogData.ReversePointer].Int64 = ID
         event[this.dialogData.ReversePointer].Valid = true
@@ -220,7 +216,6 @@ export class EventsTableComponent implements OnInit {
         this.eventService.updateEvent(event)
           .subscribe(event => {
             this.eventService.EventServiceChanged.next("update")
-            console.log("event saved")
           });
       }
     )

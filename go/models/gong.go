@@ -29,7 +29,7 @@ type StageStruct struct { // insertion point for definition of arrays registerin
 	AllModelsStructDeleteCallback AllModelsStructDeleteInterface
 
 	BackRepo BackRepoInterface
-	
+
 	// if set will be called before each commit to the back repo
 	OnInitCommitCallback OnInitCommitInterface
 }
@@ -41,6 +41,8 @@ type OnInitCommitInterface interface {
 type BackRepoInterface interface {
 	Commit(stage *StageStruct)
 	Checkout(stage *StageStruct)
+	Backup(stage *StageStruct, dirPath string)
+	Restore(stage *StageStruct, dirPath string)
 	// insertion point for Commit and Checkout signatures
 	CommitDummyAgent(dummyagent *DummyAgent)
 	CheckoutDummyAgent(dummyagent *DummyAgent)
@@ -82,6 +84,21 @@ func (stage *StageStruct) Commit() {
 func (stage *StageStruct) Checkout() {
 	if stage.BackRepo != nil {
 		stage.BackRepo.Checkout(stage)
+	}
+}
+
+// backup generates backup files in the dirPath
+func (stage *StageStruct) Backup(dirPath string) {
+	if stage.BackRepo != nil {
+		stage.BackRepo.Backup(stage, dirPath)
+	}
+}
+
+// Restore resets Stage & BackRepo and restores their content from the restore files in dirPath
+// Restore shall be performed only on a new database with rowids at 0 (otherwise, it will panic)
+func (stage *StageStruct) Restore(dirPath string) {
+	if stage.BackRepo != nil {
+		stage.BackRepo.Restore(stage, dirPath)
 	}
 }
 
@@ -701,11 +718,17 @@ type AllModelsStructDeleteInterface interface { // insertion point for Callbacks
 
 func (stage *StageStruct) Reset() { // insertion point for array reset
 	stage.DummyAgents = make(map[*DummyAgent]struct{}, 0)
+
 	stage.Engines = make(map[*Engine]struct{}, 0)
+
 	stage.Events = make(map[*Event]struct{}, 0)
+
 	stage.GongsimCommands = make(map[*GongsimCommand]struct{}, 0)
+
 	stage.GongsimStatuss = make(map[*GongsimStatus]struct{}, 0)
+
 	stage.UpdateStates = make(map[*UpdateState]struct{}, 0)
+
 }
 
 func (stage *StageStruct) Nil() { // insertion point for array nil

@@ -3,9 +3,13 @@ package orm
 
 import (
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"log"
+	"os"
+	"path/filepath"
 	"sort"
 	"time"
 
@@ -27,9 +31,30 @@ var dummy_UpdateState_sort sort.Float64Slice
 //
 // swagger:model updatestateAPI
 type UpdateStateAPI struct {
+	gorm.Model
+
 	models.UpdateState
 
-	// insertion for fields declaration
+	// encoding of pointers
+	UpdateStatePointersEnconding
+}
+
+// UpdateStatePointersEnconding encodes pointers to Struct and
+// reverse pointers of slice of poitners to Struct
+type UpdateStatePointersEnconding struct {
+	// insertion for pointer fields encoding declaration
+}
+
+// UpdateStateDB describes a updatestate in the database
+//
+// It incorporates the GORM ID, basic fields from the model (because they can be serialized),
+// the encoded version of pointers
+//
+// swagger:model updatestateDB
+type UpdateStateDB struct {
+	gorm.Model
+
+	// insertion for basic fields declaration
 	// Declation for basic field updatestateDB.Name {{BasicKind}} (to be completed)
 	Name_Data sql.NullString
 
@@ -39,18 +64,8 @@ type UpdateStateAPI struct {
 	// Declation for basic field updatestateDB.Period {{BasicKind}} (to be completed)
 	Period_Data sql.NullInt64
 
-	// end of insertion
-}
-
-// UpdateStateDB describes a updatestate in the database
-//
-// It incorporates all fields : from the model, from the generated field for the API and the GORM ID
-//
-// swagger:model updatestateDB
-type UpdateStateDB struct {
-	gorm.Model
-
-	UpdateStateAPI
+	// encoding of pointers
+	UpdateStatePointersEnconding
 }
 
 // UpdateStateDBs arrays updatestateDBs
@@ -74,6 +89,13 @@ type BackRepoUpdateStateStruct struct {
 	Map_UpdateStateDBID_UpdateStatePtr *map[uint]*models.UpdateState
 
 	db *gorm.DB
+}
+
+// GetUpdateStateDBFromUpdateStatePtr is a handy function to access the back repo instance from the stage instance
+func (backRepoUpdateState *BackRepoUpdateStateStruct) GetUpdateStateDBFromUpdateStatePtr(updatestate *models.UpdateState) (updatestateDB *UpdateStateDB) {
+	id := (*backRepoUpdateState.Map_UpdateStatePtr_UpdateStateDBID)[updatestate]
+	updatestateDB = (*backRepoUpdateState.Map_UpdateStateDBID_UpdateStateDB)[id]
+	return
 }
 
 // BackRepoUpdateState.Init set up the BackRepo of the UpdateState
@@ -157,7 +179,7 @@ func (backRepoUpdateState *BackRepoUpdateStateStruct) CommitPhaseOneInstance(upd
 
 	// initiate updatestate
 	var updatestateDB UpdateStateDB
-	updatestateDB.UpdateState = *updatestate
+	updatestateDB.CopyBasicFieldsFromUpdateState(updatestate)
 
 	query := backRepoUpdateState.db.Create(&updatestateDB)
 	if query.Error != nil {
@@ -190,20 +212,9 @@ func (backRepoUpdateState *BackRepoUpdateStateStruct) CommitPhaseTwoInstance(bac
 	// fetch matching updatestateDB
 	if updatestateDB, ok := (*backRepoUpdateState.Map_UpdateStateDBID_UpdateStateDB)[idx]; ok {
 
-		{
-			{
-				// insertion point for fields commit
-				updatestateDB.Name_Data.String = updatestate.Name
-				updatestateDB.Name_Data.Valid = true
+		updatestateDB.CopyBasicFieldsFromUpdateState(updatestate)
 
-				updatestateDB.Duration_Data.Int64 = int64(updatestate.Duration)
-				updatestateDB.Duration_Data.Valid = true
-
-				updatestateDB.Period_Data.Int64 = int64(updatestate.Period)
-				updatestateDB.Period_Data.Valid = true
-
-			}
-		}
+		// insertion point for translating pointers encodings into actual pointers
 		query := backRepoUpdateState.db.Save(&updatestateDB)
 		if query.Error != nil {
 			return query.Error
@@ -244,18 +255,23 @@ func (backRepoUpdateState *BackRepoUpdateStateStruct) CheckoutPhaseOne() (Error 
 // models version of the updatestateDB
 func (backRepoUpdateState *BackRepoUpdateStateStruct) CheckoutPhaseOneInstance(updatestateDB *UpdateStateDB) (Error error) {
 
-	// if absent, create entries in the backRepoUpdateState maps.
-	updatestateWithNewFieldValues := updatestateDB.UpdateState
-	if _, ok := (*backRepoUpdateState.Map_UpdateStateDBID_UpdateStatePtr)[updatestateDB.ID]; !ok {
+	updatestate, ok := (*backRepoUpdateState.Map_UpdateStateDBID_UpdateStatePtr)[updatestateDB.ID]
+	if !ok {
+		updatestate = new(models.UpdateState)
 
-		(*backRepoUpdateState.Map_UpdateStateDBID_UpdateStatePtr)[updatestateDB.ID] = &updatestateWithNewFieldValues
-		(*backRepoUpdateState.Map_UpdateStatePtr_UpdateStateDBID)[&updatestateWithNewFieldValues] = updatestateDB.ID
+		(*backRepoUpdateState.Map_UpdateStateDBID_UpdateStatePtr)[updatestateDB.ID] = updatestate
+		(*backRepoUpdateState.Map_UpdateStatePtr_UpdateStateDBID)[updatestate] = updatestateDB.ID
 
 		// append model store with the new element
-		updatestateWithNewFieldValues.Stage()
+		updatestate.Stage()
 	}
-	updatestateDBWithNewFieldValues := *updatestateDB
-	(*backRepoUpdateState.Map_UpdateStateDBID_UpdateStateDB)[updatestateDB.ID] = &updatestateDBWithNewFieldValues
+	updatestateDB.CopyBasicFieldsToUpdateState(updatestate)
+
+	// preserve pointer to aclassDB. Otherwise, pointer will is recycled and the map of pointers
+	// Map_UpdateStateDBID_UpdateStateDB)[updatestateDB hold variable pointers
+	updatestateDB_Data := *updatestateDB
+	preservedPtrToUpdateState := &updatestateDB_Data
+	(*backRepoUpdateState.Map_UpdateStateDBID_UpdateStateDB)[updatestateDB.ID] = preservedPtrToUpdateState
 
 	return
 }
@@ -277,18 +293,8 @@ func (backRepoUpdateState *BackRepoUpdateStateStruct) CheckoutPhaseTwoInstance(b
 
 	updatestate := (*backRepoUpdateState.Map_UpdateStateDBID_UpdateStatePtr)[updatestateDB.ID]
 	_ = updatestate // sometimes, there is no code generated. This lines voids the "unused variable" compilation error
-	{
-		{
-			// insertion point for checkout, i.e. update of fields of stage instance from fields of back repo instances
-			//
-			updatestate.Name = updatestateDB.Name_Data.String
 
-			updatestate.Duration = time.Duration(updatestateDB.Duration_Data.Int64)
-
-			updatestate.Period = time.Duration(updatestateDB.Period_Data.Int64)
-
-		}
-	}
+	// insertion point for checkout of pointer encoding
 	return
 }
 
@@ -315,5 +321,92 @@ func (backRepo *BackRepoStruct) CheckoutUpdateState(updatestate *models.UpdateSt
 			backRepo.BackRepoUpdateState.CheckoutPhaseOneInstance(&updatestateDB)
 			backRepo.BackRepoUpdateState.CheckoutPhaseTwoInstance(backRepo, &updatestateDB)
 		}
+	}
+}
+
+// CopyBasicFieldsToUpdateStateDB is used to copy basic fields between the Stage or the CRUD to the back repo
+func (updatestateDB *UpdateStateDB) CopyBasicFieldsFromUpdateState(updatestate *models.UpdateState) {
+	// insertion point for fields commit
+	updatestateDB.Name_Data.String = updatestate.Name
+	updatestateDB.Name_Data.Valid = true
+
+	updatestateDB.Duration_Data.Int64 = int64(updatestate.Duration)
+	updatestateDB.Duration_Data.Valid = true
+
+	updatestateDB.Period_Data.Int64 = int64(updatestate.Period)
+	updatestateDB.Period_Data.Valid = true
+
+}
+
+// CopyBasicFieldsToUpdateStateDB is used to copy basic fields between the Stage or the CRUD to the back repo
+func (updatestateDB *UpdateStateDB) CopyBasicFieldsToUpdateState(updatestate *models.UpdateState) {
+
+	// insertion point for checkout of basic fields (back repo to stage)
+	updatestate.Name = updatestateDB.Name_Data.String
+	updatestate.Duration = time.Duration(updatestateDB.Duration_Data.Int64)
+	updatestate.Period = time.Duration(updatestateDB.Period_Data.Int64)
+}
+
+// Backup generates a json file from a slice of all UpdateStateDB instances in the backrepo
+func (backRepoUpdateState *BackRepoUpdateStateStruct) Backup(dirPath string) {
+
+	filename := filepath.Join(dirPath, "UpdateStateDB.json")
+
+	// organize the map into an array with increasing IDs, in order to have repoductible
+	// backup file
+	var forBackup []*UpdateStateDB
+	for _, updatestateDB := range *backRepoUpdateState.Map_UpdateStateDBID_UpdateStateDB {
+		forBackup = append(forBackup, updatestateDB)
+	}
+
+	sort.Slice(forBackup[:], func(i, j int) bool {
+		return forBackup[i].ID < forBackup[j].ID
+	})
+
+	file, err := json.MarshalIndent(forBackup, "", " ")
+
+	if err != nil {
+		log.Panic("Cannot json UpdateState ", filename, " ", err.Error())
+	}
+
+	err = ioutil.WriteFile(filename, file, 0644)
+	if err != nil {
+		log.Panic("Cannot write the json UpdateState file", err.Error())
+	}
+}
+
+func (backRepoUpdateState *BackRepoUpdateStateStruct) Restore(dirPath string) {
+
+	filename := filepath.Join(dirPath, "UpdateStateDB.json")
+	jsonFile, err := os.Open(filename)
+	// if we os.Open returns an error then handle it
+	if err != nil {
+		log.Panic("Cannot restore/open the json UpdateState file", filename, " ", err.Error())
+	}
+
+	// read our opened jsonFile as a byte array.
+	byteValue, _ := ioutil.ReadAll(jsonFile)
+
+	var forRestore []*UpdateStateDB
+
+	err = json.Unmarshal(byteValue, &forRestore)
+
+	// fill up Map_UpdateStateDBID_UpdateStateDB
+	for _, updatestateDB := range forRestore {
+
+		updatestateDB_ID := updatestateDB.ID
+		updatestateDB.ID = 0
+		query := backRepoUpdateState.db.Create(updatestateDB)
+		if query.Error != nil {
+			log.Panic(query.Error)
+		}
+		if updatestateDB_ID != updatestateDB.ID {
+			log.Panicf("ID of UpdateState restore ID %d, name %s, has wrong ID %d in DB after create",
+				updatestateDB_ID, updatestateDB.Name_Data.String, updatestateDB.ID)
+		}
+	}
+
+	if err != nil {
+		log.Panic("Cannot restore/unmarshall json UpdateState file", err.Error())
 	}
 }

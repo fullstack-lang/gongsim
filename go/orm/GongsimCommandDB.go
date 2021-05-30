@@ -3,9 +3,13 @@ package orm
 
 import (
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"log"
+	"os"
+	"path/filepath"
 	"sort"
 	"time"
 
@@ -27,9 +31,30 @@ var dummy_GongsimCommand_sort sort.Float64Slice
 //
 // swagger:model gongsimcommandAPI
 type GongsimCommandAPI struct {
+	gorm.Model
+
 	models.GongsimCommand
 
-	// insertion for fields declaration
+	// encoding of pointers
+	GongsimCommandPointersEnconding
+}
+
+// GongsimCommandPointersEnconding encodes pointers to Struct and
+// reverse pointers of slice of poitners to Struct
+type GongsimCommandPointersEnconding struct {
+	// insertion for pointer fields encoding declaration
+}
+
+// GongsimCommandDB describes a gongsimcommand in the database
+//
+// It incorporates the GORM ID, basic fields from the model (because they can be serialized),
+// the encoded version of pointers
+//
+// swagger:model gongsimcommandDB
+type GongsimCommandDB struct {
+	gorm.Model
+
+	// insertion for basic fields declaration
 	// Declation for basic field gongsimcommandDB.Name {{BasicKind}} (to be completed)
 	Name_Data sql.NullString
 
@@ -45,18 +70,8 @@ type GongsimCommandAPI struct {
 	// Declation for basic field gongsimcommandDB.DateSpeedCommand {{BasicKind}} (to be completed)
 	DateSpeedCommand_Data sql.NullString
 
-	// end of insertion
-}
-
-// GongsimCommandDB describes a gongsimcommand in the database
-//
-// It incorporates all fields : from the model, from the generated field for the API and the GORM ID
-//
-// swagger:model gongsimcommandDB
-type GongsimCommandDB struct {
-	gorm.Model
-
-	GongsimCommandAPI
+	// encoding of pointers
+	GongsimCommandPointersEnconding
 }
 
 // GongsimCommandDBs arrays gongsimcommandDBs
@@ -80,6 +95,13 @@ type BackRepoGongsimCommandStruct struct {
 	Map_GongsimCommandDBID_GongsimCommandPtr *map[uint]*models.GongsimCommand
 
 	db *gorm.DB
+}
+
+// GetGongsimCommandDBFromGongsimCommandPtr is a handy function to access the back repo instance from the stage instance
+func (backRepoGongsimCommand *BackRepoGongsimCommandStruct) GetGongsimCommandDBFromGongsimCommandPtr(gongsimcommand *models.GongsimCommand) (gongsimcommandDB *GongsimCommandDB) {
+	id := (*backRepoGongsimCommand.Map_GongsimCommandPtr_GongsimCommandDBID)[gongsimcommand]
+	gongsimcommandDB = (*backRepoGongsimCommand.Map_GongsimCommandDBID_GongsimCommandDB)[id]
+	return
 }
 
 // BackRepoGongsimCommand.Init set up the BackRepo of the GongsimCommand
@@ -163,7 +185,7 @@ func (backRepoGongsimCommand *BackRepoGongsimCommandStruct) CommitPhaseOneInstan
 
 	// initiate gongsimcommand
 	var gongsimcommandDB GongsimCommandDB
-	gongsimcommandDB.GongsimCommand = *gongsimcommand
+	gongsimcommandDB.CopyBasicFieldsFromGongsimCommand(gongsimcommand)
 
 	query := backRepoGongsimCommand.db.Create(&gongsimcommandDB)
 	if query.Error != nil {
@@ -196,26 +218,9 @@ func (backRepoGongsimCommand *BackRepoGongsimCommandStruct) CommitPhaseTwoInstan
 	// fetch matching gongsimcommandDB
 	if gongsimcommandDB, ok := (*backRepoGongsimCommand.Map_GongsimCommandDBID_GongsimCommandDB)[idx]; ok {
 
-		{
-			{
-				// insertion point for fields commit
-				gongsimcommandDB.Name_Data.String = gongsimcommand.Name
-				gongsimcommandDB.Name_Data.Valid = true
+		gongsimcommandDB.CopyBasicFieldsFromGongsimCommand(gongsimcommand)
 
-				gongsimcommandDB.Command_Data.String = string(gongsimcommand.Command)
-				gongsimcommandDB.Command_Data.Valid = true
-
-				gongsimcommandDB.CommandDate_Data.String = gongsimcommand.CommandDate
-				gongsimcommandDB.CommandDate_Data.Valid = true
-
-				gongsimcommandDB.SpeedCommandType_Data.String = string(gongsimcommand.SpeedCommandType)
-				gongsimcommandDB.SpeedCommandType_Data.Valid = true
-
-				gongsimcommandDB.DateSpeedCommand_Data.String = gongsimcommand.DateSpeedCommand
-				gongsimcommandDB.DateSpeedCommand_Data.Valid = true
-
-			}
-		}
+		// insertion point for translating pointers encodings into actual pointers
 		query := backRepoGongsimCommand.db.Save(&gongsimcommandDB)
 		if query.Error != nil {
 			return query.Error
@@ -256,18 +261,23 @@ func (backRepoGongsimCommand *BackRepoGongsimCommandStruct) CheckoutPhaseOne() (
 // models version of the gongsimcommandDB
 func (backRepoGongsimCommand *BackRepoGongsimCommandStruct) CheckoutPhaseOneInstance(gongsimcommandDB *GongsimCommandDB) (Error error) {
 
-	// if absent, create entries in the backRepoGongsimCommand maps.
-	gongsimcommandWithNewFieldValues := gongsimcommandDB.GongsimCommand
-	if _, ok := (*backRepoGongsimCommand.Map_GongsimCommandDBID_GongsimCommandPtr)[gongsimcommandDB.ID]; !ok {
+	gongsimcommand, ok := (*backRepoGongsimCommand.Map_GongsimCommandDBID_GongsimCommandPtr)[gongsimcommandDB.ID]
+	if !ok {
+		gongsimcommand = new(models.GongsimCommand)
 
-		(*backRepoGongsimCommand.Map_GongsimCommandDBID_GongsimCommandPtr)[gongsimcommandDB.ID] = &gongsimcommandWithNewFieldValues
-		(*backRepoGongsimCommand.Map_GongsimCommandPtr_GongsimCommandDBID)[&gongsimcommandWithNewFieldValues] = gongsimcommandDB.ID
+		(*backRepoGongsimCommand.Map_GongsimCommandDBID_GongsimCommandPtr)[gongsimcommandDB.ID] = gongsimcommand
+		(*backRepoGongsimCommand.Map_GongsimCommandPtr_GongsimCommandDBID)[gongsimcommand] = gongsimcommandDB.ID
 
 		// append model store with the new element
-		gongsimcommandWithNewFieldValues.Stage()
+		gongsimcommand.Stage()
 	}
-	gongsimcommandDBWithNewFieldValues := *gongsimcommandDB
-	(*backRepoGongsimCommand.Map_GongsimCommandDBID_GongsimCommandDB)[gongsimcommandDB.ID] = &gongsimcommandDBWithNewFieldValues
+	gongsimcommandDB.CopyBasicFieldsToGongsimCommand(gongsimcommand)
+
+	// preserve pointer to aclassDB. Otherwise, pointer will is recycled and the map of pointers
+	// Map_GongsimCommandDBID_GongsimCommandDB)[gongsimcommandDB hold variable pointers
+	gongsimcommandDB_Data := *gongsimcommandDB
+	preservedPtrToGongsimCommand := &gongsimcommandDB_Data
+	(*backRepoGongsimCommand.Map_GongsimCommandDBID_GongsimCommandDB)[gongsimcommandDB.ID] = preservedPtrToGongsimCommand
 
 	return
 }
@@ -289,22 +299,8 @@ func (backRepoGongsimCommand *BackRepoGongsimCommandStruct) CheckoutPhaseTwoInst
 
 	gongsimcommand := (*backRepoGongsimCommand.Map_GongsimCommandDBID_GongsimCommandPtr)[gongsimcommandDB.ID]
 	_ = gongsimcommand // sometimes, there is no code generated. This lines voids the "unused variable" compilation error
-	{
-		{
-			// insertion point for checkout, i.e. update of fields of stage instance from fields of back repo instances
-			//
-			gongsimcommand.Name = gongsimcommandDB.Name_Data.String
 
-			gongsimcommand.Command = models.GongsimCommandType(gongsimcommandDB.Command_Data.String)
-
-			gongsimcommand.CommandDate = gongsimcommandDB.CommandDate_Data.String
-
-			gongsimcommand.SpeedCommandType = models.SpeedCommandType(gongsimcommandDB.SpeedCommandType_Data.String)
-
-			gongsimcommand.DateSpeedCommand = gongsimcommandDB.DateSpeedCommand_Data.String
-
-		}
-	}
+	// insertion point for checkout of pointer encoding
 	return
 }
 
@@ -331,5 +327,100 @@ func (backRepo *BackRepoStruct) CheckoutGongsimCommand(gongsimcommand *models.Go
 			backRepo.BackRepoGongsimCommand.CheckoutPhaseOneInstance(&gongsimcommandDB)
 			backRepo.BackRepoGongsimCommand.CheckoutPhaseTwoInstance(backRepo, &gongsimcommandDB)
 		}
+	}
+}
+
+// CopyBasicFieldsToGongsimCommandDB is used to copy basic fields between the Stage or the CRUD to the back repo
+func (gongsimcommandDB *GongsimCommandDB) CopyBasicFieldsFromGongsimCommand(gongsimcommand *models.GongsimCommand) {
+	// insertion point for fields commit
+	gongsimcommandDB.Name_Data.String = gongsimcommand.Name
+	gongsimcommandDB.Name_Data.Valid = true
+
+	gongsimcommandDB.Command_Data.String = string(gongsimcommand.Command)
+	gongsimcommandDB.Command_Data.Valid = true
+
+	gongsimcommandDB.CommandDate_Data.String = gongsimcommand.CommandDate
+	gongsimcommandDB.CommandDate_Data.Valid = true
+
+	gongsimcommandDB.SpeedCommandType_Data.String = string(gongsimcommand.SpeedCommandType)
+	gongsimcommandDB.SpeedCommandType_Data.Valid = true
+
+	gongsimcommandDB.DateSpeedCommand_Data.String = gongsimcommand.DateSpeedCommand
+	gongsimcommandDB.DateSpeedCommand_Data.Valid = true
+
+}
+
+// CopyBasicFieldsToGongsimCommandDB is used to copy basic fields between the Stage or the CRUD to the back repo
+func (gongsimcommandDB *GongsimCommandDB) CopyBasicFieldsToGongsimCommand(gongsimcommand *models.GongsimCommand) {
+
+	// insertion point for checkout of basic fields (back repo to stage)
+	gongsimcommand.Name = gongsimcommandDB.Name_Data.String
+	gongsimcommand.Command = models.GongsimCommandType(gongsimcommandDB.Command_Data.String)
+	gongsimcommand.CommandDate = gongsimcommandDB.CommandDate_Data.String
+	gongsimcommand.SpeedCommandType = models.SpeedCommandType(gongsimcommandDB.SpeedCommandType_Data.String)
+	gongsimcommand.DateSpeedCommand = gongsimcommandDB.DateSpeedCommand_Data.String
+}
+
+// Backup generates a json file from a slice of all GongsimCommandDB instances in the backrepo
+func (backRepoGongsimCommand *BackRepoGongsimCommandStruct) Backup(dirPath string) {
+
+	filename := filepath.Join(dirPath, "GongsimCommandDB.json")
+
+	// organize the map into an array with increasing IDs, in order to have repoductible
+	// backup file
+	var forBackup []*GongsimCommandDB
+	for _, gongsimcommandDB := range *backRepoGongsimCommand.Map_GongsimCommandDBID_GongsimCommandDB {
+		forBackup = append(forBackup, gongsimcommandDB)
+	}
+
+	sort.Slice(forBackup[:], func(i, j int) bool {
+		return forBackup[i].ID < forBackup[j].ID
+	})
+
+	file, err := json.MarshalIndent(forBackup, "", " ")
+
+	if err != nil {
+		log.Panic("Cannot json GongsimCommand ", filename, " ", err.Error())
+	}
+
+	err = ioutil.WriteFile(filename, file, 0644)
+	if err != nil {
+		log.Panic("Cannot write the json GongsimCommand file", err.Error())
+	}
+}
+
+func (backRepoGongsimCommand *BackRepoGongsimCommandStruct) Restore(dirPath string) {
+
+	filename := filepath.Join(dirPath, "GongsimCommandDB.json")
+	jsonFile, err := os.Open(filename)
+	// if we os.Open returns an error then handle it
+	if err != nil {
+		log.Panic("Cannot restore/open the json GongsimCommand file", filename, " ", err.Error())
+	}
+
+	// read our opened jsonFile as a byte array.
+	byteValue, _ := ioutil.ReadAll(jsonFile)
+
+	var forRestore []*GongsimCommandDB
+
+	err = json.Unmarshal(byteValue, &forRestore)
+
+	// fill up Map_GongsimCommandDBID_GongsimCommandDB
+	for _, gongsimcommandDB := range forRestore {
+
+		gongsimcommandDB_ID := gongsimcommandDB.ID
+		gongsimcommandDB.ID = 0
+		query := backRepoGongsimCommand.db.Create(gongsimcommandDB)
+		if query.Error != nil {
+			log.Panic(query.Error)
+		}
+		if gongsimcommandDB_ID != gongsimcommandDB.ID {
+			log.Panicf("ID of GongsimCommand restore ID %d, name %s, has wrong ID %d in DB after create",
+				gongsimcommandDB_ID, gongsimcommandDB.Name_Data.String, gongsimcommandDB.ID)
+		}
+	}
+
+	if err != nil {
+		log.Panic("Cannot restore/unmarshall json GongsimCommand file", err.Error())
 	}
 }

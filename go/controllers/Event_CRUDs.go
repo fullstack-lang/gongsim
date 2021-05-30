@@ -49,8 +49,9 @@ type EventInput struct {
 func GetEvents(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
 
-	var events []orm.EventDB
-	query := db.Find(&events)
+	// source slice
+	var eventDBs []orm.EventDB
+	query := db.Find(&eventDBs)
 	if query.Error != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
@@ -59,22 +60,23 @@ func GetEvents(c *gin.Context) {
 		return
 	}
 
+	// slice that will be transmitted to the front
+	var eventAPIs []orm.EventAPI
+
 	// for each event, update fields from the database nullable fields
-	for idx := range events {
-		event := &events[idx]
-		_ = event
+	for idx := range eventDBs {
+		eventDB := &eventDBs[idx]
+		_ = eventDB
+		var eventAPI orm.EventAPI
+
 		// insertion point for updating fields
-		if event.Name_Data.Valid {
-			event.Name = event.Name_Data.String
-		}
-
-		if event.Duration_Data.Valid {
-			event.Duration = time.Duration(event.Duration_Data.Int64)
-		}
-
+		eventAPI.ID = eventDB.ID
+		eventDB.CopyBasicFieldsToEvent(&eventAPI.Event)
+		eventAPI.EventPointersEnconding = eventDB.EventPointersEnconding
+		eventAPIs = append(eventAPIs, eventAPI)
 	}
 
-	c.JSON(http.StatusOK, events)
+	c.JSON(http.StatusOK, eventAPIs)
 }
 
 // PostEvent
@@ -107,13 +109,8 @@ func PostEvent(c *gin.Context) {
 
 	// Create event
 	eventDB := orm.EventDB{}
-	eventDB.EventAPI = input
-	// insertion point for nullable field set
-	eventDB.Name_Data.String = input.Name
-	eventDB.Name_Data.Valid = true
-
-	eventDB.Duration_Data.Int64 = int64(input.Duration)
-	eventDB.Duration_Data.Valid = true
+	eventDB.EventPointersEnconding = input.EventPointersEnconding
+	eventDB.CopyBasicFieldsFromEvent(&input.Event)
 
 	query := db.Create(&eventDB)
 	if query.Error != nil {
@@ -143,9 +140,9 @@ func PostEvent(c *gin.Context) {
 func GetEvent(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
 
-	// Get event in DB
-	var event orm.EventDB
-	if err := db.First(&event, c.Param("id")).Error; err != nil {
+	// Get eventDB in DB
+	var eventDB orm.EventDB
+	if err := db.First(&eventDB, c.Param("id")).Error; err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
 		returnError.Body.Message = err.Error()
@@ -153,16 +150,12 @@ func GetEvent(c *gin.Context) {
 		return
 	}
 
-	// insertion point for fields value set from nullable fields
-	if event.Name_Data.Valid {
-		event.Name = event.Name_Data.String
-	}
+	var eventAPI orm.EventAPI
+	eventAPI.ID = eventDB.ID
+	eventAPI.EventPointersEnconding = eventDB.EventPointersEnconding
+	eventDB.CopyBasicFieldsToEvent(&eventAPI.Event)
 
-	if event.Duration_Data.Valid {
-		event.Duration = time.Duration(event.Duration_Data.Int64)
-	}
-
-	c.JSON(http.StatusOK, event)
+	c.JSON(http.StatusOK, eventAPI)
 }
 
 // UpdateEvent
@@ -199,14 +192,10 @@ func UpdateEvent(c *gin.Context) {
 	}
 
 	// update
-	// insertion point for nullable field set
-	input.Name_Data.String = input.Name
-	input.Name_Data.Valid = true
+	eventDB.CopyBasicFieldsFromEvent(&input.Event)
+	eventDB.EventPointersEnconding = input.EventPointersEnconding
 
-	input.Duration_Data.Int64 = int64(input.Duration)
-	input.Duration_Data.Valid = true
-
-	query = db.Model(&eventDB).Updates(input)
+	query = db.Model(&eventDB).Updates(eventDB)
 	if query.Error != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest

@@ -69,8 +69,6 @@ export class EngineDetailComponent implements OnInit {
 		this.frontRepoService.pull().subscribe(
 			frontRepo => {
 				this.frontRepo = frontRepo
-				console.log("front repo EnginePull returned")
-
 				if (id != 0 && association == undefined) {
 					this.engine = frontRepo.Engines.get(id)
 				} else {
@@ -103,8 +101,6 @@ export class EngineDetailComponent implements OnInit {
 			this.engineService.updateEngine(this.engine)
 				.subscribe(engine => {
 					this.engineService.EngineServiceChanged.next("update")
-
-					console.log("engine saved")
 				});
 		} else {
 			switch (association) {
@@ -115,7 +111,6 @@ export class EngineDetailComponent implements OnInit {
 				this.engineService.EngineServiceChanged.next("post")
 
 				this.engine = {} // reset fields
-				console.log("engine added")
 			});
 		}
 	}
@@ -144,7 +139,6 @@ export class EngineDetailComponent implements OnInit {
 		);
 
 		dialogRef.afterClosed().subscribe(result => {
-			console.log('The dialog was closed');
 		});
 	}
 
@@ -167,7 +161,6 @@ export class EngineDetailComponent implements OnInit {
 		);
 
 		dialogRef.afterClosed().subscribe(result => {
-			console.log('The dialog was closed');
 		});
 	}
 }

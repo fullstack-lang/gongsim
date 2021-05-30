@@ -49,8 +49,9 @@ type UpdateStateInput struct {
 func GetUpdateStates(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
 
-	var updatestates []orm.UpdateStateDB
-	query := db.Find(&updatestates)
+	// source slice
+	var updatestateDBs []orm.UpdateStateDB
+	query := db.Find(&updatestateDBs)
 	if query.Error != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
@@ -59,26 +60,23 @@ func GetUpdateStates(c *gin.Context) {
 		return
 	}
 
+	// slice that will be transmitted to the front
+	var updatestateAPIs []orm.UpdateStateAPI
+
 	// for each updatestate, update fields from the database nullable fields
-	for idx := range updatestates {
-		updatestate := &updatestates[idx]
-		_ = updatestate
+	for idx := range updatestateDBs {
+		updatestateDB := &updatestateDBs[idx]
+		_ = updatestateDB
+		var updatestateAPI orm.UpdateStateAPI
+
 		// insertion point for updating fields
-		if updatestate.Name_Data.Valid {
-			updatestate.Name = updatestate.Name_Data.String
-		}
-
-		if updatestate.Duration_Data.Valid {
-			updatestate.Duration = time.Duration(updatestate.Duration_Data.Int64)
-		}
-
-		if updatestate.Period_Data.Valid {
-			updatestate.Period = time.Duration(updatestate.Period_Data.Int64)
-		}
-
+		updatestateAPI.ID = updatestateDB.ID
+		updatestateDB.CopyBasicFieldsToUpdateState(&updatestateAPI.UpdateState)
+		updatestateAPI.UpdateStatePointersEnconding = updatestateDB.UpdateStatePointersEnconding
+		updatestateAPIs = append(updatestateAPIs, updatestateAPI)
 	}
 
-	c.JSON(http.StatusOK, updatestates)
+	c.JSON(http.StatusOK, updatestateAPIs)
 }
 
 // PostUpdateState
@@ -111,16 +109,8 @@ func PostUpdateState(c *gin.Context) {
 
 	// Create updatestate
 	updatestateDB := orm.UpdateStateDB{}
-	updatestateDB.UpdateStateAPI = input
-	// insertion point for nullable field set
-	updatestateDB.Name_Data.String = input.Name
-	updatestateDB.Name_Data.Valid = true
-
-	updatestateDB.Duration_Data.Int64 = int64(input.Duration)
-	updatestateDB.Duration_Data.Valid = true
-
-	updatestateDB.Period_Data.Int64 = int64(input.Period)
-	updatestateDB.Period_Data.Valid = true
+	updatestateDB.UpdateStatePointersEnconding = input.UpdateStatePointersEnconding
+	updatestateDB.CopyBasicFieldsFromUpdateState(&input.UpdateState)
 
 	query := db.Create(&updatestateDB)
 	if query.Error != nil {
@@ -150,9 +140,9 @@ func PostUpdateState(c *gin.Context) {
 func GetUpdateState(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
 
-	// Get updatestate in DB
-	var updatestate orm.UpdateStateDB
-	if err := db.First(&updatestate, c.Param("id")).Error; err != nil {
+	// Get updatestateDB in DB
+	var updatestateDB orm.UpdateStateDB
+	if err := db.First(&updatestateDB, c.Param("id")).Error; err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
 		returnError.Body.Message = err.Error()
@@ -160,20 +150,12 @@ func GetUpdateState(c *gin.Context) {
 		return
 	}
 
-	// insertion point for fields value set from nullable fields
-	if updatestate.Name_Data.Valid {
-		updatestate.Name = updatestate.Name_Data.String
-	}
+	var updatestateAPI orm.UpdateStateAPI
+	updatestateAPI.ID = updatestateDB.ID
+	updatestateAPI.UpdateStatePointersEnconding = updatestateDB.UpdateStatePointersEnconding
+	updatestateDB.CopyBasicFieldsToUpdateState(&updatestateAPI.UpdateState)
 
-	if updatestate.Duration_Data.Valid {
-		updatestate.Duration = time.Duration(updatestate.Duration_Data.Int64)
-	}
-
-	if updatestate.Period_Data.Valid {
-		updatestate.Period = time.Duration(updatestate.Period_Data.Int64)
-	}
-
-	c.JSON(http.StatusOK, updatestate)
+	c.JSON(http.StatusOK, updatestateAPI)
 }
 
 // UpdateUpdateState
@@ -210,17 +192,10 @@ func UpdateUpdateState(c *gin.Context) {
 	}
 
 	// update
-	// insertion point for nullable field set
-	input.Name_Data.String = input.Name
-	input.Name_Data.Valid = true
+	updatestateDB.CopyBasicFieldsFromUpdateState(&input.UpdateState)
+	updatestateDB.UpdateStatePointersEnconding = input.UpdateStatePointersEnconding
 
-	input.Duration_Data.Int64 = int64(input.Duration)
-	input.Duration_Data.Valid = true
-
-	input.Period_Data.Int64 = int64(input.Period)
-	input.Period_Data.Valid = true
-
-	query = db.Model(&updatestateDB).Updates(input)
+	query = db.Model(&updatestateDB).Updates(updatestateDB)
 	if query.Error != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest

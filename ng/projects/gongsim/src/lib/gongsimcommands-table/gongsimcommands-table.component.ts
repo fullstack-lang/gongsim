@@ -104,7 +104,6 @@ export class GongsimCommandsTableComponent implements OnInit {
     this.frontRepoService.pull().subscribe(
       frontRepo => {
         this.frontRepo = frontRepo
-        console.log("front repo pull returned")
 
         this.gongsimcommands = this.frontRepo.GongsimCommands_array;
 
@@ -142,8 +141,6 @@ export class GongsimCommandsTableComponent implements OnInit {
     this.gongsimcommandService.deleteGongsimCommand(gongsimcommandID).subscribe(
       gongsimcommand => {
         this.gongsimcommandService.GongsimCommandServiceChanged.next("delete")
-
-        console.log("gongsimcommand deleted")
       }
     );
   }
@@ -205,7 +202,6 @@ export class GongsimCommandsTableComponent implements OnInit {
     // from selection, set gongsimcommand that belong to gongsimcommand through Anarrayofb
     this.selection.selected.forEach(
       gongsimcommand => {
-        console.log("selection ID " + gongsimcommand.ID)
         let ID = +this.dialogData.ID
         gongsimcommand[this.dialogData.ReversePointer].Int64 = ID
         gongsimcommand[this.dialogData.ReversePointer].Valid = true
@@ -219,7 +215,6 @@ export class GongsimCommandsTableComponent implements OnInit {
         this.gongsimcommandService.updateGongsimCommand(gongsimcommand)
           .subscribe(gongsimcommand => {
             this.gongsimcommandService.GongsimCommandServiceChanged.next("update")
-            console.log("gongsimcommand saved")
           });
       }
     )

@@ -49,8 +49,9 @@ type GongsimStatusInput struct {
 func GetGongsimStatuss(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
 
-	var gongsimstatuss []orm.GongsimStatusDB
-	query := db.Find(&gongsimstatuss)
+	// source slice
+	var gongsimstatusDBs []orm.GongsimStatusDB
+	query := db.Find(&gongsimstatusDBs)
 	if query.Error != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
@@ -59,34 +60,23 @@ func GetGongsimStatuss(c *gin.Context) {
 		return
 	}
 
+	// slice that will be transmitted to the front
+	var gongsimstatusAPIs []orm.GongsimStatusAPI
+
 	// for each gongsimstatus, update fields from the database nullable fields
-	for idx := range gongsimstatuss {
-		gongsimstatus := &gongsimstatuss[idx]
-		_ = gongsimstatus
+	for idx := range gongsimstatusDBs {
+		gongsimstatusDB := &gongsimstatusDBs[idx]
+		_ = gongsimstatusDB
+		var gongsimstatusAPI orm.GongsimStatusAPI
+
 		// insertion point for updating fields
-		if gongsimstatus.Name_Data.Valid {
-			gongsimstatus.Name = gongsimstatus.Name_Data.String
-		}
-
-		if gongsimstatus.CurrentCommand_Data.Valid {
-			gongsimstatus.CurrentCommand = models.GongsimCommandType(gongsimstatus.CurrentCommand_Data.String)
-		}
-
-		if gongsimstatus.CompletionDate_Data.Valid {
-			gongsimstatus.CompletionDate = gongsimstatus.CompletionDate_Data.String
-		}
-
-		if gongsimstatus.CurrentSpeedCommand_Data.Valid {
-			gongsimstatus.CurrentSpeedCommand = models.SpeedCommandType(gongsimstatus.CurrentSpeedCommand_Data.String)
-		}
-
-		if gongsimstatus.SpeedCommandCompletionDate_Data.Valid {
-			gongsimstatus.SpeedCommandCompletionDate = gongsimstatus.SpeedCommandCompletionDate_Data.String
-		}
-
+		gongsimstatusAPI.ID = gongsimstatusDB.ID
+		gongsimstatusDB.CopyBasicFieldsToGongsimStatus(&gongsimstatusAPI.GongsimStatus)
+		gongsimstatusAPI.GongsimStatusPointersEnconding = gongsimstatusDB.GongsimStatusPointersEnconding
+		gongsimstatusAPIs = append(gongsimstatusAPIs, gongsimstatusAPI)
 	}
 
-	c.JSON(http.StatusOK, gongsimstatuss)
+	c.JSON(http.StatusOK, gongsimstatusAPIs)
 }
 
 // PostGongsimStatus
@@ -119,22 +109,8 @@ func PostGongsimStatus(c *gin.Context) {
 
 	// Create gongsimstatus
 	gongsimstatusDB := orm.GongsimStatusDB{}
-	gongsimstatusDB.GongsimStatusAPI = input
-	// insertion point for nullable field set
-	gongsimstatusDB.Name_Data.String = input.Name
-	gongsimstatusDB.Name_Data.Valid = true
-
-	gongsimstatusDB.CurrentCommand_Data.String = string(input.CurrentCommand)
-	gongsimstatusDB.CurrentCommand_Data.Valid = true
-
-	gongsimstatusDB.CompletionDate_Data.String = input.CompletionDate
-	gongsimstatusDB.CompletionDate_Data.Valid = true
-
-	gongsimstatusDB.CurrentSpeedCommand_Data.String = string(input.CurrentSpeedCommand)
-	gongsimstatusDB.CurrentSpeedCommand_Data.Valid = true
-
-	gongsimstatusDB.SpeedCommandCompletionDate_Data.String = input.SpeedCommandCompletionDate
-	gongsimstatusDB.SpeedCommandCompletionDate_Data.Valid = true
+	gongsimstatusDB.GongsimStatusPointersEnconding = input.GongsimStatusPointersEnconding
+	gongsimstatusDB.CopyBasicFieldsFromGongsimStatus(&input.GongsimStatus)
 
 	query := db.Create(&gongsimstatusDB)
 	if query.Error != nil {
@@ -164,9 +140,9 @@ func PostGongsimStatus(c *gin.Context) {
 func GetGongsimStatus(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
 
-	// Get gongsimstatus in DB
-	var gongsimstatus orm.GongsimStatusDB
-	if err := db.First(&gongsimstatus, c.Param("id")).Error; err != nil {
+	// Get gongsimstatusDB in DB
+	var gongsimstatusDB orm.GongsimStatusDB
+	if err := db.First(&gongsimstatusDB, c.Param("id")).Error; err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
 		returnError.Body.Message = err.Error()
@@ -174,28 +150,12 @@ func GetGongsimStatus(c *gin.Context) {
 		return
 	}
 
-	// insertion point for fields value set from nullable fields
-	if gongsimstatus.Name_Data.Valid {
-		gongsimstatus.Name = gongsimstatus.Name_Data.String
-	}
+	var gongsimstatusAPI orm.GongsimStatusAPI
+	gongsimstatusAPI.ID = gongsimstatusDB.ID
+	gongsimstatusAPI.GongsimStatusPointersEnconding = gongsimstatusDB.GongsimStatusPointersEnconding
+	gongsimstatusDB.CopyBasicFieldsToGongsimStatus(&gongsimstatusAPI.GongsimStatus)
 
-	if gongsimstatus.CurrentCommand_Data.Valid {
-		gongsimstatus.CurrentCommand = models.GongsimCommandType(gongsimstatus.CurrentCommand_Data.String)
-	}
-
-	if gongsimstatus.CompletionDate_Data.Valid {
-		gongsimstatus.CompletionDate = gongsimstatus.CompletionDate_Data.String
-	}
-
-	if gongsimstatus.CurrentSpeedCommand_Data.Valid {
-		gongsimstatus.CurrentSpeedCommand = models.SpeedCommandType(gongsimstatus.CurrentSpeedCommand_Data.String)
-	}
-
-	if gongsimstatus.SpeedCommandCompletionDate_Data.Valid {
-		gongsimstatus.SpeedCommandCompletionDate = gongsimstatus.SpeedCommandCompletionDate_Data.String
-	}
-
-	c.JSON(http.StatusOK, gongsimstatus)
+	c.JSON(http.StatusOK, gongsimstatusAPI)
 }
 
 // UpdateGongsimStatus
@@ -232,23 +192,10 @@ func UpdateGongsimStatus(c *gin.Context) {
 	}
 
 	// update
-	// insertion point for nullable field set
-	input.Name_Data.String = input.Name
-	input.Name_Data.Valid = true
+	gongsimstatusDB.CopyBasicFieldsFromGongsimStatus(&input.GongsimStatus)
+	gongsimstatusDB.GongsimStatusPointersEnconding = input.GongsimStatusPointersEnconding
 
-	input.CurrentCommand_Data.String = string(input.CurrentCommand)
-	input.CurrentCommand_Data.Valid = true
-
-	input.CompletionDate_Data.String = input.CompletionDate
-	input.CompletionDate_Data.Valid = true
-
-	input.CurrentSpeedCommand_Data.String = string(input.CurrentSpeedCommand)
-	input.CurrentSpeedCommand_Data.Valid = true
-
-	input.SpeedCommandCompletionDate_Data.String = input.SpeedCommandCompletionDate
-	input.SpeedCommandCompletionDate_Data.Valid = true
-
-	query = db.Model(&gongsimstatusDB).Updates(input)
+	query = db.Model(&gongsimstatusDB).Updates(gongsimstatusDB)
 	if query.Error != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest

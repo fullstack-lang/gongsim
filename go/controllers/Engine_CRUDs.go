@@ -49,8 +49,9 @@ type EngineInput struct {
 func GetEngines(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
 
-	var engines []orm.EngineDB
-	query := db.Find(&engines)
+	// source slice
+	var engineDBs []orm.EngineDB
+	query := db.Find(&engineDBs)
 	if query.Error != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
@@ -59,46 +60,23 @@ func GetEngines(c *gin.Context) {
 		return
 	}
 
+	// slice that will be transmitted to the front
+	var engineAPIs []orm.EngineAPI
+
 	// for each engine, update fields from the database nullable fields
-	for idx := range engines {
-		engine := &engines[idx]
-		_ = engine
+	for idx := range engineDBs {
+		engineDB := &engineDBs[idx]
+		_ = engineDB
+		var engineAPI orm.EngineAPI
+
 		// insertion point for updating fields
-		if engine.Name_Data.Valid {
-			engine.Name = engine.Name_Data.String
-		}
-
-		if engine.EndTime_Data.Valid {
-			engine.EndTime = engine.EndTime_Data.String
-		}
-
-		if engine.CurrentTime_Data.Valid {
-			engine.CurrentTime = engine.CurrentTime_Data.String
-		}
-
-		if engine.SecondsSinceStart_Data.Valid {
-			engine.SecondsSinceStart = engine.SecondsSinceStart_Data.Float64
-		}
-
-		if engine.Fired_Data.Valid {
-			engine.Fired = int(engine.Fired_Data.Int64)
-		}
-
-		if engine.ControlMode_Data.Valid {
-			engine.ControlMode = models.ControlMode(engine.ControlMode_Data.String)
-		}
-
-		if engine.State_Data.Valid {
-			engine.State = models.EngineState(engine.State_Data.String)
-		}
-
-		if engine.Speed_Data.Valid {
-			engine.Speed = engine.Speed_Data.Float64
-		}
-
+		engineAPI.ID = engineDB.ID
+		engineDB.CopyBasicFieldsToEngine(&engineAPI.Engine)
+		engineAPI.EnginePointersEnconding = engineDB.EnginePointersEnconding
+		engineAPIs = append(engineAPIs, engineAPI)
 	}
 
-	c.JSON(http.StatusOK, engines)
+	c.JSON(http.StatusOK, engineAPIs)
 }
 
 // PostEngine
@@ -131,31 +109,8 @@ func PostEngine(c *gin.Context) {
 
 	// Create engine
 	engineDB := orm.EngineDB{}
-	engineDB.EngineAPI = input
-	// insertion point for nullable field set
-	engineDB.Name_Data.String = input.Name
-	engineDB.Name_Data.Valid = true
-
-	engineDB.EndTime_Data.String = input.EndTime
-	engineDB.EndTime_Data.Valid = true
-
-	engineDB.CurrentTime_Data.String = input.CurrentTime
-	engineDB.CurrentTime_Data.Valid = true
-
-	engineDB.SecondsSinceStart_Data.Float64 = input.SecondsSinceStart
-	engineDB.SecondsSinceStart_Data.Valid = true
-
-	engineDB.Fired_Data.Int64 = int64(input.Fired)
-	engineDB.Fired_Data.Valid = true
-
-	engineDB.ControlMode_Data.String = string(input.ControlMode)
-	engineDB.ControlMode_Data.Valid = true
-
-	engineDB.State_Data.String = string(input.State)
-	engineDB.State_Data.Valid = true
-
-	engineDB.Speed_Data.Float64 = input.Speed
-	engineDB.Speed_Data.Valid = true
+	engineDB.EnginePointersEnconding = input.EnginePointersEnconding
+	engineDB.CopyBasicFieldsFromEngine(&input.Engine)
 
 	query := db.Create(&engineDB)
 	if query.Error != nil {
@@ -185,9 +140,9 @@ func PostEngine(c *gin.Context) {
 func GetEngine(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
 
-	// Get engine in DB
-	var engine orm.EngineDB
-	if err := db.First(&engine, c.Param("id")).Error; err != nil {
+	// Get engineDB in DB
+	var engineDB orm.EngineDB
+	if err := db.First(&engineDB, c.Param("id")).Error; err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
 		returnError.Body.Message = err.Error()
@@ -195,40 +150,12 @@ func GetEngine(c *gin.Context) {
 		return
 	}
 
-	// insertion point for fields value set from nullable fields
-	if engine.Name_Data.Valid {
-		engine.Name = engine.Name_Data.String
-	}
+	var engineAPI orm.EngineAPI
+	engineAPI.ID = engineDB.ID
+	engineAPI.EnginePointersEnconding = engineDB.EnginePointersEnconding
+	engineDB.CopyBasicFieldsToEngine(&engineAPI.Engine)
 
-	if engine.EndTime_Data.Valid {
-		engine.EndTime = engine.EndTime_Data.String
-	}
-
-	if engine.CurrentTime_Data.Valid {
-		engine.CurrentTime = engine.CurrentTime_Data.String
-	}
-
-	if engine.SecondsSinceStart_Data.Valid {
-		engine.SecondsSinceStart = engine.SecondsSinceStart_Data.Float64
-	}
-
-	if engine.Fired_Data.Valid {
-		engine.Fired = int(engine.Fired_Data.Int64)
-	}
-
-	if engine.ControlMode_Data.Valid {
-		engine.ControlMode = models.ControlMode(engine.ControlMode_Data.String)
-	}
-
-	if engine.State_Data.Valid {
-		engine.State = models.EngineState(engine.State_Data.String)
-	}
-
-	if engine.Speed_Data.Valid {
-		engine.Speed = engine.Speed_Data.Float64
-	}
-
-	c.JSON(http.StatusOK, engine)
+	c.JSON(http.StatusOK, engineAPI)
 }
 
 // UpdateEngine
@@ -265,32 +192,10 @@ func UpdateEngine(c *gin.Context) {
 	}
 
 	// update
-	// insertion point for nullable field set
-	input.Name_Data.String = input.Name
-	input.Name_Data.Valid = true
+	engineDB.CopyBasicFieldsFromEngine(&input.Engine)
+	engineDB.EnginePointersEnconding = input.EnginePointersEnconding
 
-	input.EndTime_Data.String = input.EndTime
-	input.EndTime_Data.Valid = true
-
-	input.CurrentTime_Data.String = input.CurrentTime
-	input.CurrentTime_Data.Valid = true
-
-	input.SecondsSinceStart_Data.Float64 = input.SecondsSinceStart
-	input.SecondsSinceStart_Data.Valid = true
-
-	input.Fired_Data.Int64 = int64(input.Fired)
-	input.Fired_Data.Valid = true
-
-	input.ControlMode_Data.String = string(input.ControlMode)
-	input.ControlMode_Data.Valid = true
-
-	input.State_Data.String = string(input.State)
-	input.State_Data.Valid = true
-
-	input.Speed_Data.Float64 = input.Speed
-	input.Speed_Data.Valid = true
-
-	query = db.Model(&engineDB).Updates(input)
+	query = db.Model(&engineDB).Updates(engineDB)
 	if query.Error != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest

@@ -3,9 +3,13 @@ package orm
 
 import (
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"log"
+	"os"
+	"path/filepath"
 	"sort"
 	"time"
 
@@ -27,9 +31,30 @@ var dummy_Engine_sort sort.Float64Slice
 //
 // swagger:model engineAPI
 type EngineAPI struct {
+	gorm.Model
+
 	models.Engine
 
-	// insertion for fields declaration
+	// encoding of pointers
+	EnginePointersEnconding
+}
+
+// EnginePointersEnconding encodes pointers to Struct and
+// reverse pointers of slice of poitners to Struct
+type EnginePointersEnconding struct {
+	// insertion for pointer fields encoding declaration
+}
+
+// EngineDB describes a engine in the database
+//
+// It incorporates the GORM ID, basic fields from the model (because they can be serialized),
+// the encoded version of pointers
+//
+// swagger:model engineDB
+type EngineDB struct {
+	gorm.Model
+
+	// insertion for basic fields declaration
 	// Declation for basic field engineDB.Name {{BasicKind}} (to be completed)
 	Name_Data sql.NullString
 
@@ -54,18 +79,8 @@ type EngineAPI struct {
 	// Declation for basic field engineDB.Speed {{BasicKind}} (to be completed)
 	Speed_Data sql.NullFloat64
 
-	// end of insertion
-}
-
-// EngineDB describes a engine in the database
-//
-// It incorporates all fields : from the model, from the generated field for the API and the GORM ID
-//
-// swagger:model engineDB
-type EngineDB struct {
-	gorm.Model
-
-	EngineAPI
+	// encoding of pointers
+	EnginePointersEnconding
 }
 
 // EngineDBs arrays engineDBs
@@ -89,6 +104,13 @@ type BackRepoEngineStruct struct {
 	Map_EngineDBID_EnginePtr *map[uint]*models.Engine
 
 	db *gorm.DB
+}
+
+// GetEngineDBFromEnginePtr is a handy function to access the back repo instance from the stage instance
+func (backRepoEngine *BackRepoEngineStruct) GetEngineDBFromEnginePtr(engine *models.Engine) (engineDB *EngineDB) {
+	id := (*backRepoEngine.Map_EnginePtr_EngineDBID)[engine]
+	engineDB = (*backRepoEngine.Map_EngineDBID_EngineDB)[id]
+	return
 }
 
 // BackRepoEngine.Init set up the BackRepo of the Engine
@@ -172,7 +194,7 @@ func (backRepoEngine *BackRepoEngineStruct) CommitPhaseOneInstance(engine *model
 
 	// initiate engine
 	var engineDB EngineDB
-	engineDB.Engine = *engine
+	engineDB.CopyBasicFieldsFromEngine(engine)
 
 	query := backRepoEngine.db.Create(&engineDB)
 	if query.Error != nil {
@@ -205,35 +227,9 @@ func (backRepoEngine *BackRepoEngineStruct) CommitPhaseTwoInstance(backRepo *Bac
 	// fetch matching engineDB
 	if engineDB, ok := (*backRepoEngine.Map_EngineDBID_EngineDB)[idx]; ok {
 
-		{
-			{
-				// insertion point for fields commit
-				engineDB.Name_Data.String = engine.Name
-				engineDB.Name_Data.Valid = true
+		engineDB.CopyBasicFieldsFromEngine(engine)
 
-				engineDB.EndTime_Data.String = engine.EndTime
-				engineDB.EndTime_Data.Valid = true
-
-				engineDB.CurrentTime_Data.String = engine.CurrentTime
-				engineDB.CurrentTime_Data.Valid = true
-
-				engineDB.SecondsSinceStart_Data.Float64 = engine.SecondsSinceStart
-				engineDB.SecondsSinceStart_Data.Valid = true
-
-				engineDB.Fired_Data.Int64 = int64(engine.Fired)
-				engineDB.Fired_Data.Valid = true
-
-				engineDB.ControlMode_Data.String = string(engine.ControlMode)
-				engineDB.ControlMode_Data.Valid = true
-
-				engineDB.State_Data.String = string(engine.State)
-				engineDB.State_Data.Valid = true
-
-				engineDB.Speed_Data.Float64 = engine.Speed
-				engineDB.Speed_Data.Valid = true
-
-			}
-		}
+		// insertion point for translating pointers encodings into actual pointers
 		query := backRepoEngine.db.Save(&engineDB)
 		if query.Error != nil {
 			return query.Error
@@ -274,18 +270,23 @@ func (backRepoEngine *BackRepoEngineStruct) CheckoutPhaseOne() (Error error) {
 // models version of the engineDB
 func (backRepoEngine *BackRepoEngineStruct) CheckoutPhaseOneInstance(engineDB *EngineDB) (Error error) {
 
-	// if absent, create entries in the backRepoEngine maps.
-	engineWithNewFieldValues := engineDB.Engine
-	if _, ok := (*backRepoEngine.Map_EngineDBID_EnginePtr)[engineDB.ID]; !ok {
+	engine, ok := (*backRepoEngine.Map_EngineDBID_EnginePtr)[engineDB.ID]
+	if !ok {
+		engine = new(models.Engine)
 
-		(*backRepoEngine.Map_EngineDBID_EnginePtr)[engineDB.ID] = &engineWithNewFieldValues
-		(*backRepoEngine.Map_EnginePtr_EngineDBID)[&engineWithNewFieldValues] = engineDB.ID
+		(*backRepoEngine.Map_EngineDBID_EnginePtr)[engineDB.ID] = engine
+		(*backRepoEngine.Map_EnginePtr_EngineDBID)[engine] = engineDB.ID
 
 		// append model store with the new element
-		engineWithNewFieldValues.Stage()
+		engine.Stage()
 	}
-	engineDBWithNewFieldValues := *engineDB
-	(*backRepoEngine.Map_EngineDBID_EngineDB)[engineDB.ID] = &engineDBWithNewFieldValues
+	engineDB.CopyBasicFieldsToEngine(engine)
+
+	// preserve pointer to aclassDB. Otherwise, pointer will is recycled and the map of pointers
+	// Map_EngineDBID_EngineDB)[engineDB hold variable pointers
+	engineDB_Data := *engineDB
+	preservedPtrToEngine := &engineDB_Data
+	(*backRepoEngine.Map_EngineDBID_EngineDB)[engineDB.ID] = preservedPtrToEngine
 
 	return
 }
@@ -307,28 +308,8 @@ func (backRepoEngine *BackRepoEngineStruct) CheckoutPhaseTwoInstance(backRepo *B
 
 	engine := (*backRepoEngine.Map_EngineDBID_EnginePtr)[engineDB.ID]
 	_ = engine // sometimes, there is no code generated. This lines voids the "unused variable" compilation error
-	{
-		{
-			// insertion point for checkout, i.e. update of fields of stage instance from fields of back repo instances
-			//
-			engine.Name = engineDB.Name_Data.String
 
-			engine.EndTime = engineDB.EndTime_Data.String
-
-			engine.CurrentTime = engineDB.CurrentTime_Data.String
-
-			engine.SecondsSinceStart = engineDB.SecondsSinceStart_Data.Float64
-
-			engine.Fired = int(engineDB.Fired_Data.Int64)
-
-			engine.ControlMode = models.ControlMode(engineDB.ControlMode_Data.String)
-
-			engine.State = models.EngineState(engineDB.State_Data.String)
-
-			engine.Speed = engineDB.Speed_Data.Float64
-
-		}
-	}
+	// insertion point for checkout of pointer encoding
 	return
 }
 
@@ -355,5 +336,112 @@ func (backRepo *BackRepoStruct) CheckoutEngine(engine *models.Engine) {
 			backRepo.BackRepoEngine.CheckoutPhaseOneInstance(&engineDB)
 			backRepo.BackRepoEngine.CheckoutPhaseTwoInstance(backRepo, &engineDB)
 		}
+	}
+}
+
+// CopyBasicFieldsToEngineDB is used to copy basic fields between the Stage or the CRUD to the back repo
+func (engineDB *EngineDB) CopyBasicFieldsFromEngine(engine *models.Engine) {
+	// insertion point for fields commit
+	engineDB.Name_Data.String = engine.Name
+	engineDB.Name_Data.Valid = true
+
+	engineDB.EndTime_Data.String = engine.EndTime
+	engineDB.EndTime_Data.Valid = true
+
+	engineDB.CurrentTime_Data.String = engine.CurrentTime
+	engineDB.CurrentTime_Data.Valid = true
+
+	engineDB.SecondsSinceStart_Data.Float64 = engine.SecondsSinceStart
+	engineDB.SecondsSinceStart_Data.Valid = true
+
+	engineDB.Fired_Data.Int64 = int64(engine.Fired)
+	engineDB.Fired_Data.Valid = true
+
+	engineDB.ControlMode_Data.String = string(engine.ControlMode)
+	engineDB.ControlMode_Data.Valid = true
+
+	engineDB.State_Data.String = string(engine.State)
+	engineDB.State_Data.Valid = true
+
+	engineDB.Speed_Data.Float64 = engine.Speed
+	engineDB.Speed_Data.Valid = true
+
+}
+
+// CopyBasicFieldsToEngineDB is used to copy basic fields between the Stage or the CRUD to the back repo
+func (engineDB *EngineDB) CopyBasicFieldsToEngine(engine *models.Engine) {
+
+	// insertion point for checkout of basic fields (back repo to stage)
+	engine.Name = engineDB.Name_Data.String
+	engine.EndTime = engineDB.EndTime_Data.String
+	engine.CurrentTime = engineDB.CurrentTime_Data.String
+	engine.SecondsSinceStart = engineDB.SecondsSinceStart_Data.Float64
+	engine.Fired = int(engineDB.Fired_Data.Int64)
+	engine.ControlMode = models.ControlMode(engineDB.ControlMode_Data.String)
+	engine.State = models.EngineState(engineDB.State_Data.String)
+	engine.Speed = engineDB.Speed_Data.Float64
+}
+
+// Backup generates a json file from a slice of all EngineDB instances in the backrepo
+func (backRepoEngine *BackRepoEngineStruct) Backup(dirPath string) {
+
+	filename := filepath.Join(dirPath, "EngineDB.json")
+
+	// organize the map into an array with increasing IDs, in order to have repoductible
+	// backup file
+	var forBackup []*EngineDB
+	for _, engineDB := range *backRepoEngine.Map_EngineDBID_EngineDB {
+		forBackup = append(forBackup, engineDB)
+	}
+
+	sort.Slice(forBackup[:], func(i, j int) bool {
+		return forBackup[i].ID < forBackup[j].ID
+	})
+
+	file, err := json.MarshalIndent(forBackup, "", " ")
+
+	if err != nil {
+		log.Panic("Cannot json Engine ", filename, " ", err.Error())
+	}
+
+	err = ioutil.WriteFile(filename, file, 0644)
+	if err != nil {
+		log.Panic("Cannot write the json Engine file", err.Error())
+	}
+}
+
+func (backRepoEngine *BackRepoEngineStruct) Restore(dirPath string) {
+
+	filename := filepath.Join(dirPath, "EngineDB.json")
+	jsonFile, err := os.Open(filename)
+	// if we os.Open returns an error then handle it
+	if err != nil {
+		log.Panic("Cannot restore/open the json Engine file", filename, " ", err.Error())
+	}
+
+	// read our opened jsonFile as a byte array.
+	byteValue, _ := ioutil.ReadAll(jsonFile)
+
+	var forRestore []*EngineDB
+
+	err = json.Unmarshal(byteValue, &forRestore)
+
+	// fill up Map_EngineDBID_EngineDB
+	for _, engineDB := range forRestore {
+
+		engineDB_ID := engineDB.ID
+		engineDB.ID = 0
+		query := backRepoEngine.db.Create(engineDB)
+		if query.Error != nil {
+			log.Panic(query.Error)
+		}
+		if engineDB_ID != engineDB.ID {
+			log.Panicf("ID of Engine restore ID %d, name %s, has wrong ID %d in DB after create",
+				engineDB_ID, engineDB.Name_Data.String, engineDB.ID)
+		}
+	}
+
+	if err != nil {
+		log.Panic("Cannot restore/unmarshall json Engine file", err.Error())
 	}
 }

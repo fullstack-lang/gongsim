@@ -63,8 +63,6 @@ export class DummyAgentDetailComponent implements OnInit {
 		this.frontRepoService.pull().subscribe(
 			frontRepo => {
 				this.frontRepo = frontRepo
-				console.log("front repo DummyAgentPull returned")
-
 				if (id != 0 && association == undefined) {
 					this.dummyagent = frontRepo.DummyAgents.get(id)
 				} else {
@@ -109,8 +107,6 @@ export class DummyAgentDetailComponent implements OnInit {
 			this.dummyagentService.updateDummyAgent(this.dummyagent)
 				.subscribe(dummyagent => {
 					this.dummyagentService.DummyAgentServiceChanged.next("update")
-
-					console.log("dummyagent saved")
 				});
 		} else {
 			switch (association) {
@@ -121,7 +117,6 @@ export class DummyAgentDetailComponent implements OnInit {
 				this.dummyagentService.DummyAgentServiceChanged.next("post")
 
 				this.dummyagent = {} // reset fields
-				console.log("dummyagent added")
 			});
 		}
 	}
@@ -150,7 +145,6 @@ export class DummyAgentDetailComponent implements OnInit {
 		);
 
 		dialogRef.afterClosed().subscribe(result => {
-			console.log('The dialog was closed');
 		});
 	}
 
@@ -173,7 +167,6 @@ export class DummyAgentDetailComponent implements OnInit {
 		);
 
 		dialogRef.afterClosed().subscribe(result => {
-			console.log('The dialog was closed');
 		});
 	}
 }

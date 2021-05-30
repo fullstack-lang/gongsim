@@ -110,7 +110,6 @@ export class EnginesTableComponent implements OnInit {
     this.frontRepoService.pull().subscribe(
       frontRepo => {
         this.frontRepo = frontRepo
-        console.log("front repo pull returned")
 
         this.engines = this.frontRepo.Engines_array;
 
@@ -148,8 +147,6 @@ export class EnginesTableComponent implements OnInit {
     this.engineService.deleteEngine(engineID).subscribe(
       engine => {
         this.engineService.EngineServiceChanged.next("delete")
-
-        console.log("engine deleted")
       }
     );
   }
@@ -211,7 +208,6 @@ export class EnginesTableComponent implements OnInit {
     // from selection, set engine that belong to engine through Anarrayofb
     this.selection.selected.forEach(
       engine => {
-        console.log("selection ID " + engine.ID)
         let ID = +this.dialogData.ID
         engine[this.dialogData.ReversePointer].Int64 = ID
         engine[this.dialogData.ReversePointer].Valid = true
@@ -225,7 +221,6 @@ export class EnginesTableComponent implements OnInit {
         this.engineService.updateEngine(engine)
           .subscribe(engine => {
             this.engineService.EngineServiceChanged.next("update")
-            console.log("engine saved")
           });
       }
     )

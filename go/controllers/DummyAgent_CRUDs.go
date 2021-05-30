@@ -49,8 +49,9 @@ type DummyAgentInput struct {
 func GetDummyAgents(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
 
-	var dummyagents []orm.DummyAgentDB
-	query := db.Find(&dummyagents)
+	// source slice
+	var dummyagentDBs []orm.DummyAgentDB
+	query := db.Find(&dummyagentDBs)
 	if query.Error != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
@@ -59,22 +60,23 @@ func GetDummyAgents(c *gin.Context) {
 		return
 	}
 
+	// slice that will be transmitted to the front
+	var dummyagentAPIs []orm.DummyAgentAPI
+
 	// for each dummyagent, update fields from the database nullable fields
-	for idx := range dummyagents {
-		dummyagent := &dummyagents[idx]
-		_ = dummyagent
+	for idx := range dummyagentDBs {
+		dummyagentDB := &dummyagentDBs[idx]
+		_ = dummyagentDB
+		var dummyagentAPI orm.DummyAgentAPI
+
 		// insertion point for updating fields
-		if dummyagent.TechName_Data.Valid {
-			dummyagent.TechName = dummyagent.TechName_Data.String
-		}
-
-		if dummyagent.Name_Data.Valid {
-			dummyagent.Name = dummyagent.Name_Data.String
-		}
-
+		dummyagentAPI.ID = dummyagentDB.ID
+		dummyagentDB.CopyBasicFieldsToDummyAgent(&dummyagentAPI.DummyAgent)
+		dummyagentAPI.DummyAgentPointersEnconding = dummyagentDB.DummyAgentPointersEnconding
+		dummyagentAPIs = append(dummyagentAPIs, dummyagentAPI)
 	}
 
-	c.JSON(http.StatusOK, dummyagents)
+	c.JSON(http.StatusOK, dummyagentAPIs)
 }
 
 // PostDummyAgent
@@ -107,13 +109,8 @@ func PostDummyAgent(c *gin.Context) {
 
 	// Create dummyagent
 	dummyagentDB := orm.DummyAgentDB{}
-	dummyagentDB.DummyAgentAPI = input
-	// insertion point for nullable field set
-	dummyagentDB.TechName_Data.String = input.TechName
-	dummyagentDB.TechName_Data.Valid = true
-
-	dummyagentDB.Name_Data.String = input.Name
-	dummyagentDB.Name_Data.Valid = true
+	dummyagentDB.DummyAgentPointersEnconding = input.DummyAgentPointersEnconding
+	dummyagentDB.CopyBasicFieldsFromDummyAgent(&input.DummyAgent)
 
 	query := db.Create(&dummyagentDB)
 	if query.Error != nil {
@@ -143,9 +140,9 @@ func PostDummyAgent(c *gin.Context) {
 func GetDummyAgent(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
 
-	// Get dummyagent in DB
-	var dummyagent orm.DummyAgentDB
-	if err := db.First(&dummyagent, c.Param("id")).Error; err != nil {
+	// Get dummyagentDB in DB
+	var dummyagentDB orm.DummyAgentDB
+	if err := db.First(&dummyagentDB, c.Param("id")).Error; err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
 		returnError.Body.Message = err.Error()
@@ -153,16 +150,12 @@ func GetDummyAgent(c *gin.Context) {
 		return
 	}
 
-	// insertion point for fields value set from nullable fields
-	if dummyagent.TechName_Data.Valid {
-		dummyagent.TechName = dummyagent.TechName_Data.String
-	}
+	var dummyagentAPI orm.DummyAgentAPI
+	dummyagentAPI.ID = dummyagentDB.ID
+	dummyagentAPI.DummyAgentPointersEnconding = dummyagentDB.DummyAgentPointersEnconding
+	dummyagentDB.CopyBasicFieldsToDummyAgent(&dummyagentAPI.DummyAgent)
 
-	if dummyagent.Name_Data.Valid {
-		dummyagent.Name = dummyagent.Name_Data.String
-	}
-
-	c.JSON(http.StatusOK, dummyagent)
+	c.JSON(http.StatusOK, dummyagentAPI)
 }
 
 // UpdateDummyAgent
@@ -199,14 +192,10 @@ func UpdateDummyAgent(c *gin.Context) {
 	}
 
 	// update
-	// insertion point for nullable field set
-	input.TechName_Data.String = input.TechName
-	input.TechName_Data.Valid = true
+	dummyagentDB.CopyBasicFieldsFromDummyAgent(&input.DummyAgent)
+	dummyagentDB.DummyAgentPointersEnconding = input.DummyAgentPointersEnconding
 
-	input.Name_Data.String = input.Name
-	input.Name_Data.Valid = true
-
-	query = db.Model(&dummyagentDB).Updates(input)
+	query = db.Model(&dummyagentDB).Updates(dummyagentDB)
 	if query.Error != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest

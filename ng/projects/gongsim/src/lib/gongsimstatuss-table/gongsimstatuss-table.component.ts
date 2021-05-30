@@ -104,7 +104,6 @@ export class GongsimStatussTableComponent implements OnInit {
     this.frontRepoService.pull().subscribe(
       frontRepo => {
         this.frontRepo = frontRepo
-        console.log("front repo pull returned")
 
         this.gongsimstatuss = this.frontRepo.GongsimStatuss_array;
 
@@ -142,8 +141,6 @@ export class GongsimStatussTableComponent implements OnInit {
     this.gongsimstatusService.deleteGongsimStatus(gongsimstatusID).subscribe(
       gongsimstatus => {
         this.gongsimstatusService.GongsimStatusServiceChanged.next("delete")
-
-        console.log("gongsimstatus deleted")
       }
     );
   }
@@ -205,7 +202,6 @@ export class GongsimStatussTableComponent implements OnInit {
     // from selection, set gongsimstatus that belong to gongsimstatus through Anarrayofb
     this.selection.selected.forEach(
       gongsimstatus => {
-        console.log("selection ID " + gongsimstatus.ID)
         let ID = +this.dialogData.ID
         gongsimstatus[this.dialogData.ReversePointer].Int64 = ID
         gongsimstatus[this.dialogData.ReversePointer].Valid = true
@@ -219,7 +215,6 @@ export class GongsimStatussTableComponent implements OnInit {
         this.gongsimstatusService.updateGongsimStatus(gongsimstatus)
           .subscribe(gongsimstatus => {
             this.gongsimstatusService.GongsimStatusServiceChanged.next("update")
-            console.log("gongsimstatus saved")
           });
       }
     )

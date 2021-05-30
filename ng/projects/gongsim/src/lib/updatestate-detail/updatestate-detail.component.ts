@@ -69,8 +69,6 @@ export class UpdateStateDetailComponent implements OnInit {
 		this.frontRepoService.pull().subscribe(
 			frontRepo => {
 				this.frontRepo = frontRepo
-				console.log("front repo UpdateStatePull returned")
-
 				if (id != 0 && association == undefined) {
 					this.updatestate = frontRepo.UpdateStates.get(id)
 				} else {
@@ -119,8 +117,6 @@ export class UpdateStateDetailComponent implements OnInit {
 			this.updatestateService.updateUpdateState(this.updatestate)
 				.subscribe(updatestate => {
 					this.updatestateService.UpdateStateServiceChanged.next("update")
-
-					console.log("updatestate saved")
 				});
 		} else {
 			switch (association) {
@@ -131,7 +127,6 @@ export class UpdateStateDetailComponent implements OnInit {
 				this.updatestateService.UpdateStateServiceChanged.next("post")
 
 				this.updatestate = {} // reset fields
-				console.log("updatestate added")
 			});
 		}
 	}
@@ -160,7 +155,6 @@ export class UpdateStateDetailComponent implements OnInit {
 		);
 
 		dialogRef.afterClosed().subscribe(result => {
-			console.log('The dialog was closed');
 		});
 	}
 
@@ -183,7 +177,6 @@ export class UpdateStateDetailComponent implements OnInit {
 		);
 
 		dialogRef.afterClosed().subscribe(result => {
-			console.log('The dialog was closed');
 		});
 	}
 }

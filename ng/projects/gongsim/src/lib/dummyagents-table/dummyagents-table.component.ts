@@ -100,7 +100,6 @@ export class DummyAgentsTableComponent implements OnInit {
     this.frontRepoService.pull().subscribe(
       frontRepo => {
         this.frontRepo = frontRepo
-        console.log("front repo pull returned")
 
         this.dummyagents = this.frontRepo.DummyAgents_array;
 
@@ -138,8 +137,6 @@ export class DummyAgentsTableComponent implements OnInit {
     this.dummyagentService.deleteDummyAgent(dummyagentID).subscribe(
       dummyagent => {
         this.dummyagentService.DummyAgentServiceChanged.next("delete")
-
-        console.log("dummyagent deleted")
       }
     );
   }
@@ -201,7 +198,6 @@ export class DummyAgentsTableComponent implements OnInit {
     // from selection, set dummyagent that belong to dummyagent through Anarrayofb
     this.selection.selected.forEach(
       dummyagent => {
-        console.log("selection ID " + dummyagent.ID)
         let ID = +this.dialogData.ID
         dummyagent[this.dialogData.ReversePointer].Int64 = ID
         dummyagent[this.dialogData.ReversePointer].Valid = true
@@ -215,7 +211,6 @@ export class DummyAgentsTableComponent implements OnInit {
         this.dummyagentService.updateDummyAgent(dummyagent)
           .subscribe(dummyagent => {
             this.dummyagentService.DummyAgentServiceChanged.next("update")
-            console.log("dummyagent saved")
           });
       }
     )

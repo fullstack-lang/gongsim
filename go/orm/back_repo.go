@@ -2,7 +2,10 @@
 package orm
 
 import (
+	"os"
+
 	"github.com/jinzhu/gorm"
+
 	"github.com/fullstack-lang/gongsim/go/models"
 )
 
@@ -94,3 +97,32 @@ var BackRepo BackRepoStruct
 func GetLastCommitNb() uint {
 	return BackRepo.GetLastCommitNb()
 }
+
+// Backup the BackRepoStruct
+func (backRepo *BackRepoStruct) Backup(stage *models.StageStruct, dirPath string) {
+	os.Mkdir(dirPath, os.ModePerm)
+
+	// insertion point for per struct backup
+	backRepo.BackRepoDummyAgent.Backup(dirPath)
+	backRepo.BackRepoEngine.Backup(dirPath)
+	backRepo.BackRepoEvent.Backup(dirPath)
+	backRepo.BackRepoGongsimCommand.Backup(dirPath)
+	backRepo.BackRepoGongsimStatus.Backup(dirPath)
+	backRepo.BackRepoUpdateState.Backup(dirPath)
+}
+
+// Restore the database into the back repo
+func (backRepo *BackRepoStruct) Restore(stage *models.StageStruct, dirPath string) {
+	models.Stage.Commit()
+	models.Stage.Reset()
+	models.Stage.Checkout()
+	// insertion point for per struct backup
+	backRepo.BackRepoDummyAgent.Restore(dirPath)
+	backRepo.BackRepoEngine.Restore(dirPath)
+	backRepo.BackRepoEvent.Restore(dirPath)
+	backRepo.BackRepoGongsimCommand.Restore(dirPath)
+	backRepo.BackRepoGongsimStatus.Restore(dirPath)
+	backRepo.BackRepoUpdateState.Restore(dirPath)
+	models.Stage.Checkout()
+}
+

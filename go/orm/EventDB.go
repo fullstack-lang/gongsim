@@ -3,9 +3,13 @@ package orm
 
 import (
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"log"
+	"os"
+	"path/filepath"
 	"sort"
 	"time"
 
@@ -27,27 +31,38 @@ var dummy_Event_sort sort.Float64Slice
 //
 // swagger:model eventAPI
 type EventAPI struct {
+	gorm.Model
+
 	models.Event
 
-	// insertion for fields declaration
+	// encoding of pointers
+	EventPointersEnconding
+}
+
+// EventPointersEnconding encodes pointers to Struct and
+// reverse pointers of slice of poitners to Struct
+type EventPointersEnconding struct {
+	// insertion for pointer fields encoding declaration
+}
+
+// EventDB describes a event in the database
+//
+// It incorporates the GORM ID, basic fields from the model (because they can be serialized),
+// the encoded version of pointers
+//
+// swagger:model eventDB
+type EventDB struct {
+	gorm.Model
+
+	// insertion for basic fields declaration
 	// Declation for basic field eventDB.Name {{BasicKind}} (to be completed)
 	Name_Data sql.NullString
 
 	// Declation for basic field eventDB.Duration {{BasicKind}} (to be completed)
 	Duration_Data sql.NullInt64
 
-	// end of insertion
-}
-
-// EventDB describes a event in the database
-//
-// It incorporates all fields : from the model, from the generated field for the API and the GORM ID
-//
-// swagger:model eventDB
-type EventDB struct {
-	gorm.Model
-
-	EventAPI
+	// encoding of pointers
+	EventPointersEnconding
 }
 
 // EventDBs arrays eventDBs
@@ -71,6 +86,13 @@ type BackRepoEventStruct struct {
 	Map_EventDBID_EventPtr *map[uint]*models.Event
 
 	db *gorm.DB
+}
+
+// GetEventDBFromEventPtr is a handy function to access the back repo instance from the stage instance
+func (backRepoEvent *BackRepoEventStruct) GetEventDBFromEventPtr(event *models.Event) (eventDB *EventDB) {
+	id := (*backRepoEvent.Map_EventPtr_EventDBID)[event]
+	eventDB = (*backRepoEvent.Map_EventDBID_EventDB)[id]
+	return
 }
 
 // BackRepoEvent.Init set up the BackRepo of the Event
@@ -154,7 +176,7 @@ func (backRepoEvent *BackRepoEventStruct) CommitPhaseOneInstance(event *models.E
 
 	// initiate event
 	var eventDB EventDB
-	eventDB.Event = *event
+	eventDB.CopyBasicFieldsFromEvent(event)
 
 	query := backRepoEvent.db.Create(&eventDB)
 	if query.Error != nil {
@@ -187,17 +209,9 @@ func (backRepoEvent *BackRepoEventStruct) CommitPhaseTwoInstance(backRepo *BackR
 	// fetch matching eventDB
 	if eventDB, ok := (*backRepoEvent.Map_EventDBID_EventDB)[idx]; ok {
 
-		{
-			{
-				// insertion point for fields commit
-				eventDB.Name_Data.String = event.Name
-				eventDB.Name_Data.Valid = true
+		eventDB.CopyBasicFieldsFromEvent(event)
 
-				eventDB.Duration_Data.Int64 = int64(event.Duration)
-				eventDB.Duration_Data.Valid = true
-
-			}
-		}
+		// insertion point for translating pointers encodings into actual pointers
 		query := backRepoEvent.db.Save(&eventDB)
 		if query.Error != nil {
 			return query.Error
@@ -238,18 +252,23 @@ func (backRepoEvent *BackRepoEventStruct) CheckoutPhaseOne() (Error error) {
 // models version of the eventDB
 func (backRepoEvent *BackRepoEventStruct) CheckoutPhaseOneInstance(eventDB *EventDB) (Error error) {
 
-	// if absent, create entries in the backRepoEvent maps.
-	eventWithNewFieldValues := eventDB.Event
-	if _, ok := (*backRepoEvent.Map_EventDBID_EventPtr)[eventDB.ID]; !ok {
+	event, ok := (*backRepoEvent.Map_EventDBID_EventPtr)[eventDB.ID]
+	if !ok {
+		event = new(models.Event)
 
-		(*backRepoEvent.Map_EventDBID_EventPtr)[eventDB.ID] = &eventWithNewFieldValues
-		(*backRepoEvent.Map_EventPtr_EventDBID)[&eventWithNewFieldValues] = eventDB.ID
+		(*backRepoEvent.Map_EventDBID_EventPtr)[eventDB.ID] = event
+		(*backRepoEvent.Map_EventPtr_EventDBID)[event] = eventDB.ID
 
 		// append model store with the new element
-		eventWithNewFieldValues.Stage()
+		event.Stage()
 	}
-	eventDBWithNewFieldValues := *eventDB
-	(*backRepoEvent.Map_EventDBID_EventDB)[eventDB.ID] = &eventDBWithNewFieldValues
+	eventDB.CopyBasicFieldsToEvent(event)
+
+	// preserve pointer to aclassDB. Otherwise, pointer will is recycled and the map of pointers
+	// Map_EventDBID_EventDB)[eventDB hold variable pointers
+	eventDB_Data := *eventDB
+	preservedPtrToEvent := &eventDB_Data
+	(*backRepoEvent.Map_EventDBID_EventDB)[eventDB.ID] = preservedPtrToEvent
 
 	return
 }
@@ -271,16 +290,8 @@ func (backRepoEvent *BackRepoEventStruct) CheckoutPhaseTwoInstance(backRepo *Bac
 
 	event := (*backRepoEvent.Map_EventDBID_EventPtr)[eventDB.ID]
 	_ = event // sometimes, there is no code generated. This lines voids the "unused variable" compilation error
-	{
-		{
-			// insertion point for checkout, i.e. update of fields of stage instance from fields of back repo instances
-			//
-			event.Name = eventDB.Name_Data.String
 
-			event.Duration = time.Duration(eventDB.Duration_Data.Int64)
-
-		}
-	}
+	// insertion point for checkout of pointer encoding
 	return
 }
 
@@ -307,5 +318,88 @@ func (backRepo *BackRepoStruct) CheckoutEvent(event *models.Event) {
 			backRepo.BackRepoEvent.CheckoutPhaseOneInstance(&eventDB)
 			backRepo.BackRepoEvent.CheckoutPhaseTwoInstance(backRepo, &eventDB)
 		}
+	}
+}
+
+// CopyBasicFieldsToEventDB is used to copy basic fields between the Stage or the CRUD to the back repo
+func (eventDB *EventDB) CopyBasicFieldsFromEvent(event *models.Event) {
+	// insertion point for fields commit
+	eventDB.Name_Data.String = event.Name
+	eventDB.Name_Data.Valid = true
+
+	eventDB.Duration_Data.Int64 = int64(event.Duration)
+	eventDB.Duration_Data.Valid = true
+
+}
+
+// CopyBasicFieldsToEventDB is used to copy basic fields between the Stage or the CRUD to the back repo
+func (eventDB *EventDB) CopyBasicFieldsToEvent(event *models.Event) {
+
+	// insertion point for checkout of basic fields (back repo to stage)
+	event.Name = eventDB.Name_Data.String
+	event.Duration = time.Duration(eventDB.Duration_Data.Int64)
+}
+
+// Backup generates a json file from a slice of all EventDB instances in the backrepo
+func (backRepoEvent *BackRepoEventStruct) Backup(dirPath string) {
+
+	filename := filepath.Join(dirPath, "EventDB.json")
+
+	// organize the map into an array with increasing IDs, in order to have repoductible
+	// backup file
+	var forBackup []*EventDB
+	for _, eventDB := range *backRepoEvent.Map_EventDBID_EventDB {
+		forBackup = append(forBackup, eventDB)
+	}
+
+	sort.Slice(forBackup[:], func(i, j int) bool {
+		return forBackup[i].ID < forBackup[j].ID
+	})
+
+	file, err := json.MarshalIndent(forBackup, "", " ")
+
+	if err != nil {
+		log.Panic("Cannot json Event ", filename, " ", err.Error())
+	}
+
+	err = ioutil.WriteFile(filename, file, 0644)
+	if err != nil {
+		log.Panic("Cannot write the json Event file", err.Error())
+	}
+}
+
+func (backRepoEvent *BackRepoEventStruct) Restore(dirPath string) {
+
+	filename := filepath.Join(dirPath, "EventDB.json")
+	jsonFile, err := os.Open(filename)
+	// if we os.Open returns an error then handle it
+	if err != nil {
+		log.Panic("Cannot restore/open the json Event file", filename, " ", err.Error())
+	}
+
+	// read our opened jsonFile as a byte array.
+	byteValue, _ := ioutil.ReadAll(jsonFile)
+
+	var forRestore []*EventDB
+
+	err = json.Unmarshal(byteValue, &forRestore)
+
+	// fill up Map_EventDBID_EventDB
+	for _, eventDB := range forRestore {
+
+		eventDB_ID := eventDB.ID
+		eventDB.ID = 0
+		query := backRepoEvent.db.Create(eventDB)
+		if query.Error != nil {
+			log.Panic(query.Error)
+		}
+		if eventDB_ID != eventDB.ID {
+			log.Panicf("ID of Event restore ID %d, name %s, has wrong ID %d in DB after create",
+				eventDB_ID, eventDB.Name_Data.String, eventDB.ID)
+		}
+	}
+
+	if err != nil {
+		log.Panic("Cannot restore/unmarshall json Event file", err.Error())
 	}
 }

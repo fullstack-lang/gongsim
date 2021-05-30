@@ -3,9 +3,13 @@ package orm
 
 import (
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"log"
+	"os"
+	"path/filepath"
 	"sort"
 	"time"
 
@@ -27,12 +31,18 @@ var dummy_DummyAgent_sort sort.Float64Slice
 //
 // swagger:model dummyagentAPI
 type DummyAgentAPI struct {
+	gorm.Model
+
 	models.DummyAgent
 
-	// insertion for fields declaration
-	// Declation for basic field dummyagentDB.TechName {{BasicKind}} (to be completed)
-	TechName_Data sql.NullString
+	// encoding of pointers
+	DummyAgentPointersEnconding
+}
 
+// DummyAgentPointersEnconding encodes pointers to Struct and
+// reverse pointers of slice of poitners to Struct
+type DummyAgentPointersEnconding struct {
+	// insertion for pointer fields encoding declaration
 	// field Engine is a pointer to another Struct (optional or 0..1)
 	// This field is generated into another field to enable AS ONE association
 	EngineID sql.NullInt64
@@ -40,21 +50,26 @@ type DummyAgentAPI struct {
 	// all gong Struct has a Name field, this enables this data to object field
 	EngineName string
 
-	// Declation for basic field dummyagentDB.Name {{BasicKind}} (to be completed)
-	Name_Data sql.NullString
-
-	// end of insertion
 }
 
 // DummyAgentDB describes a dummyagent in the database
 //
-// It incorporates all fields : from the model, from the generated field for the API and the GORM ID
+// It incorporates the GORM ID, basic fields from the model (because they can be serialized),
+// the encoded version of pointers
 //
 // swagger:model dummyagentDB
 type DummyAgentDB struct {
 	gorm.Model
 
-	DummyAgentAPI
+	// insertion for basic fields declaration
+	// Declation for basic field dummyagentDB.TechName {{BasicKind}} (to be completed)
+	TechName_Data sql.NullString
+
+	// Declation for basic field dummyagentDB.Name {{BasicKind}} (to be completed)
+	Name_Data sql.NullString
+
+	// encoding of pointers
+	DummyAgentPointersEnconding
 }
 
 // DummyAgentDBs arrays dummyagentDBs
@@ -78,6 +93,13 @@ type BackRepoDummyAgentStruct struct {
 	Map_DummyAgentDBID_DummyAgentPtr *map[uint]*models.DummyAgent
 
 	db *gorm.DB
+}
+
+// GetDummyAgentDBFromDummyAgentPtr is a handy function to access the back repo instance from the stage instance
+func (backRepoDummyAgent *BackRepoDummyAgentStruct) GetDummyAgentDBFromDummyAgentPtr(dummyagent *models.DummyAgent) (dummyagentDB *DummyAgentDB) {
+	id := (*backRepoDummyAgent.Map_DummyAgentPtr_DummyAgentDBID)[dummyagent]
+	dummyagentDB = (*backRepoDummyAgent.Map_DummyAgentDBID_DummyAgentDB)[id]
+	return
 }
 
 // BackRepoDummyAgent.Init set up the BackRepo of the DummyAgent
@@ -161,7 +183,7 @@ func (backRepoDummyAgent *BackRepoDummyAgentStruct) CommitPhaseOneInstance(dummy
 
 	// initiate dummyagent
 	var dummyagentDB DummyAgentDB
-	dummyagentDB.DummyAgent = *dummyagent
+	dummyagentDB.CopyBasicFieldsFromDummyAgent(dummyagent)
 
 	query := backRepoDummyAgent.db.Create(&dummyagentDB)
 	if query.Error != nil {
@@ -194,25 +216,17 @@ func (backRepoDummyAgent *BackRepoDummyAgentStruct) CommitPhaseTwoInstance(backR
 	// fetch matching dummyagentDB
 	if dummyagentDB, ok := (*backRepoDummyAgent.Map_DummyAgentDBID_DummyAgentDB)[idx]; ok {
 
-		{
-			{
-				// insertion point for fields commit
-				dummyagentDB.TechName_Data.String = dummyagent.TechName
-				dummyagentDB.TechName_Data.Valid = true
+		dummyagentDB.CopyBasicFieldsFromDummyAgent(dummyagent)
 
-				// commit pointer value dummyagent.Engine translates to updating the dummyagent.EngineID
-				dummyagentDB.EngineID.Valid = true // allow for a 0 value (nil association)
-				if dummyagent.Engine != nil {
-					if EngineId, ok := (*backRepo.BackRepoEngine.Map_EnginePtr_EngineDBID)[dummyagent.Engine]; ok {
-						dummyagentDB.EngineID.Int64 = int64(EngineId)
-					}
-				}
-
-				dummyagentDB.Name_Data.String = dummyagent.Name
-				dummyagentDB.Name_Data.Valid = true
-
+		// insertion point for translating pointers encodings into actual pointers
+		// commit pointer value dummyagent.Engine translates to updating the dummyagent.EngineID
+		dummyagentDB.EngineID.Valid = true // allow for a 0 value (nil association)
+		if dummyagent.Engine != nil {
+			if EngineId, ok := (*backRepo.BackRepoEngine.Map_EnginePtr_EngineDBID)[dummyagent.Engine]; ok {
+				dummyagentDB.EngineID.Int64 = int64(EngineId)
 			}
 		}
+
 		query := backRepoDummyAgent.db.Save(&dummyagentDB)
 		if query.Error != nil {
 			return query.Error
@@ -253,18 +267,23 @@ func (backRepoDummyAgent *BackRepoDummyAgentStruct) CheckoutPhaseOne() (Error er
 // models version of the dummyagentDB
 func (backRepoDummyAgent *BackRepoDummyAgentStruct) CheckoutPhaseOneInstance(dummyagentDB *DummyAgentDB) (Error error) {
 
-	// if absent, create entries in the backRepoDummyAgent maps.
-	dummyagentWithNewFieldValues := dummyagentDB.DummyAgent
-	if _, ok := (*backRepoDummyAgent.Map_DummyAgentDBID_DummyAgentPtr)[dummyagentDB.ID]; !ok {
+	dummyagent, ok := (*backRepoDummyAgent.Map_DummyAgentDBID_DummyAgentPtr)[dummyagentDB.ID]
+	if !ok {
+		dummyagent = new(models.DummyAgent)
 
-		(*backRepoDummyAgent.Map_DummyAgentDBID_DummyAgentPtr)[dummyagentDB.ID] = &dummyagentWithNewFieldValues
-		(*backRepoDummyAgent.Map_DummyAgentPtr_DummyAgentDBID)[&dummyagentWithNewFieldValues] = dummyagentDB.ID
+		(*backRepoDummyAgent.Map_DummyAgentDBID_DummyAgentPtr)[dummyagentDB.ID] = dummyagent
+		(*backRepoDummyAgent.Map_DummyAgentPtr_DummyAgentDBID)[dummyagent] = dummyagentDB.ID
 
 		// append model store with the new element
-		dummyagentWithNewFieldValues.Stage()
+		dummyagent.Stage()
 	}
-	dummyagentDBWithNewFieldValues := *dummyagentDB
-	(*backRepoDummyAgent.Map_DummyAgentDBID_DummyAgentDB)[dummyagentDB.ID] = &dummyagentDBWithNewFieldValues
+	dummyagentDB.CopyBasicFieldsToDummyAgent(dummyagent)
+
+	// preserve pointer to aclassDB. Otherwise, pointer will is recycled and the map of pointers
+	// Map_DummyAgentDBID_DummyAgentDB)[dummyagentDB hold variable pointers
+	dummyagentDB_Data := *dummyagentDB
+	preservedPtrToDummyAgent := &dummyagentDB_Data
+	(*backRepoDummyAgent.Map_DummyAgentDBID_DummyAgentDB)[dummyagentDB.ID] = preservedPtrToDummyAgent
 
 	return
 }
@@ -286,20 +305,11 @@ func (backRepoDummyAgent *BackRepoDummyAgentStruct) CheckoutPhaseTwoInstance(bac
 
 	dummyagent := (*backRepoDummyAgent.Map_DummyAgentDBID_DummyAgentPtr)[dummyagentDB.ID]
 	_ = dummyagent // sometimes, there is no code generated. This lines voids the "unused variable" compilation error
-	{
-		{
-			// insertion point for checkout, i.e. update of fields of stage instance from fields of back repo instances
-			//
-			dummyagent.TechName = dummyagentDB.TechName_Data.String
 
-			// Engine field
-			if dummyagentDB.EngineID.Int64 != 0 {
-				dummyagent.Engine = (*backRepo.BackRepoEngine.Map_EngineDBID_EnginePtr)[uint(dummyagentDB.EngineID.Int64)]
-			}
-
-			dummyagent.Name = dummyagentDB.Name_Data.String
-
-		}
+	// insertion point for checkout of pointer encoding
+	// Engine field
+	if dummyagentDB.EngineID.Int64 != 0 {
+		dummyagent.Engine = (*backRepo.BackRepoEngine.Map_EngineDBID_EnginePtr)[uint(dummyagentDB.EngineID.Int64)]
 	}
 	return
 }
@@ -327,5 +337,88 @@ func (backRepo *BackRepoStruct) CheckoutDummyAgent(dummyagent *models.DummyAgent
 			backRepo.BackRepoDummyAgent.CheckoutPhaseOneInstance(&dummyagentDB)
 			backRepo.BackRepoDummyAgent.CheckoutPhaseTwoInstance(backRepo, &dummyagentDB)
 		}
+	}
+}
+
+// CopyBasicFieldsToDummyAgentDB is used to copy basic fields between the Stage or the CRUD to the back repo
+func (dummyagentDB *DummyAgentDB) CopyBasicFieldsFromDummyAgent(dummyagent *models.DummyAgent) {
+	// insertion point for fields commit
+	dummyagentDB.TechName_Data.String = dummyagent.TechName
+	dummyagentDB.TechName_Data.Valid = true
+
+	dummyagentDB.Name_Data.String = dummyagent.Name
+	dummyagentDB.Name_Data.Valid = true
+
+}
+
+// CopyBasicFieldsToDummyAgentDB is used to copy basic fields between the Stage or the CRUD to the back repo
+func (dummyagentDB *DummyAgentDB) CopyBasicFieldsToDummyAgent(dummyagent *models.DummyAgent) {
+
+	// insertion point for checkout of basic fields (back repo to stage)
+	dummyagent.TechName = dummyagentDB.TechName_Data.String
+	dummyagent.Name = dummyagentDB.Name_Data.String
+}
+
+// Backup generates a json file from a slice of all DummyAgentDB instances in the backrepo
+func (backRepoDummyAgent *BackRepoDummyAgentStruct) Backup(dirPath string) {
+
+	filename := filepath.Join(dirPath, "DummyAgentDB.json")
+
+	// organize the map into an array with increasing IDs, in order to have repoductible
+	// backup file
+	var forBackup []*DummyAgentDB
+	for _, dummyagentDB := range *backRepoDummyAgent.Map_DummyAgentDBID_DummyAgentDB {
+		forBackup = append(forBackup, dummyagentDB)
+	}
+
+	sort.Slice(forBackup[:], func(i, j int) bool {
+		return forBackup[i].ID < forBackup[j].ID
+	})
+
+	file, err := json.MarshalIndent(forBackup, "", " ")
+
+	if err != nil {
+		log.Panic("Cannot json DummyAgent ", filename, " ", err.Error())
+	}
+
+	err = ioutil.WriteFile(filename, file, 0644)
+	if err != nil {
+		log.Panic("Cannot write the json DummyAgent file", err.Error())
+	}
+}
+
+func (backRepoDummyAgent *BackRepoDummyAgentStruct) Restore(dirPath string) {
+
+	filename := filepath.Join(dirPath, "DummyAgentDB.json")
+	jsonFile, err := os.Open(filename)
+	// if we os.Open returns an error then handle it
+	if err != nil {
+		log.Panic("Cannot restore/open the json DummyAgent file", filename, " ", err.Error())
+	}
+
+	// read our opened jsonFile as a byte array.
+	byteValue, _ := ioutil.ReadAll(jsonFile)
+
+	var forRestore []*DummyAgentDB
+
+	err = json.Unmarshal(byteValue, &forRestore)
+
+	// fill up Map_DummyAgentDBID_DummyAgentDB
+	for _, dummyagentDB := range forRestore {
+
+		dummyagentDB_ID := dummyagentDB.ID
+		dummyagentDB.ID = 0
+		query := backRepoDummyAgent.db.Create(dummyagentDB)
+		if query.Error != nil {
+			log.Panic(query.Error)
+		}
+		if dummyagentDB_ID != dummyagentDB.ID {
+			log.Panicf("ID of DummyAgent restore ID %d, name %s, has wrong ID %d in DB after create",
+				dummyagentDB_ID, dummyagentDB.Name_Data.String, dummyagentDB.ID)
+		}
+	}
+
+	if err != nil {
+		log.Panic("Cannot restore/unmarshall json DummyAgent file", err.Error())
 	}
 }

@@ -100,7 +100,6 @@ export class UpdateStatesTableComponent implements OnInit {
     this.frontRepoService.pull().subscribe(
       frontRepo => {
         this.frontRepo = frontRepo
-        console.log("front repo pull returned")
 
         this.updatestates = this.frontRepo.UpdateStates_array;
 
@@ -152,8 +151,6 @@ export class UpdateStatesTableComponent implements OnInit {
     this.updatestateService.deleteUpdateState(updatestateID).subscribe(
       updatestate => {
         this.updatestateService.UpdateStateServiceChanged.next("delete")
-
-        console.log("updatestate deleted")
       }
     );
   }
@@ -215,7 +212,6 @@ export class UpdateStatesTableComponent implements OnInit {
     // from selection, set updatestate that belong to updatestate through Anarrayofb
     this.selection.selected.forEach(
       updatestate => {
-        console.log("selection ID " + updatestate.ID)
         let ID = +this.dialogData.ID
         updatestate[this.dialogData.ReversePointer].Int64 = ID
         updatestate[this.dialogData.ReversePointer].Valid = true
@@ -229,7 +225,6 @@ export class UpdateStatesTableComponent implements OnInit {
         this.updatestateService.updateUpdateState(updatestate)
           .subscribe(updatestate => {
             this.updatestateService.UpdateStateServiceChanged.next("update")
-            console.log("updatestate saved")
           });
       }
     )

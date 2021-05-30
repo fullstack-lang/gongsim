@@ -66,8 +66,6 @@ export class EventDetailComponent implements OnInit {
 		this.frontRepoService.pull().subscribe(
 			frontRepo => {
 				this.frontRepo = frontRepo
-				console.log("front repo EventPull returned")
-
 				if (id != 0 && association == undefined) {
 					this.event = frontRepo.Events.get(id)
 				} else {
@@ -108,8 +106,6 @@ export class EventDetailComponent implements OnInit {
 			this.eventService.updateEvent(this.event)
 				.subscribe(event => {
 					this.eventService.EventServiceChanged.next("update")
-
-					console.log("event saved")
 				});
 		} else {
 			switch (association) {
@@ -120,7 +116,6 @@ export class EventDetailComponent implements OnInit {
 				this.eventService.EventServiceChanged.next("post")
 
 				this.event = {} // reset fields
-				console.log("event added")
 			});
 		}
 	}
@@ -149,7 +144,6 @@ export class EventDetailComponent implements OnInit {
 		);
 
 		dialogRef.afterClosed().subscribe(result => {
-			console.log('The dialog was closed');
 		});
 	}
 
@@ -172,7 +166,6 @@ export class EventDetailComponent implements OnInit {
 		);
 
 		dialogRef.afterClosed().subscribe(result => {
-			console.log('The dialog was closed');
 		});
 	}
 }
