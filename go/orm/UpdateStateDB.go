@@ -91,6 +91,10 @@ type BackRepoUpdateStateStruct struct {
 	db *gorm.DB
 }
 
+func (backRepoUpdateState *BackRepoUpdateStateStruct) GetDB() *gorm.DB {
+	return backRepoUpdateState.db
+}
+
 // GetUpdateStateDBFromUpdateStatePtr is a handy function to access the back repo instance from the stage instance
 func (backRepoUpdateState *BackRepoUpdateStateStruct) GetUpdateStateDBFromUpdateStatePtr(updatestate *models.UpdateState) (updatestateDB *UpdateStateDB) {
 	id := (*backRepoUpdateState.Map_UpdateStatePtr_UpdateStateDBID)[updatestate]

@@ -9,7 +9,6 @@ import (
 	"github.com/fullstack-lang/gongsim/go/orm"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 )
 
 // declaration in order to justify use of the models import
@@ -47,8 +46,8 @@ type UpdateStateInput struct {
 //    default: genericError
 //        200: updatestateDBsResponse
 func GetUpdateStates(c *gin.Context) {
-	db := c.MustGet("db").(*gorm.DB)
-
+	db := orm.BackRepo.BackRepoUpdateState.GetDB()
+	
 	// source slice
 	var updatestateDBs []orm.UpdateStateDB
 	query := db.Find(&updatestateDBs)
@@ -61,7 +60,7 @@ func GetUpdateStates(c *gin.Context) {
 	}
 
 	// slice that will be transmitted to the front
-	var updatestateAPIs []orm.UpdateStateAPI
+	updatestateAPIs := make([]orm.UpdateStateAPI, 0)
 
 	// for each updatestate, update fields from the database nullable fields
 	for idx := range updatestateDBs {
@@ -93,7 +92,7 @@ func GetUpdateStates(c *gin.Context) {
 //     Responses:
 //       200: updatestateDBResponse
 func PostUpdateState(c *gin.Context) {
-	db := c.MustGet("db").(*gorm.DB)
+	db := orm.BackRepo.BackRepoUpdateState.GetDB()
 
 	// Validate input
 	var input orm.UpdateStateAPI
@@ -138,7 +137,7 @@ func PostUpdateState(c *gin.Context) {
 //    default: genericError
 //        200: updatestateDBResponse
 func GetUpdateState(c *gin.Context) {
-	db := c.MustGet("db").(*gorm.DB)
+	db := orm.BackRepo.BackRepoUpdateState.GetDB()
 
 	// Get updatestateDB in DB
 	var updatestateDB orm.UpdateStateDB
@@ -168,7 +167,7 @@ func GetUpdateState(c *gin.Context) {
 //    default: genericError
 //        200: updatestateDBResponse
 func UpdateUpdateState(c *gin.Context) {
-	db := c.MustGet("db").(*gorm.DB)
+	db := orm.BackRepo.BackRepoUpdateState.GetDB()
 
 	// Get model if exist
 	var updatestateDB orm.UpdateStateDB
@@ -221,7 +220,7 @@ func UpdateUpdateState(c *gin.Context) {
 // Responses:
 //    default: genericError
 func DeleteUpdateState(c *gin.Context) {
-	db := c.MustGet("db").(*gorm.DB)
+	db := orm.BackRepo.BackRepoUpdateState.GetDB()
 
 	// Get model if exist
 	var updatestateDB orm.UpdateStateDB

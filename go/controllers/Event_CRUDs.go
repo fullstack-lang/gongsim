@@ -9,7 +9,6 @@ import (
 	"github.com/fullstack-lang/gongsim/go/orm"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 )
 
 // declaration in order to justify use of the models import
@@ -47,8 +46,8 @@ type EventInput struct {
 //    default: genericError
 //        200: eventDBsResponse
 func GetEvents(c *gin.Context) {
-	db := c.MustGet("db").(*gorm.DB)
-
+	db := orm.BackRepo.BackRepoEvent.GetDB()
+	
 	// source slice
 	var eventDBs []orm.EventDB
 	query := db.Find(&eventDBs)
@@ -61,7 +60,7 @@ func GetEvents(c *gin.Context) {
 	}
 
 	// slice that will be transmitted to the front
-	var eventAPIs []orm.EventAPI
+	eventAPIs := make([]orm.EventAPI, 0)
 
 	// for each event, update fields from the database nullable fields
 	for idx := range eventDBs {
@@ -93,7 +92,7 @@ func GetEvents(c *gin.Context) {
 //     Responses:
 //       200: eventDBResponse
 func PostEvent(c *gin.Context) {
-	db := c.MustGet("db").(*gorm.DB)
+	db := orm.BackRepo.BackRepoEvent.GetDB()
 
 	// Validate input
 	var input orm.EventAPI
@@ -138,7 +137,7 @@ func PostEvent(c *gin.Context) {
 //    default: genericError
 //        200: eventDBResponse
 func GetEvent(c *gin.Context) {
-	db := c.MustGet("db").(*gorm.DB)
+	db := orm.BackRepo.BackRepoEvent.GetDB()
 
 	// Get eventDB in DB
 	var eventDB orm.EventDB
@@ -168,7 +167,7 @@ func GetEvent(c *gin.Context) {
 //    default: genericError
 //        200: eventDBResponse
 func UpdateEvent(c *gin.Context) {
-	db := c.MustGet("db").(*gorm.DB)
+	db := orm.BackRepo.BackRepoEvent.GetDB()
 
 	// Get model if exist
 	var eventDB orm.EventDB
@@ -221,7 +220,7 @@ func UpdateEvent(c *gin.Context) {
 // Responses:
 //    default: genericError
 func DeleteEvent(c *gin.Context) {
-	db := c.MustGet("db").(*gorm.DB)
+	db := orm.BackRepo.BackRepoEvent.GetDB()
 
 	// Get model if exist
 	var eventDB orm.EventDB

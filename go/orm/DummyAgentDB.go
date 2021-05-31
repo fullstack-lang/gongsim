@@ -95,6 +95,10 @@ type BackRepoDummyAgentStruct struct {
 	db *gorm.DB
 }
 
+func (backRepoDummyAgent *BackRepoDummyAgentStruct) GetDB() *gorm.DB {
+	return backRepoDummyAgent.db
+}
+
 // GetDummyAgentDBFromDummyAgentPtr is a handy function to access the back repo instance from the stage instance
 func (backRepoDummyAgent *BackRepoDummyAgentStruct) GetDummyAgentDBFromDummyAgentPtr(dummyagent *models.DummyAgent) (dummyagentDB *DummyAgentDB) {
 	id := (*backRepoDummyAgent.Map_DummyAgentPtr_DummyAgentDBID)[dummyagent]

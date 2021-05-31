@@ -106,6 +106,10 @@ type BackRepoEngineStruct struct {
 	db *gorm.DB
 }
 
+func (backRepoEngine *BackRepoEngineStruct) GetDB() *gorm.DB {
+	return backRepoEngine.db
+}
+
 // GetEngineDBFromEnginePtr is a handy function to access the back repo instance from the stage instance
 func (backRepoEngine *BackRepoEngineStruct) GetEngineDBFromEnginePtr(engine *models.Engine) (engineDB *EngineDB) {
 	id := (*backRepoEngine.Map_EnginePtr_EngineDBID)[engine]

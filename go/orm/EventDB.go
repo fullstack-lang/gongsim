@@ -88,6 +88,10 @@ type BackRepoEventStruct struct {
 	db *gorm.DB
 }
 
+func (backRepoEvent *BackRepoEventStruct) GetDB() *gorm.DB {
+	return backRepoEvent.db
+}
+
 // GetEventDBFromEventPtr is a handy function to access the back repo instance from the stage instance
 func (backRepoEvent *BackRepoEventStruct) GetEventDBFromEventPtr(event *models.Event) (eventDB *EventDB) {
 	id := (*backRepoEvent.Map_EventPtr_EventDBID)[event]

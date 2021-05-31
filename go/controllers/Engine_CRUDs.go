@@ -9,7 +9,6 @@ import (
 	"github.com/fullstack-lang/gongsim/go/orm"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 )
 
 // declaration in order to justify use of the models import
@@ -47,8 +46,8 @@ type EngineInput struct {
 //    default: genericError
 //        200: engineDBsResponse
 func GetEngines(c *gin.Context) {
-	db := c.MustGet("db").(*gorm.DB)
-
+	db := orm.BackRepo.BackRepoEngine.GetDB()
+	
 	// source slice
 	var engineDBs []orm.EngineDB
 	query := db.Find(&engineDBs)
@@ -61,7 +60,7 @@ func GetEngines(c *gin.Context) {
 	}
 
 	// slice that will be transmitted to the front
-	var engineAPIs []orm.EngineAPI
+	engineAPIs := make([]orm.EngineAPI, 0)
 
 	// for each engine, update fields from the database nullable fields
 	for idx := range engineDBs {
@@ -93,7 +92,7 @@ func GetEngines(c *gin.Context) {
 //     Responses:
 //       200: engineDBResponse
 func PostEngine(c *gin.Context) {
-	db := c.MustGet("db").(*gorm.DB)
+	db := orm.BackRepo.BackRepoEngine.GetDB()
 
 	// Validate input
 	var input orm.EngineAPI
@@ -138,7 +137,7 @@ func PostEngine(c *gin.Context) {
 //    default: genericError
 //        200: engineDBResponse
 func GetEngine(c *gin.Context) {
-	db := c.MustGet("db").(*gorm.DB)
+	db := orm.BackRepo.BackRepoEngine.GetDB()
 
 	// Get engineDB in DB
 	var engineDB orm.EngineDB
@@ -168,7 +167,7 @@ func GetEngine(c *gin.Context) {
 //    default: genericError
 //        200: engineDBResponse
 func UpdateEngine(c *gin.Context) {
-	db := c.MustGet("db").(*gorm.DB)
+	db := orm.BackRepo.BackRepoEngine.GetDB()
 
 	// Get model if exist
 	var engineDB orm.EngineDB
@@ -221,7 +220,7 @@ func UpdateEngine(c *gin.Context) {
 // Responses:
 //    default: genericError
 func DeleteEngine(c *gin.Context) {
-	db := c.MustGet("db").(*gorm.DB)
+	db := orm.BackRepo.BackRepoEngine.GetDB()
 
 	// Get model if exist
 	var engineDB orm.EngineDB

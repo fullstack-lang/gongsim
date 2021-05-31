@@ -9,7 +9,6 @@ import (
 	"github.com/fullstack-lang/gongsim/go/orm"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 )
 
 // declaration in order to justify use of the models import
@@ -47,8 +46,8 @@ type GongsimCommandInput struct {
 //    default: genericError
 //        200: gongsimcommandDBsResponse
 func GetGongsimCommands(c *gin.Context) {
-	db := c.MustGet("db").(*gorm.DB)
-
+	db := orm.BackRepo.BackRepoGongsimCommand.GetDB()
+	
 	// source slice
 	var gongsimcommandDBs []orm.GongsimCommandDB
 	query := db.Find(&gongsimcommandDBs)
@@ -61,7 +60,7 @@ func GetGongsimCommands(c *gin.Context) {
 	}
 
 	// slice that will be transmitted to the front
-	var gongsimcommandAPIs []orm.GongsimCommandAPI
+	gongsimcommandAPIs := make([]orm.GongsimCommandAPI, 0)
 
 	// for each gongsimcommand, update fields from the database nullable fields
 	for idx := range gongsimcommandDBs {
@@ -93,7 +92,7 @@ func GetGongsimCommands(c *gin.Context) {
 //     Responses:
 //       200: gongsimcommandDBResponse
 func PostGongsimCommand(c *gin.Context) {
-	db := c.MustGet("db").(*gorm.DB)
+	db := orm.BackRepo.BackRepoGongsimCommand.GetDB()
 
 	// Validate input
 	var input orm.GongsimCommandAPI
@@ -138,7 +137,7 @@ func PostGongsimCommand(c *gin.Context) {
 //    default: genericError
 //        200: gongsimcommandDBResponse
 func GetGongsimCommand(c *gin.Context) {
-	db := c.MustGet("db").(*gorm.DB)
+	db := orm.BackRepo.BackRepoGongsimCommand.GetDB()
 
 	// Get gongsimcommandDB in DB
 	var gongsimcommandDB orm.GongsimCommandDB
@@ -168,7 +167,7 @@ func GetGongsimCommand(c *gin.Context) {
 //    default: genericError
 //        200: gongsimcommandDBResponse
 func UpdateGongsimCommand(c *gin.Context) {
-	db := c.MustGet("db").(*gorm.DB)
+	db := orm.BackRepo.BackRepoGongsimCommand.GetDB()
 
 	// Get model if exist
 	var gongsimcommandDB orm.GongsimCommandDB
@@ -221,7 +220,7 @@ func UpdateGongsimCommand(c *gin.Context) {
 // Responses:
 //    default: genericError
 func DeleteGongsimCommand(c *gin.Context) {
-	db := c.MustGet("db").(*gorm.DB)
+	db := orm.BackRepo.BackRepoGongsimCommand.GetDB()
 
 	// Get model if exist
 	var gongsimcommandDB orm.GongsimCommandDB

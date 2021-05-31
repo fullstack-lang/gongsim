@@ -97,6 +97,10 @@ type BackRepoGongsimCommandStruct struct {
 	db *gorm.DB
 }
 
+func (backRepoGongsimCommand *BackRepoGongsimCommandStruct) GetDB() *gorm.DB {
+	return backRepoGongsimCommand.db
+}
+
 // GetGongsimCommandDBFromGongsimCommandPtr is a handy function to access the back repo instance from the stage instance
 func (backRepoGongsimCommand *BackRepoGongsimCommandStruct) GetGongsimCommandDBFromGongsimCommandPtr(gongsimcommand *models.GongsimCommand) (gongsimcommandDB *GongsimCommandDB) {
 	id := (*backRepoGongsimCommand.Map_GongsimCommandPtr_GongsimCommandDBID)[gongsimcommand]

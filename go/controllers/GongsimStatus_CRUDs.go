@@ -9,7 +9,6 @@ import (
 	"github.com/fullstack-lang/gongsim/go/orm"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 )
 
 // declaration in order to justify use of the models import
@@ -47,8 +46,8 @@ type GongsimStatusInput struct {
 //    default: genericError
 //        200: gongsimstatusDBsResponse
 func GetGongsimStatuss(c *gin.Context) {
-	db := c.MustGet("db").(*gorm.DB)
-
+	db := orm.BackRepo.BackRepoGongsimStatus.GetDB()
+	
 	// source slice
 	var gongsimstatusDBs []orm.GongsimStatusDB
 	query := db.Find(&gongsimstatusDBs)
@@ -61,7 +60,7 @@ func GetGongsimStatuss(c *gin.Context) {
 	}
 
 	// slice that will be transmitted to the front
-	var gongsimstatusAPIs []orm.GongsimStatusAPI
+	gongsimstatusAPIs := make([]orm.GongsimStatusAPI, 0)
 
 	// for each gongsimstatus, update fields from the database nullable fields
 	for idx := range gongsimstatusDBs {
@@ -93,7 +92,7 @@ func GetGongsimStatuss(c *gin.Context) {
 //     Responses:
 //       200: gongsimstatusDBResponse
 func PostGongsimStatus(c *gin.Context) {
-	db := c.MustGet("db").(*gorm.DB)
+	db := orm.BackRepo.BackRepoGongsimStatus.GetDB()
 
 	// Validate input
 	var input orm.GongsimStatusAPI
@@ -138,7 +137,7 @@ func PostGongsimStatus(c *gin.Context) {
 //    default: genericError
 //        200: gongsimstatusDBResponse
 func GetGongsimStatus(c *gin.Context) {
-	db := c.MustGet("db").(*gorm.DB)
+	db := orm.BackRepo.BackRepoGongsimStatus.GetDB()
 
 	// Get gongsimstatusDB in DB
 	var gongsimstatusDB orm.GongsimStatusDB
@@ -168,7 +167,7 @@ func GetGongsimStatus(c *gin.Context) {
 //    default: genericError
 //        200: gongsimstatusDBResponse
 func UpdateGongsimStatus(c *gin.Context) {
-	db := c.MustGet("db").(*gorm.DB)
+	db := orm.BackRepo.BackRepoGongsimStatus.GetDB()
 
 	// Get model if exist
 	var gongsimstatusDB orm.GongsimStatusDB
@@ -221,7 +220,7 @@ func UpdateGongsimStatus(c *gin.Context) {
 // Responses:
 //    default: genericError
 func DeleteGongsimStatus(c *gin.Context) {
-	db := c.MustGet("db").(*gorm.DB)
+	db := orm.BackRepo.BackRepoGongsimStatus.GetDB()
 
 	// Get model if exist
 	var gongsimstatusDB orm.GongsimStatusDB

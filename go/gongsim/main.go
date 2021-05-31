@@ -77,11 +77,7 @@ func main() {
 	r := gin.Default()
 	r.Use(cors.Default())
 
-	// Provide db variable to controllers
-	r.Use(func(c *gin.Context) {
-		c.Set("db", db) // a gin Context can have a map of variable that is set up at runtime
-		c.Next()
-	})
+	orm.BackRepo.Init(db)
 
 	controllers.RegisterControllers(r)
 

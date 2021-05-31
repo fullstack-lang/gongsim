@@ -9,7 +9,6 @@ import (
 	"github.com/fullstack-lang/gongsim/go/orm"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 )
 
 // declaration in order to justify use of the models import
@@ -47,8 +46,8 @@ type DummyAgentInput struct {
 //    default: genericError
 //        200: dummyagentDBsResponse
 func GetDummyAgents(c *gin.Context) {
-	db := c.MustGet("db").(*gorm.DB)
-
+	db := orm.BackRepo.BackRepoDummyAgent.GetDB()
+	
 	// source slice
 	var dummyagentDBs []orm.DummyAgentDB
 	query := db.Find(&dummyagentDBs)
@@ -61,7 +60,7 @@ func GetDummyAgents(c *gin.Context) {
 	}
 
 	// slice that will be transmitted to the front
-	var dummyagentAPIs []orm.DummyAgentAPI
+	dummyagentAPIs := make([]orm.DummyAgentAPI, 0)
 
 	// for each dummyagent, update fields from the database nullable fields
 	for idx := range dummyagentDBs {
@@ -93,7 +92,7 @@ func GetDummyAgents(c *gin.Context) {
 //     Responses:
 //       200: dummyagentDBResponse
 func PostDummyAgent(c *gin.Context) {
-	db := c.MustGet("db").(*gorm.DB)
+	db := orm.BackRepo.BackRepoDummyAgent.GetDB()
 
 	// Validate input
 	var input orm.DummyAgentAPI
@@ -138,7 +137,7 @@ func PostDummyAgent(c *gin.Context) {
 //    default: genericError
 //        200: dummyagentDBResponse
 func GetDummyAgent(c *gin.Context) {
-	db := c.MustGet("db").(*gorm.DB)
+	db := orm.BackRepo.BackRepoDummyAgent.GetDB()
 
 	// Get dummyagentDB in DB
 	var dummyagentDB orm.DummyAgentDB
@@ -168,7 +167,7 @@ func GetDummyAgent(c *gin.Context) {
 //    default: genericError
 //        200: dummyagentDBResponse
 func UpdateDummyAgent(c *gin.Context) {
-	db := c.MustGet("db").(*gorm.DB)
+	db := orm.BackRepo.BackRepoDummyAgent.GetDB()
 
 	// Get model if exist
 	var dummyagentDB orm.DummyAgentDB
@@ -221,7 +220,7 @@ func UpdateDummyAgent(c *gin.Context) {
 // Responses:
 //    default: genericError
 func DeleteDummyAgent(c *gin.Context) {
-	db := c.MustGet("db").(*gorm.DB)
+	db := orm.BackRepo.BackRepoDummyAgent.GetDB()
 
 	// Get model if exist
 	var dummyagentDB orm.DummyAgentDB
