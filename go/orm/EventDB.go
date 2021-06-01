@@ -268,7 +268,7 @@ func (backRepoEvent *BackRepoEventStruct) CheckoutPhaseOneInstance(eventDB *Even
 	}
 	eventDB.CopyBasicFieldsToEvent(event)
 
-	// preserve pointer to aclassDB. Otherwise, pointer will is recycled and the map of pointers
+	// preserve pointer to eventDB. Otherwise, pointer will is recycled and the map of pointers
 	// Map_EventDBID_EventDB)[eventDB hold variable pointers
 	eventDB_Data := *eventDB
 	preservedPtrToEvent := &eventDB_Data
@@ -351,7 +351,7 @@ func (backRepoEvent *BackRepoEventStruct) Backup(dirPath string) {
 
 	// organize the map into an array with increasing IDs, in order to have repoductible
 	// backup file
-	var forBackup []*EventDB
+	forBackup := make([]*EventDB, 0)
 	for _, eventDB := range *backRepoEvent.Map_EventDBID_EventDB {
 		forBackup = append(forBackup, eventDB)
 	}
@@ -372,7 +372,13 @@ func (backRepoEvent *BackRepoEventStruct) Backup(dirPath string) {
 	}
 }
 
-func (backRepoEvent *BackRepoEventStruct) Restore(dirPath string) {
+// RestorePhaseOne read the file "EventDB.json" in dirPath that stores an array
+// of EventDB and stores it in the database
+// the map BackRepoEventid_atBckpTime_newID is updated accordingly
+func (backRepoEvent *BackRepoEventStruct) RestorePhaseOne(dirPath string) {
+
+	// resets the map
+	BackRepoEventid_atBckpTime_newID = make(map[uint]uint)
 
 	filename := filepath.Join(dirPath, "EventDB.json")
 	jsonFile, err := os.Open(filename)
@@ -391,19 +397,40 @@ func (backRepoEvent *BackRepoEventStruct) Restore(dirPath string) {
 	// fill up Map_EventDBID_EventDB
 	for _, eventDB := range forRestore {
 
-		eventDB_ID := eventDB.ID
+		eventDB_ID_atBackupTime := eventDB.ID
 		eventDB.ID = 0
 		query := backRepoEvent.db.Create(eventDB)
 		if query.Error != nil {
 			log.Panic(query.Error)
 		}
-		if eventDB_ID != eventDB.ID {
-			log.Panicf("ID of Event restore ID %d, name %s, has wrong ID %d in DB after create",
-				eventDB_ID, eventDB.Name_Data.String, eventDB.ID)
-		}
+		(*backRepoEvent.Map_EventDBID_EventDB)[eventDB.ID] = eventDB
+		BackRepoEventid_atBckpTime_newID[eventDB_ID_atBackupTime] = eventDB.ID
 	}
 
 	if err != nil {
 		log.Panic("Cannot restore/unmarshall json Event file", err.Error())
 	}
 }
+
+// RestorePhaseTwo uses all map BackRepo<Event>id_atBckpTime_newID
+// to compute new index
+func (backRepoEvent *BackRepoEventStruct) RestorePhaseTwo() {
+
+	for _, eventDB := range (*backRepoEvent.Map_EventDBID_EventDB) {
+
+		// next line of code is to avert unused variable compilation error
+		_ = eventDB
+
+		// insertion point for reindexing pointers encoding
+		// update databse with new index encoding
+		query := backRepoEvent.db.Model(eventDB).Updates(*eventDB)
+		if query.Error != nil {
+			log.Panic(query.Error)
+		}
+	}
+
+}
+
+// this field is used during the restauration process.
+// it stores the ID at the backup time and is used for renumbering
+var BackRepoEventid_atBckpTime_newID map[uint]uint

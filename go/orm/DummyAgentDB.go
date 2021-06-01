@@ -283,7 +283,7 @@ func (backRepoDummyAgent *BackRepoDummyAgentStruct) CheckoutPhaseOneInstance(dum
 	}
 	dummyagentDB.CopyBasicFieldsToDummyAgent(dummyagent)
 
-	// preserve pointer to aclassDB. Otherwise, pointer will is recycled and the map of pointers
+	// preserve pointer to dummyagentDB. Otherwise, pointer will is recycled and the map of pointers
 	// Map_DummyAgentDBID_DummyAgentDB)[dummyagentDB hold variable pointers
 	dummyagentDB_Data := *dummyagentDB
 	preservedPtrToDummyAgent := &dummyagentDB_Data
@@ -370,7 +370,7 @@ func (backRepoDummyAgent *BackRepoDummyAgentStruct) Backup(dirPath string) {
 
 	// organize the map into an array with increasing IDs, in order to have repoductible
 	// backup file
-	var forBackup []*DummyAgentDB
+	forBackup := make([]*DummyAgentDB, 0)
 	for _, dummyagentDB := range *backRepoDummyAgent.Map_DummyAgentDBID_DummyAgentDB {
 		forBackup = append(forBackup, dummyagentDB)
 	}
@@ -391,7 +391,13 @@ func (backRepoDummyAgent *BackRepoDummyAgentStruct) Backup(dirPath string) {
 	}
 }
 
-func (backRepoDummyAgent *BackRepoDummyAgentStruct) Restore(dirPath string) {
+// RestorePhaseOne read the file "DummyAgentDB.json" in dirPath that stores an array
+// of DummyAgentDB and stores it in the database
+// the map BackRepoDummyAgentid_atBckpTime_newID is updated accordingly
+func (backRepoDummyAgent *BackRepoDummyAgentStruct) RestorePhaseOne(dirPath string) {
+
+	// resets the map
+	BackRepoDummyAgentid_atBckpTime_newID = make(map[uint]uint)
 
 	filename := filepath.Join(dirPath, "DummyAgentDB.json")
 	jsonFile, err := os.Open(filename)
@@ -410,19 +416,45 @@ func (backRepoDummyAgent *BackRepoDummyAgentStruct) Restore(dirPath string) {
 	// fill up Map_DummyAgentDBID_DummyAgentDB
 	for _, dummyagentDB := range forRestore {
 
-		dummyagentDB_ID := dummyagentDB.ID
+		dummyagentDB_ID_atBackupTime := dummyagentDB.ID
 		dummyagentDB.ID = 0
 		query := backRepoDummyAgent.db.Create(dummyagentDB)
 		if query.Error != nil {
 			log.Panic(query.Error)
 		}
-		if dummyagentDB_ID != dummyagentDB.ID {
-			log.Panicf("ID of DummyAgent restore ID %d, name %s, has wrong ID %d in DB after create",
-				dummyagentDB_ID, dummyagentDB.Name_Data.String, dummyagentDB.ID)
-		}
+		(*backRepoDummyAgent.Map_DummyAgentDBID_DummyAgentDB)[dummyagentDB.ID] = dummyagentDB
+		BackRepoDummyAgentid_atBckpTime_newID[dummyagentDB_ID_atBackupTime] = dummyagentDB.ID
 	}
 
 	if err != nil {
 		log.Panic("Cannot restore/unmarshall json DummyAgent file", err.Error())
 	}
 }
+
+// RestorePhaseTwo uses all map BackRepo<DummyAgent>id_atBckpTime_newID
+// to compute new index
+func (backRepoDummyAgent *BackRepoDummyAgentStruct) RestorePhaseTwo() {
+
+	for _, dummyagentDB := range (*backRepoDummyAgent.Map_DummyAgentDBID_DummyAgentDB) {
+
+		// next line of code is to avert unused variable compilation error
+		_ = dummyagentDB
+
+		// insertion point for reindexing pointers encoding
+		// reindexing Engine field
+		if dummyagentDB.EngineID.Int64 != 0 {
+			dummyagentDB.EngineID.Int64 = int64(BackRepoEngineid_atBckpTime_newID[uint(dummyagentDB.EngineID.Int64)])
+		}
+
+		// update databse with new index encoding
+		query := backRepoDummyAgent.db.Model(dummyagentDB).Updates(*dummyagentDB)
+		if query.Error != nil {
+			log.Panic(query.Error)
+		}
+	}
+
+}
+
+// this field is used during the restauration process.
+// it stores the ID at the backup time and is used for renumbering
+var BackRepoDummyAgentid_atBckpTime_newID map[uint]uint

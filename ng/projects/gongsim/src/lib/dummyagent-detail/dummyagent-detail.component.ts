@@ -169,4 +169,10 @@ export class DummyAgentDetailComponent implements OnInit {
 		dialogRef.afterClosed().subscribe(result => {
 		});
 	}
+
+	fillUpNameIfEmpty(event) {
+		if (this.dummyagent.Name == undefined) {
+			this.dummyagent.Name = event.value.Name		
+		}
+	}
 }

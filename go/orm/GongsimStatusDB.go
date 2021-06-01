@@ -277,7 +277,7 @@ func (backRepoGongsimStatus *BackRepoGongsimStatusStruct) CheckoutPhaseOneInstan
 	}
 	gongsimstatusDB.CopyBasicFieldsToGongsimStatus(gongsimstatus)
 
-	// preserve pointer to aclassDB. Otherwise, pointer will is recycled and the map of pointers
+	// preserve pointer to gongsimstatusDB. Otherwise, pointer will is recycled and the map of pointers
 	// Map_GongsimStatusDBID_GongsimStatusDB)[gongsimstatusDB hold variable pointers
 	gongsimstatusDB_Data := *gongsimstatusDB
 	preservedPtrToGongsimStatus := &gongsimstatusDB_Data
@@ -372,7 +372,7 @@ func (backRepoGongsimStatus *BackRepoGongsimStatusStruct) Backup(dirPath string)
 
 	// organize the map into an array with increasing IDs, in order to have repoductible
 	// backup file
-	var forBackup []*GongsimStatusDB
+	forBackup := make([]*GongsimStatusDB, 0)
 	for _, gongsimstatusDB := range *backRepoGongsimStatus.Map_GongsimStatusDBID_GongsimStatusDB {
 		forBackup = append(forBackup, gongsimstatusDB)
 	}
@@ -393,7 +393,13 @@ func (backRepoGongsimStatus *BackRepoGongsimStatusStruct) Backup(dirPath string)
 	}
 }
 
-func (backRepoGongsimStatus *BackRepoGongsimStatusStruct) Restore(dirPath string) {
+// RestorePhaseOne read the file "GongsimStatusDB.json" in dirPath that stores an array
+// of GongsimStatusDB and stores it in the database
+// the map BackRepoGongsimStatusid_atBckpTime_newID is updated accordingly
+func (backRepoGongsimStatus *BackRepoGongsimStatusStruct) RestorePhaseOne(dirPath string) {
+
+	// resets the map
+	BackRepoGongsimStatusid_atBckpTime_newID = make(map[uint]uint)
 
 	filename := filepath.Join(dirPath, "GongsimStatusDB.json")
 	jsonFile, err := os.Open(filename)
@@ -412,19 +418,40 @@ func (backRepoGongsimStatus *BackRepoGongsimStatusStruct) Restore(dirPath string
 	// fill up Map_GongsimStatusDBID_GongsimStatusDB
 	for _, gongsimstatusDB := range forRestore {
 
-		gongsimstatusDB_ID := gongsimstatusDB.ID
+		gongsimstatusDB_ID_atBackupTime := gongsimstatusDB.ID
 		gongsimstatusDB.ID = 0
 		query := backRepoGongsimStatus.db.Create(gongsimstatusDB)
 		if query.Error != nil {
 			log.Panic(query.Error)
 		}
-		if gongsimstatusDB_ID != gongsimstatusDB.ID {
-			log.Panicf("ID of GongsimStatus restore ID %d, name %s, has wrong ID %d in DB after create",
-				gongsimstatusDB_ID, gongsimstatusDB.Name_Data.String, gongsimstatusDB.ID)
-		}
+		(*backRepoGongsimStatus.Map_GongsimStatusDBID_GongsimStatusDB)[gongsimstatusDB.ID] = gongsimstatusDB
+		BackRepoGongsimStatusid_atBckpTime_newID[gongsimstatusDB_ID_atBackupTime] = gongsimstatusDB.ID
 	}
 
 	if err != nil {
 		log.Panic("Cannot restore/unmarshall json GongsimStatus file", err.Error())
 	}
 }
+
+// RestorePhaseTwo uses all map BackRepo<GongsimStatus>id_atBckpTime_newID
+// to compute new index
+func (backRepoGongsimStatus *BackRepoGongsimStatusStruct) RestorePhaseTwo() {
+
+	for _, gongsimstatusDB := range (*backRepoGongsimStatus.Map_GongsimStatusDBID_GongsimStatusDB) {
+
+		// next line of code is to avert unused variable compilation error
+		_ = gongsimstatusDB
+
+		// insertion point for reindexing pointers encoding
+		// update databse with new index encoding
+		query := backRepoGongsimStatus.db.Model(gongsimstatusDB).Updates(*gongsimstatusDB)
+		if query.Error != nil {
+			log.Panic(query.Error)
+		}
+	}
+
+}
+
+// this field is used during the restauration process.
+// it stores the ID at the backup time and is used for renumbering
+var BackRepoGongsimStatusid_atBckpTime_newID map[uint]uint

@@ -163,4 +163,10 @@ export class GongsimCommandDetailComponent implements OnInit {
 		dialogRef.afterClosed().subscribe(result => {
 		});
 	}
+
+	fillUpNameIfEmpty(event) {
+		if (this.gongsimcommand.Name == undefined) {
+			this.gongsimcommand.Name = event.value.Name		
+		}
+	}
 }

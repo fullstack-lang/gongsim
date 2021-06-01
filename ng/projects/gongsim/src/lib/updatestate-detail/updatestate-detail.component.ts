@@ -179,4 +179,10 @@ export class UpdateStateDetailComponent implements OnInit {
 		dialogRef.afterClosed().subscribe(result => {
 		});
 	}
+
+	fillUpNameIfEmpty(event) {
+		if (this.updatestate.Name == undefined) {
+			this.updatestate.Name = event.value.Name		
+		}
+	}
 }

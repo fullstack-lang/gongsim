@@ -13,7 +13,7 @@
     <div class="details__item">
         <mat-form-field>
             <mat-label>Engine</mat-label>
-            <mat-select [(ngModel)]="dummyagent.Engine">
+            <mat-select [(ngModel)]="dummyagent.Engine" (selectionChange)="fillUpNameIfEmpty($event)">
                 <mat-option>None</mat-option>
                 <mat-option *ngFor="let engine of frontRepo.Engines_array" [value]="engine">
                     {{engine.Name}}

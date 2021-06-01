@@ -163,4 +163,10 @@ export class GongsimStatusDetailComponent implements OnInit {
 		dialogRef.afterClosed().subscribe(result => {
 		});
 	}
+
+	fillUpNameIfEmpty(event) {
+		if (this.gongsimstatus.Name == undefined) {
+			this.gongsimstatus.Name = event.value.Name		
+		}
+	}
 }

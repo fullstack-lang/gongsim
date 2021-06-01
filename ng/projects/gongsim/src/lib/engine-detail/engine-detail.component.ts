@@ -163,4 +163,10 @@ export class EngineDetailComponent implements OnInit {
 		dialogRef.afterClosed().subscribe(result => {
 		});
 	}
+
+	fillUpNameIfEmpty(event) {
+		if (this.engine.Name == undefined) {
+			this.engine.Name = event.value.Name		
+		}
+	}
 }

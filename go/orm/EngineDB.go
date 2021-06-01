@@ -286,7 +286,7 @@ func (backRepoEngine *BackRepoEngineStruct) CheckoutPhaseOneInstance(engineDB *E
 	}
 	engineDB.CopyBasicFieldsToEngine(engine)
 
-	// preserve pointer to aclassDB. Otherwise, pointer will is recycled and the map of pointers
+	// preserve pointer to engineDB. Otherwise, pointer will is recycled and the map of pointers
 	// Map_EngineDBID_EngineDB)[engineDB hold variable pointers
 	engineDB_Data := *engineDB
 	preservedPtrToEngine := &engineDB_Data
@@ -393,7 +393,7 @@ func (backRepoEngine *BackRepoEngineStruct) Backup(dirPath string) {
 
 	// organize the map into an array with increasing IDs, in order to have repoductible
 	// backup file
-	var forBackup []*EngineDB
+	forBackup := make([]*EngineDB, 0)
 	for _, engineDB := range *backRepoEngine.Map_EngineDBID_EngineDB {
 		forBackup = append(forBackup, engineDB)
 	}
@@ -414,7 +414,13 @@ func (backRepoEngine *BackRepoEngineStruct) Backup(dirPath string) {
 	}
 }
 
-func (backRepoEngine *BackRepoEngineStruct) Restore(dirPath string) {
+// RestorePhaseOne read the file "EngineDB.json" in dirPath that stores an array
+// of EngineDB and stores it in the database
+// the map BackRepoEngineid_atBckpTime_newID is updated accordingly
+func (backRepoEngine *BackRepoEngineStruct) RestorePhaseOne(dirPath string) {
+
+	// resets the map
+	BackRepoEngineid_atBckpTime_newID = make(map[uint]uint)
 
 	filename := filepath.Join(dirPath, "EngineDB.json")
 	jsonFile, err := os.Open(filename)
@@ -433,19 +439,40 @@ func (backRepoEngine *BackRepoEngineStruct) Restore(dirPath string) {
 	// fill up Map_EngineDBID_EngineDB
 	for _, engineDB := range forRestore {
 
-		engineDB_ID := engineDB.ID
+		engineDB_ID_atBackupTime := engineDB.ID
 		engineDB.ID = 0
 		query := backRepoEngine.db.Create(engineDB)
 		if query.Error != nil {
 			log.Panic(query.Error)
 		}
-		if engineDB_ID != engineDB.ID {
-			log.Panicf("ID of Engine restore ID %d, name %s, has wrong ID %d in DB after create",
-				engineDB_ID, engineDB.Name_Data.String, engineDB.ID)
-		}
+		(*backRepoEngine.Map_EngineDBID_EngineDB)[engineDB.ID] = engineDB
+		BackRepoEngineid_atBckpTime_newID[engineDB_ID_atBackupTime] = engineDB.ID
 	}
 
 	if err != nil {
 		log.Panic("Cannot restore/unmarshall json Engine file", err.Error())
 	}
 }
+
+// RestorePhaseTwo uses all map BackRepo<Engine>id_atBckpTime_newID
+// to compute new index
+func (backRepoEngine *BackRepoEngineStruct) RestorePhaseTwo() {
+
+	for _, engineDB := range (*backRepoEngine.Map_EngineDBID_EngineDB) {
+
+		// next line of code is to avert unused variable compilation error
+		_ = engineDB
+
+		// insertion point for reindexing pointers encoding
+		// update databse with new index encoding
+		query := backRepoEngine.db.Model(engineDB).Updates(*engineDB)
+		if query.Error != nil {
+			log.Panic(query.Error)
+		}
+	}
+
+}
+
+// this field is used during the restauration process.
+// it stores the ID at the backup time and is used for renumbering
+var BackRepoEngineid_atBckpTime_newID map[uint]uint

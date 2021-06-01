@@ -168,4 +168,10 @@ export class EventDetailComponent implements OnInit {
 		dialogRef.afterClosed().subscribe(result => {
 		});
 	}
+
+	fillUpNameIfEmpty(event) {
+		if (this.event.Name == undefined) {
+			this.event.Name = event.value.Name		
+		}
+	}
 }
