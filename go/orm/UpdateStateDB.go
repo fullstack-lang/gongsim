@@ -13,7 +13,9 @@ import (
 	"sort"
 	"time"
 
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
+
+	"github.com/tealeg/xlsx/v3"
 
 	"github.com/fullstack-lang/gongsim/go/models"
 )
@@ -77,6 +79,30 @@ type UpdateStateDBs []UpdateStateDB
 type UpdateStateDBResponse struct {
 	UpdateStateDB
 }
+
+// UpdateStateWOP is a UpdateState without pointers
+// it holds the same basic fields but pointers are encoded into uint
+type UpdateStateWOP struct {
+	ID int
+
+	// insertion for WOP basic fields
+
+	Name string
+
+	Duration time.Duration
+
+	Period time.Duration
+	// insertion for WOP pointer fields
+}
+
+var UpdateState_Fields = []string{
+	// insertion for WOP basic fields
+	"ID",
+	"Name",
+	"Duration",
+	"Period",
+}
+
 
 type BackRepoUpdateStateStruct struct {
 	// stores UpdateStateDB according to their gorm ID
@@ -267,6 +293,7 @@ func (backRepoUpdateState *BackRepoUpdateStateStruct) CheckoutPhaseOneInstance(u
 		(*backRepoUpdateState.Map_UpdateStatePtr_UpdateStateDBID)[updatestate] = updatestateDB.ID
 
 		// append model store with the new element
+		updatestate.Name = updatestateDB.Name_Data.String
 		updatestate.Stage()
 	}
 	updatestateDB.CopyBasicFieldsToUpdateState(updatestate)
@@ -328,7 +355,7 @@ func (backRepo *BackRepoStruct) CheckoutUpdateState(updatestate *models.UpdateSt
 	}
 }
 
-// CopyBasicFieldsToUpdateStateDB is used to copy basic fields between the Stage or the CRUD to the back repo
+// CopyBasicFieldsFromUpdateState
 func (updatestateDB *UpdateStateDB) CopyBasicFieldsFromUpdateState(updatestate *models.UpdateState) {
 	// insertion point for fields commit
 	updatestateDB.Name_Data.String = updatestate.Name
@@ -342,9 +369,31 @@ func (updatestateDB *UpdateStateDB) CopyBasicFieldsFromUpdateState(updatestate *
 
 }
 
-// CopyBasicFieldsToUpdateStateDB is used to copy basic fields between the Stage or the CRUD to the back repo
-func (updatestateDB *UpdateStateDB) CopyBasicFieldsToUpdateState(updatestate *models.UpdateState) {
+// CopyBasicFieldsFromUpdateStateWOP
+func (updatestateDB *UpdateStateDB) CopyBasicFieldsFromUpdateStateWOP(updatestate *UpdateStateWOP) {
+	// insertion point for fields commit
+	updatestateDB.Name_Data.String = updatestate.Name
+	updatestateDB.Name_Data.Valid = true
 
+	updatestateDB.Duration_Data.Int64 = int64(updatestate.Duration)
+	updatestateDB.Duration_Data.Valid = true
+
+	updatestateDB.Period_Data.Int64 = int64(updatestate.Period)
+	updatestateDB.Period_Data.Valid = true
+
+}
+
+// CopyBasicFieldsToUpdateState
+func (updatestateDB *UpdateStateDB) CopyBasicFieldsToUpdateState(updatestate *models.UpdateState) {
+	// insertion point for checkout of basic fields (back repo to stage)
+	updatestate.Name = updatestateDB.Name_Data.String
+	updatestate.Duration = time.Duration(updatestateDB.Duration_Data.Int64)
+	updatestate.Period = time.Duration(updatestateDB.Period_Data.Int64)
+}
+
+// CopyBasicFieldsToUpdateStateWOP
+func (updatestateDB *UpdateStateDB) CopyBasicFieldsToUpdateStateWOP(updatestate *UpdateStateWOP) {
+	updatestate.ID = int(updatestateDB.ID)
 	// insertion point for checkout of basic fields (back repo to stage)
 	updatestate.Name = updatestateDB.Name_Data.String
 	updatestate.Duration = time.Duration(updatestateDB.Duration_Data.Int64)
@@ -376,6 +425,38 @@ func (backRepoUpdateState *BackRepoUpdateStateStruct) Backup(dirPath string) {
 	err = ioutil.WriteFile(filename, file, 0644)
 	if err != nil {
 		log.Panic("Cannot write the json UpdateState file", err.Error())
+	}
+}
+
+// Backup generates a json file from a slice of all UpdateStateDB instances in the backrepo
+func (backRepoUpdateState *BackRepoUpdateStateStruct) BackupXL(file *xlsx.File) {
+
+	// organize the map into an array with increasing IDs, in order to have repoductible
+	// backup file
+	forBackup := make([]*UpdateStateDB, 0)
+	for _, updatestateDB := range *backRepoUpdateState.Map_UpdateStateDBID_UpdateStateDB {
+		forBackup = append(forBackup, updatestateDB)
+	}
+
+	sort.Slice(forBackup[:], func(i, j int) bool {
+		return forBackup[i].ID < forBackup[j].ID
+	})
+
+	sh, err := file.AddSheet("UpdateState")
+	if err != nil {
+		log.Panic("Cannot add XL file", err.Error())
+	}
+	_ = sh
+
+	row := sh.AddRow()
+	row.WriteSlice(&UpdateState_Fields, -1)
+	for _, updatestateDB := range forBackup {
+
+		var updatestateWOP UpdateStateWOP
+		updatestateDB.CopyBasicFieldsToUpdateStateWOP(&updatestateWOP)
+
+		row := sh.AddRow()
+		row.WriteStruct(&updatestateWOP, -1)
 	}
 }
 

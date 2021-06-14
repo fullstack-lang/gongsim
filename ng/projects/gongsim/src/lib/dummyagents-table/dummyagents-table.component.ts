@@ -20,7 +20,7 @@ import { FrontRepoService, FrontRepo } from '../front-repo.service'
 
 // generated table component
 @Component({
-  selector: 'app-dummyagents-table',
+  selector: 'app-dummyagentstable',
   templateUrl: './dummyagents-table.component.html',
   styleUrls: ['./dummyagents-table.component.css'],
 })
@@ -47,6 +47,37 @@ export class DummyAgentsTableComponent implements OnInit {
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
   ngAfterViewInit() {
+
+	// enable sorting on all fields (including pointers and reverse pointer)
+	this.matTableDataSource.sortingDataAccessor = (dummyagentDB: DummyAgentDB, property: string) => {
+		switch (property) {
+				// insertion point for specific sorting accessor
+  			case 'Engine':
+				return (dummyagentDB.Engine ? dummyagentDB.Engine.Name : '');
+
+				default:
+					return DummyAgentDB[property];
+		}
+	}; 
+
+	// enable filtering on all fields (including pointers and reverse pointer, which is not done by default)
+	this.matTableDataSource.filterPredicate = (dummyagentDB: DummyAgentDB, filter: string) => {
+
+		// filtering is based on finding a lower case filter into a concatenated string
+		// the dummyagentDB properties
+		let mergedContent = ""
+
+		// insertion point for merging of fields
+		mergedContent += dummyagentDB.TechName.toLowerCase()
+		if (dummyagentDB.Engine) {
+    		mergedContent += dummyagentDB.Engine.Name.toLowerCase()
+		}
+		mergedContent += dummyagentDB.Name.toLowerCase()
+
+		let isSelected = mergedContent.includes(filter.toLowerCase())
+		return isSelected
+	};
+
     this.matTableDataSource.sort = this.sort;
     this.matTableDataSource.paginator = this.paginator;
   }
@@ -147,14 +178,14 @@ export class DummyAgentsTableComponent implements OnInit {
 
   // display dummyagent in router
   displayDummyAgentInRouter(dummyagentID: number) {
-    this.router.navigate(["dummyagent-display", dummyagentID])
+    this.router.navigate(["github_com_fullstack_lang_gongsim_go-" + "dummyagent-display", dummyagentID])
   }
 
   // set editor outlet
   setEditorRouterOutlet(dummyagentID: number) {
     this.router.navigate([{
       outlets: {
-        editor: ["dummyagent-detail", dummyagentID]
+        github_com_fullstack_lang_gongsim_go_editor: ["github_com_fullstack_lang_gongsim_go-" + "dummyagent-detail", dummyagentID]
       }
     }]);
   }
@@ -163,7 +194,7 @@ export class DummyAgentsTableComponent implements OnInit {
   setPresentationRouterOutlet(dummyagentID: number) {
     this.router.navigate([{
       outlets: {
-        presentation: ["dummyagent-presentation", dummyagentID]
+        github_com_fullstack_lang_gongsim_go_presentation: ["github_com_fullstack_lang_gongsim_go-" + "dummyagent-presentation", dummyagentID]
       }
     }]);
   }

@@ -20,7 +20,7 @@ import { FrontRepoService, FrontRepo } from '../front-repo.service'
 
 // generated table component
 @Component({
-  selector: 'app-engines-table',
+  selector: 'app-enginestable',
   templateUrl: './engines-table.component.html',
   styleUrls: ['./engines-table.component.css'],
 })
@@ -47,6 +47,37 @@ export class EnginesTableComponent implements OnInit {
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
   ngAfterViewInit() {
+
+	// enable sorting on all fields (including pointers and reverse pointer)
+	this.matTableDataSource.sortingDataAccessor = (engineDB: EngineDB, property: string) => {
+		switch (property) {
+				// insertion point for specific sorting accessor
+				default:
+					return EngineDB[property];
+		}
+	}; 
+
+	// enable filtering on all fields (including pointers and reverse pointer, which is not done by default)
+	this.matTableDataSource.filterPredicate = (engineDB: EngineDB, filter: string) => {
+
+		// filtering is based on finding a lower case filter into a concatenated string
+		// the engineDB properties
+		let mergedContent = ""
+
+		// insertion point for merging of fields
+		mergedContent += engineDB.Name.toLowerCase()
+		mergedContent += engineDB.EndTime.toLowerCase()
+		mergedContent += engineDB.CurrentTime.toLowerCase()
+		mergedContent += engineDB.SecondsSinceStart.toString()
+		mergedContent += engineDB.Fired.toString()
+		mergedContent += engineDB.ControlMode.toLowerCase()
+		mergedContent += engineDB.State.toLowerCase()
+		mergedContent += engineDB.Speed.toString()
+
+		let isSelected = mergedContent.includes(filter.toLowerCase())
+		return isSelected
+	};
+
     this.matTableDataSource.sort = this.sort;
     this.matTableDataSource.paginator = this.paginator;
   }
@@ -157,14 +188,14 @@ export class EnginesTableComponent implements OnInit {
 
   // display engine in router
   displayEngineInRouter(engineID: number) {
-    this.router.navigate(["engine-display", engineID])
+    this.router.navigate(["github_com_fullstack_lang_gongsim_go-" + "engine-display", engineID])
   }
 
   // set editor outlet
   setEditorRouterOutlet(engineID: number) {
     this.router.navigate([{
       outlets: {
-        editor: ["engine-detail", engineID]
+        github_com_fullstack_lang_gongsim_go_editor: ["github_com_fullstack_lang_gongsim_go-" + "engine-detail", engineID]
       }
     }]);
   }
@@ -173,7 +204,7 @@ export class EnginesTableComponent implements OnInit {
   setPresentationRouterOutlet(engineID: number) {
     this.router.navigate([{
       outlets: {
-        presentation: ["engine-presentation", engineID]
+        github_com_fullstack_lang_gongsim_go_presentation: ["github_com_fullstack_lang_gongsim_go-" + "engine-presentation", engineID]
       }
     }]);
   }

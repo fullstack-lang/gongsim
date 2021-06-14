@@ -20,7 +20,7 @@ import { FrontRepoService, FrontRepo } from '../front-repo.service'
 
 // generated table component
 @Component({
-  selector: 'app-gongsimcommands-table',
+  selector: 'app-gongsimcommandstable',
   templateUrl: './gongsimcommands-table.component.html',
   styleUrls: ['./gongsimcommands-table.component.css'],
 })
@@ -47,6 +47,34 @@ export class GongsimCommandsTableComponent implements OnInit {
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
   ngAfterViewInit() {
+
+	// enable sorting on all fields (including pointers and reverse pointer)
+	this.matTableDataSource.sortingDataAccessor = (gongsimcommandDB: GongsimCommandDB, property: string) => {
+		switch (property) {
+				// insertion point for specific sorting accessor
+				default:
+					return GongsimCommandDB[property];
+		}
+	}; 
+
+	// enable filtering on all fields (including pointers and reverse pointer, which is not done by default)
+	this.matTableDataSource.filterPredicate = (gongsimcommandDB: GongsimCommandDB, filter: string) => {
+
+		// filtering is based on finding a lower case filter into a concatenated string
+		// the gongsimcommandDB properties
+		let mergedContent = ""
+
+		// insertion point for merging of fields
+		mergedContent += gongsimcommandDB.Name.toLowerCase()
+		mergedContent += gongsimcommandDB.Command.toLowerCase()
+		mergedContent += gongsimcommandDB.CommandDate.toLowerCase()
+		mergedContent += gongsimcommandDB.SpeedCommandType.toLowerCase()
+		mergedContent += gongsimcommandDB.DateSpeedCommand.toLowerCase()
+
+		let isSelected = mergedContent.includes(filter.toLowerCase())
+		return isSelected
+	};
+
     this.matTableDataSource.sort = this.sort;
     this.matTableDataSource.paginator = this.paginator;
   }
@@ -151,14 +179,14 @@ export class GongsimCommandsTableComponent implements OnInit {
 
   // display gongsimcommand in router
   displayGongsimCommandInRouter(gongsimcommandID: number) {
-    this.router.navigate(["gongsimcommand-display", gongsimcommandID])
+    this.router.navigate(["github_com_fullstack_lang_gongsim_go-" + "gongsimcommand-display", gongsimcommandID])
   }
 
   // set editor outlet
   setEditorRouterOutlet(gongsimcommandID: number) {
     this.router.navigate([{
       outlets: {
-        editor: ["gongsimcommand-detail", gongsimcommandID]
+        github_com_fullstack_lang_gongsim_go_editor: ["github_com_fullstack_lang_gongsim_go-" + "gongsimcommand-detail", gongsimcommandID]
       }
     }]);
   }
@@ -167,7 +195,7 @@ export class GongsimCommandsTableComponent implements OnInit {
   setPresentationRouterOutlet(gongsimcommandID: number) {
     this.router.navigate([{
       outlets: {
-        presentation: ["gongsimcommand-presentation", gongsimcommandID]
+        github_com_fullstack_lang_gongsim_go_presentation: ["github_com_fullstack_lang_gongsim_go-" + "gongsimcommand-presentation", gongsimcommandID]
       }
     }]);
   }

@@ -20,7 +20,7 @@ import { FrontRepoService, FrontRepo } from '../front-repo.service'
 
 // generated table component
 @Component({
-  selector: 'app-updatestates-table',
+  selector: 'app-updatestatestable',
   templateUrl: './updatestates-table.component.html',
   styleUrls: ['./updatestates-table.component.css'],
 })
@@ -47,6 +47,30 @@ export class UpdateStatesTableComponent implements OnInit {
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
   ngAfterViewInit() {
+
+	// enable sorting on all fields (including pointers and reverse pointer)
+	this.matTableDataSource.sortingDataAccessor = (updatestateDB: UpdateStateDB, property: string) => {
+		switch (property) {
+				// insertion point for specific sorting accessor
+				default:
+					return UpdateStateDB[property];
+		}
+	}; 
+
+	// enable filtering on all fields (including pointers and reverse pointer, which is not done by default)
+	this.matTableDataSource.filterPredicate = (updatestateDB: UpdateStateDB, filter: string) => {
+
+		// filtering is based on finding a lower case filter into a concatenated string
+		// the updatestateDB properties
+		let mergedContent = ""
+
+		// insertion point for merging of fields
+		mergedContent += updatestateDB.Name.toLowerCase()
+
+		let isSelected = mergedContent.includes(filter.toLowerCase())
+		return isSelected
+	};
+
     this.matTableDataSource.sort = this.sort;
     this.matTableDataSource.paginator = this.paginator;
   }
@@ -161,14 +185,14 @@ export class UpdateStatesTableComponent implements OnInit {
 
   // display updatestate in router
   displayUpdateStateInRouter(updatestateID: number) {
-    this.router.navigate(["updatestate-display", updatestateID])
+    this.router.navigate(["github_com_fullstack_lang_gongsim_go-" + "updatestate-display", updatestateID])
   }
 
   // set editor outlet
   setEditorRouterOutlet(updatestateID: number) {
     this.router.navigate([{
       outlets: {
-        editor: ["updatestate-detail", updatestateID]
+        github_com_fullstack_lang_gongsim_go_editor: ["github_com_fullstack_lang_gongsim_go-" + "updatestate-detail", updatestateID]
       }
     }]);
   }
@@ -177,7 +201,7 @@ export class UpdateStatesTableComponent implements OnInit {
   setPresentationRouterOutlet(updatestateID: number) {
     this.router.navigate([{
       outlets: {
-        presentation: ["updatestate-presentation", updatestateID]
+        github_com_fullstack_lang_gongsim_go_presentation: ["github_com_fullstack_lang_gongsim_go-" + "updatestate-presentation", updatestateID]
       }
     }]);
   }

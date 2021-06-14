@@ -13,7 +13,9 @@ import (
 	"sort"
 	"time"
 
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
+
+	"github.com/tealeg/xlsx/v3"
 
 	"github.com/fullstack-lang/gongsim/go/models"
 )
@@ -83,6 +85,36 @@ type GongsimStatusDBs []GongsimStatusDB
 type GongsimStatusDBResponse struct {
 	GongsimStatusDB
 }
+
+// GongsimStatusWOP is a GongsimStatus without pointers
+// it holds the same basic fields but pointers are encoded into uint
+type GongsimStatusWOP struct {
+	ID int
+
+	// insertion for WOP basic fields
+
+	Name string
+
+	CurrentCommand models.GongsimCommandType
+
+	CompletionDate string
+
+	CurrentSpeedCommand models.SpeedCommandType
+
+	SpeedCommandCompletionDate string
+	// insertion for WOP pointer fields
+}
+
+var GongsimStatus_Fields = []string{
+	// insertion for WOP basic fields
+	"ID",
+	"Name",
+	"CurrentCommand",
+	"CompletionDate",
+	"CurrentSpeedCommand",
+	"SpeedCommandCompletionDate",
+}
+
 
 type BackRepoGongsimStatusStruct struct {
 	// stores GongsimStatusDB according to their gorm ID
@@ -273,6 +305,7 @@ func (backRepoGongsimStatus *BackRepoGongsimStatusStruct) CheckoutPhaseOneInstan
 		(*backRepoGongsimStatus.Map_GongsimStatusPtr_GongsimStatusDBID)[gongsimstatus] = gongsimstatusDB.ID
 
 		// append model store with the new element
+		gongsimstatus.Name = gongsimstatusDB.Name_Data.String
 		gongsimstatus.Stage()
 	}
 	gongsimstatusDB.CopyBasicFieldsToGongsimStatus(gongsimstatus)
@@ -334,7 +367,7 @@ func (backRepo *BackRepoStruct) CheckoutGongsimStatus(gongsimstatus *models.Gong
 	}
 }
 
-// CopyBasicFieldsToGongsimStatusDB is used to copy basic fields between the Stage or the CRUD to the back repo
+// CopyBasicFieldsFromGongsimStatus
 func (gongsimstatusDB *GongsimStatusDB) CopyBasicFieldsFromGongsimStatus(gongsimstatus *models.GongsimStatus) {
 	// insertion point for fields commit
 	gongsimstatusDB.Name_Data.String = gongsimstatus.Name
@@ -354,9 +387,39 @@ func (gongsimstatusDB *GongsimStatusDB) CopyBasicFieldsFromGongsimStatus(gongsim
 
 }
 
-// CopyBasicFieldsToGongsimStatusDB is used to copy basic fields between the Stage or the CRUD to the back repo
-func (gongsimstatusDB *GongsimStatusDB) CopyBasicFieldsToGongsimStatus(gongsimstatus *models.GongsimStatus) {
+// CopyBasicFieldsFromGongsimStatusWOP
+func (gongsimstatusDB *GongsimStatusDB) CopyBasicFieldsFromGongsimStatusWOP(gongsimstatus *GongsimStatusWOP) {
+	// insertion point for fields commit
+	gongsimstatusDB.Name_Data.String = gongsimstatus.Name
+	gongsimstatusDB.Name_Data.Valid = true
 
+	gongsimstatusDB.CurrentCommand_Data.String = string(gongsimstatus.CurrentCommand)
+	gongsimstatusDB.CurrentCommand_Data.Valid = true
+
+	gongsimstatusDB.CompletionDate_Data.String = gongsimstatus.CompletionDate
+	gongsimstatusDB.CompletionDate_Data.Valid = true
+
+	gongsimstatusDB.CurrentSpeedCommand_Data.String = string(gongsimstatus.CurrentSpeedCommand)
+	gongsimstatusDB.CurrentSpeedCommand_Data.Valid = true
+
+	gongsimstatusDB.SpeedCommandCompletionDate_Data.String = gongsimstatus.SpeedCommandCompletionDate
+	gongsimstatusDB.SpeedCommandCompletionDate_Data.Valid = true
+
+}
+
+// CopyBasicFieldsToGongsimStatus
+func (gongsimstatusDB *GongsimStatusDB) CopyBasicFieldsToGongsimStatus(gongsimstatus *models.GongsimStatus) {
+	// insertion point for checkout of basic fields (back repo to stage)
+	gongsimstatus.Name = gongsimstatusDB.Name_Data.String
+	gongsimstatus.CurrentCommand = models.GongsimCommandType(gongsimstatusDB.CurrentCommand_Data.String)
+	gongsimstatus.CompletionDate = gongsimstatusDB.CompletionDate_Data.String
+	gongsimstatus.CurrentSpeedCommand = models.SpeedCommandType(gongsimstatusDB.CurrentSpeedCommand_Data.String)
+	gongsimstatus.SpeedCommandCompletionDate = gongsimstatusDB.SpeedCommandCompletionDate_Data.String
+}
+
+// CopyBasicFieldsToGongsimStatusWOP
+func (gongsimstatusDB *GongsimStatusDB) CopyBasicFieldsToGongsimStatusWOP(gongsimstatus *GongsimStatusWOP) {
+	gongsimstatus.ID = int(gongsimstatusDB.ID)
 	// insertion point for checkout of basic fields (back repo to stage)
 	gongsimstatus.Name = gongsimstatusDB.Name_Data.String
 	gongsimstatus.CurrentCommand = models.GongsimCommandType(gongsimstatusDB.CurrentCommand_Data.String)
@@ -390,6 +453,38 @@ func (backRepoGongsimStatus *BackRepoGongsimStatusStruct) Backup(dirPath string)
 	err = ioutil.WriteFile(filename, file, 0644)
 	if err != nil {
 		log.Panic("Cannot write the json GongsimStatus file", err.Error())
+	}
+}
+
+// Backup generates a json file from a slice of all GongsimStatusDB instances in the backrepo
+func (backRepoGongsimStatus *BackRepoGongsimStatusStruct) BackupXL(file *xlsx.File) {
+
+	// organize the map into an array with increasing IDs, in order to have repoductible
+	// backup file
+	forBackup := make([]*GongsimStatusDB, 0)
+	for _, gongsimstatusDB := range *backRepoGongsimStatus.Map_GongsimStatusDBID_GongsimStatusDB {
+		forBackup = append(forBackup, gongsimstatusDB)
+	}
+
+	sort.Slice(forBackup[:], func(i, j int) bool {
+		return forBackup[i].ID < forBackup[j].ID
+	})
+
+	sh, err := file.AddSheet("GongsimStatus")
+	if err != nil {
+		log.Panic("Cannot add XL file", err.Error())
+	}
+	_ = sh
+
+	row := sh.AddRow()
+	row.WriteSlice(&GongsimStatus_Fields, -1)
+	for _, gongsimstatusDB := range forBackup {
+
+		var gongsimstatusWOP GongsimStatusWOP
+		gongsimstatusDB.CopyBasicFieldsToGongsimStatusWOP(&gongsimstatusWOP)
+
+		row := sh.AddRow()
+		row.WriteStruct(&gongsimstatusWOP, -1)
 	}
 }
 

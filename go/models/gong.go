@@ -13,16 +13,22 @@ var __member __void
 // swagger:ignore
 type StageStruct struct { // insertion point for definition of arrays registering instances
 	DummyAgents map[*DummyAgent]struct{}
+	DummyAgents_mapString map[string]*DummyAgent
 
 	Engines map[*Engine]struct{}
+	Engines_mapString map[string]*Engine
 
 	Events map[*Event]struct{}
+	Events_mapString map[string]*Event
 
 	GongsimCommands map[*GongsimCommand]struct{}
+	GongsimCommands_mapString map[string]*GongsimCommand
 
 	GongsimStatuss map[*GongsimStatus]struct{}
+	GongsimStatuss_mapString map[string]*GongsimStatus
 
 	UpdateStates map[*UpdateState]struct{}
+	UpdateStates_mapString map[string]*UpdateState
 
 	AllModelsStructCreateCallback AllModelsStructCreateInterface
 
@@ -43,6 +49,8 @@ type BackRepoInterface interface {
 	Checkout(stage *StageStruct)
 	Backup(stage *StageStruct, dirPath string)
 	Restore(stage *StageStruct, dirPath string)
+	BackupXL(stage *StageStruct, dirPath string)
+	RestoreXL(stage *StageStruct, dirPath string)
 	// insertion point for Commit and Checkout signatures
 	CommitDummyAgent(dummyagent *DummyAgent)
 	CheckoutDummyAgent(dummyagent *DummyAgent)
@@ -62,17 +70,24 @@ type BackRepoInterface interface {
 // swagger:ignore instructs the gong compiler (gongc) to avoid this particular struct
 var Stage StageStruct = StageStruct{ // insertion point for array initiatialisation
 	DummyAgents: make(map[*DummyAgent]struct{}, 0),
+	DummyAgents_mapString: make(map[string]*DummyAgent, 0),
 
 	Engines: make(map[*Engine]struct{}, 0),
+	Engines_mapString: make(map[string]*Engine, 0),
 
 	Events: make(map[*Event]struct{}, 0),
+	Events_mapString: make(map[string]*Event, 0),
 
 	GongsimCommands: make(map[*GongsimCommand]struct{}, 0),
+	GongsimCommands_mapString: make(map[string]*GongsimCommand, 0),
 
 	GongsimStatuss: make(map[*GongsimStatus]struct{}, 0),
+	GongsimStatuss_mapString: make(map[string]*GongsimStatus, 0),
 
 	UpdateStates: make(map[*UpdateState]struct{}, 0),
+	UpdateStates_mapString: make(map[string]*UpdateState, 0),
 
+	// end of insertion point
 }
 
 func (stage *StageStruct) Commit() {
@@ -95,10 +110,23 @@ func (stage *StageStruct) Backup(dirPath string) {
 }
 
 // Restore resets Stage & BackRepo and restores their content from the restore files in dirPath
-// Restore shall be performed only on a new database with rowids at 0 (otherwise, it will panic)
 func (stage *StageStruct) Restore(dirPath string) {
 	if stage.BackRepo != nil {
 		stage.BackRepo.Restore(stage, dirPath)
+	}
+}
+
+// backup generates backup files in the dirPath
+func (stage *StageStruct) BackupXL(dirPath string) {
+	if stage.BackRepo != nil {
+		stage.BackRepo.BackupXL(stage, dirPath)
+	}
+}
+
+// Restore resets Stage & BackRepo and restores their content from the restore files in dirPath
+func (stage *StageStruct) RestoreXL(dirPath string) {
+	if stage.BackRepo != nil {
+		stage.BackRepo.RestoreXL(stage, dirPath)
 	}
 }
 
@@ -118,12 +146,15 @@ func (stage *StageStruct) getDummyAgentOrderedStructWithNameField() []*DummyAgen
 // Stage puts dummyagent to the model stage
 func (dummyagent *DummyAgent) Stage() *DummyAgent {
 	Stage.DummyAgents[dummyagent] = __member
+	Stage.DummyAgents_mapString[dummyagent.Name] = dummyagent
+	
 	return dummyagent
 }
 
 // Unstage removes dummyagent off the model stage
 func (dummyagent *DummyAgent) Unstage() *DummyAgent {
 	delete(Stage.DummyAgents, dummyagent)
+	delete(Stage.DummyAgents_mapString, dummyagent.Name)
 	return dummyagent
 }
 
@@ -217,12 +248,15 @@ func (stage *StageStruct) getEngineOrderedStructWithNameField() []*Engine {
 // Stage puts engine to the model stage
 func (engine *Engine) Stage() *Engine {
 	Stage.Engines[engine] = __member
+	Stage.Engines_mapString[engine.Name] = engine
+	
 	return engine
 }
 
 // Unstage removes engine off the model stage
 func (engine *Engine) Unstage() *Engine {
 	delete(Stage.Engines, engine)
+	delete(Stage.Engines_mapString, engine.Name)
 	return engine
 }
 
@@ -316,12 +350,15 @@ func (stage *StageStruct) getEventOrderedStructWithNameField() []*Event {
 // Stage puts event to the model stage
 func (event *Event) Stage() *Event {
 	Stage.Events[event] = __member
+	Stage.Events_mapString[event.Name] = event
+	
 	return event
 }
 
 // Unstage removes event off the model stage
 func (event *Event) Unstage() *Event {
 	delete(Stage.Events, event)
+	delete(Stage.Events_mapString, event.Name)
 	return event
 }
 
@@ -415,12 +452,15 @@ func (stage *StageStruct) getGongsimCommandOrderedStructWithNameField() []*Gongs
 // Stage puts gongsimcommand to the model stage
 func (gongsimcommand *GongsimCommand) Stage() *GongsimCommand {
 	Stage.GongsimCommands[gongsimcommand] = __member
+	Stage.GongsimCommands_mapString[gongsimcommand.Name] = gongsimcommand
+	
 	return gongsimcommand
 }
 
 // Unstage removes gongsimcommand off the model stage
 func (gongsimcommand *GongsimCommand) Unstage() *GongsimCommand {
 	delete(Stage.GongsimCommands, gongsimcommand)
+	delete(Stage.GongsimCommands_mapString, gongsimcommand.Name)
 	return gongsimcommand
 }
 
@@ -514,12 +554,15 @@ func (stage *StageStruct) getGongsimStatusOrderedStructWithNameField() []*Gongsi
 // Stage puts gongsimstatus to the model stage
 func (gongsimstatus *GongsimStatus) Stage() *GongsimStatus {
 	Stage.GongsimStatuss[gongsimstatus] = __member
+	Stage.GongsimStatuss_mapString[gongsimstatus.Name] = gongsimstatus
+	
 	return gongsimstatus
 }
 
 // Unstage removes gongsimstatus off the model stage
 func (gongsimstatus *GongsimStatus) Unstage() *GongsimStatus {
 	delete(Stage.GongsimStatuss, gongsimstatus)
+	delete(Stage.GongsimStatuss_mapString, gongsimstatus.Name)
 	return gongsimstatus
 }
 
@@ -613,12 +656,15 @@ func (stage *StageStruct) getUpdateStateOrderedStructWithNameField() []*UpdateSt
 // Stage puts updatestate to the model stage
 func (updatestate *UpdateState) Stage() *UpdateState {
 	Stage.UpdateStates[updatestate] = __member
+	Stage.UpdateStates_mapString[updatestate.Name] = updatestate
+	
 	return updatestate
 }
 
 // Unstage removes updatestate off the model stage
 func (updatestate *UpdateState) Unstage() *UpdateState {
 	delete(Stage.UpdateStates, updatestate)
+	delete(Stage.UpdateStates_mapString, updatestate.Name)
 	return updatestate
 }
 
@@ -718,24 +764,42 @@ type AllModelsStructDeleteInterface interface { // insertion point for Callbacks
 
 func (stage *StageStruct) Reset() { // insertion point for array reset
 	stage.DummyAgents = make(map[*DummyAgent]struct{}, 0)
+	stage.DummyAgents_mapString = make(map[string]*DummyAgent, 0)
 
 	stage.Engines = make(map[*Engine]struct{}, 0)
+	stage.Engines_mapString = make(map[string]*Engine, 0)
 
 	stage.Events = make(map[*Event]struct{}, 0)
+	stage.Events_mapString = make(map[string]*Event, 0)
 
 	stage.GongsimCommands = make(map[*GongsimCommand]struct{}, 0)
+	stage.GongsimCommands_mapString = make(map[string]*GongsimCommand, 0)
 
 	stage.GongsimStatuss = make(map[*GongsimStatus]struct{}, 0)
+	stage.GongsimStatuss_mapString = make(map[string]*GongsimStatus, 0)
 
 	stage.UpdateStates = make(map[*UpdateState]struct{}, 0)
+	stage.UpdateStates_mapString = make(map[string]*UpdateState, 0)
 
 }
 
 func (stage *StageStruct) Nil() { // insertion point for array nil
 	stage.DummyAgents = nil
+	stage.DummyAgents_mapString = nil
+
 	stage.Engines = nil
+	stage.Engines_mapString = nil
+
 	stage.Events = nil
+	stage.Events_mapString = nil
+
 	stage.GongsimCommands = nil
+	stage.GongsimCommands_mapString = nil
+
 	stage.GongsimStatuss = nil
+	stage.GongsimStatuss_mapString = nil
+
 	stage.UpdateStates = nil
+	stage.UpdateStates_mapString = nil
+
 }

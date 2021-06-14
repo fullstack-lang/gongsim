@@ -90,11 +90,9 @@ export class DummyAgentDetailComponent implements OnInit {
 		if (this.dummyagent.Engine != undefined) {
 			this.dummyagent.EngineID.Int64 = this.dummyagent.Engine.ID
 			this.dummyagent.EngineID.Valid = true
-			this.dummyagent.EngineName = this.dummyagent.Engine.Name
 		} else {
 			this.dummyagent.EngineID.Int64 = 0
 			this.dummyagent.EngineID.Valid = true
-			this.dummyagent.EngineName = ""
 		}
 		
 		// save from the front pointer space to the non pointer space for serialization

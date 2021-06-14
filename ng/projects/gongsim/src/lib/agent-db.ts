@@ -15,6 +15,5 @@ export class AgentDB {
 	// insertion point for other declarations
 	Engine?: EngineDB
 	EngineID?: NullInt64
-	EngineName?: string
 
 }

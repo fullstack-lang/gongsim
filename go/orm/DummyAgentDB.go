@@ -13,7 +13,9 @@ import (
 	"sort"
 	"time"
 
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
+
+	"github.com/tealeg/xlsx/v3"
 
 	"github.com/fullstack-lang/gongsim/go/models"
 )
@@ -47,9 +49,6 @@ type DummyAgentPointersEnconding struct {
 	// This field is generated into another field to enable AS ONE association
 	EngineID sql.NullInt64
 
-	// all gong Struct has a Name field, this enables this data to object field
-	EngineName string
-
 }
 
 // DummyAgentDB describes a dummyagent in the database
@@ -81,6 +80,27 @@ type DummyAgentDBs []DummyAgentDB
 type DummyAgentDBResponse struct {
 	DummyAgentDB
 }
+
+// DummyAgentWOP is a DummyAgent without pointers
+// it holds the same basic fields but pointers are encoded into uint
+type DummyAgentWOP struct {
+	ID int
+
+	// insertion for WOP basic fields
+
+	TechName string
+
+	Name string
+	// insertion for WOP pointer fields
+}
+
+var DummyAgent_Fields = []string{
+	// insertion for WOP basic fields
+	"ID",
+	"TechName",
+	"Name",
+}
+
 
 type BackRepoDummyAgentStruct struct {
 	// stores DummyAgentDB according to their gorm ID
@@ -279,6 +299,7 @@ func (backRepoDummyAgent *BackRepoDummyAgentStruct) CheckoutPhaseOneInstance(dum
 		(*backRepoDummyAgent.Map_DummyAgentPtr_DummyAgentDBID)[dummyagent] = dummyagentDB.ID
 
 		// append model store with the new element
+		dummyagent.Name = dummyagentDB.Name_Data.String
 		dummyagent.Stage()
 	}
 	dummyagentDB.CopyBasicFieldsToDummyAgent(dummyagent)
@@ -344,7 +365,7 @@ func (backRepo *BackRepoStruct) CheckoutDummyAgent(dummyagent *models.DummyAgent
 	}
 }
 
-// CopyBasicFieldsToDummyAgentDB is used to copy basic fields between the Stage or the CRUD to the back repo
+// CopyBasicFieldsFromDummyAgent
 func (dummyagentDB *DummyAgentDB) CopyBasicFieldsFromDummyAgent(dummyagent *models.DummyAgent) {
 	// insertion point for fields commit
 	dummyagentDB.TechName_Data.String = dummyagent.TechName
@@ -355,9 +376,27 @@ func (dummyagentDB *DummyAgentDB) CopyBasicFieldsFromDummyAgent(dummyagent *mode
 
 }
 
-// CopyBasicFieldsToDummyAgentDB is used to copy basic fields between the Stage or the CRUD to the back repo
-func (dummyagentDB *DummyAgentDB) CopyBasicFieldsToDummyAgent(dummyagent *models.DummyAgent) {
+// CopyBasicFieldsFromDummyAgentWOP
+func (dummyagentDB *DummyAgentDB) CopyBasicFieldsFromDummyAgentWOP(dummyagent *DummyAgentWOP) {
+	// insertion point for fields commit
+	dummyagentDB.TechName_Data.String = dummyagent.TechName
+	dummyagentDB.TechName_Data.Valid = true
 
+	dummyagentDB.Name_Data.String = dummyagent.Name
+	dummyagentDB.Name_Data.Valid = true
+
+}
+
+// CopyBasicFieldsToDummyAgent
+func (dummyagentDB *DummyAgentDB) CopyBasicFieldsToDummyAgent(dummyagent *models.DummyAgent) {
+	// insertion point for checkout of basic fields (back repo to stage)
+	dummyagent.TechName = dummyagentDB.TechName_Data.String
+	dummyagent.Name = dummyagentDB.Name_Data.String
+}
+
+// CopyBasicFieldsToDummyAgentWOP
+func (dummyagentDB *DummyAgentDB) CopyBasicFieldsToDummyAgentWOP(dummyagent *DummyAgentWOP) {
+	dummyagent.ID = int(dummyagentDB.ID)
 	// insertion point for checkout of basic fields (back repo to stage)
 	dummyagent.TechName = dummyagentDB.TechName_Data.String
 	dummyagent.Name = dummyagentDB.Name_Data.String
@@ -388,6 +427,38 @@ func (backRepoDummyAgent *BackRepoDummyAgentStruct) Backup(dirPath string) {
 	err = ioutil.WriteFile(filename, file, 0644)
 	if err != nil {
 		log.Panic("Cannot write the json DummyAgent file", err.Error())
+	}
+}
+
+// Backup generates a json file from a slice of all DummyAgentDB instances in the backrepo
+func (backRepoDummyAgent *BackRepoDummyAgentStruct) BackupXL(file *xlsx.File) {
+
+	// organize the map into an array with increasing IDs, in order to have repoductible
+	// backup file
+	forBackup := make([]*DummyAgentDB, 0)
+	for _, dummyagentDB := range *backRepoDummyAgent.Map_DummyAgentDBID_DummyAgentDB {
+		forBackup = append(forBackup, dummyagentDB)
+	}
+
+	sort.Slice(forBackup[:], func(i, j int) bool {
+		return forBackup[i].ID < forBackup[j].ID
+	})
+
+	sh, err := file.AddSheet("DummyAgent")
+	if err != nil {
+		log.Panic("Cannot add XL file", err.Error())
+	}
+	_ = sh
+
+	row := sh.AddRow()
+	row.WriteSlice(&DummyAgent_Fields, -1)
+	for _, dummyagentDB := range forBackup {
+
+		var dummyagentWOP DummyAgentWOP
+		dummyagentDB.CopyBasicFieldsToDummyAgentWOP(&dummyagentWOP)
+
+		row := sh.AddRow()
+		row.WriteStruct(&dummyagentWOP, -1)
 	}
 }
 

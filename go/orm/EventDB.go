@@ -13,7 +13,9 @@ import (
 	"sort"
 	"time"
 
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
+
+	"github.com/tealeg/xlsx/v3"
 
 	"github.com/fullstack-lang/gongsim/go/models"
 )
@@ -74,6 +76,27 @@ type EventDBs []EventDB
 type EventDBResponse struct {
 	EventDB
 }
+
+// EventWOP is a Event without pointers
+// it holds the same basic fields but pointers are encoded into uint
+type EventWOP struct {
+	ID int
+
+	// insertion for WOP basic fields
+
+	Name string
+
+	Duration time.Duration
+	// insertion for WOP pointer fields
+}
+
+var Event_Fields = []string{
+	// insertion for WOP basic fields
+	"ID",
+	"Name",
+	"Duration",
+}
+
 
 type BackRepoEventStruct struct {
 	// stores EventDB according to their gorm ID
@@ -264,6 +287,7 @@ func (backRepoEvent *BackRepoEventStruct) CheckoutPhaseOneInstance(eventDB *Even
 		(*backRepoEvent.Map_EventPtr_EventDBID)[event] = eventDB.ID
 
 		// append model store with the new element
+		event.Name = eventDB.Name_Data.String
 		event.Stage()
 	}
 	eventDB.CopyBasicFieldsToEvent(event)
@@ -325,7 +349,7 @@ func (backRepo *BackRepoStruct) CheckoutEvent(event *models.Event) {
 	}
 }
 
-// CopyBasicFieldsToEventDB is used to copy basic fields between the Stage or the CRUD to the back repo
+// CopyBasicFieldsFromEvent
 func (eventDB *EventDB) CopyBasicFieldsFromEvent(event *models.Event) {
 	// insertion point for fields commit
 	eventDB.Name_Data.String = event.Name
@@ -336,9 +360,27 @@ func (eventDB *EventDB) CopyBasicFieldsFromEvent(event *models.Event) {
 
 }
 
-// CopyBasicFieldsToEventDB is used to copy basic fields between the Stage or the CRUD to the back repo
-func (eventDB *EventDB) CopyBasicFieldsToEvent(event *models.Event) {
+// CopyBasicFieldsFromEventWOP
+func (eventDB *EventDB) CopyBasicFieldsFromEventWOP(event *EventWOP) {
+	// insertion point for fields commit
+	eventDB.Name_Data.String = event.Name
+	eventDB.Name_Data.Valid = true
 
+	eventDB.Duration_Data.Int64 = int64(event.Duration)
+	eventDB.Duration_Data.Valid = true
+
+}
+
+// CopyBasicFieldsToEvent
+func (eventDB *EventDB) CopyBasicFieldsToEvent(event *models.Event) {
+	// insertion point for checkout of basic fields (back repo to stage)
+	event.Name = eventDB.Name_Data.String
+	event.Duration = time.Duration(eventDB.Duration_Data.Int64)
+}
+
+// CopyBasicFieldsToEventWOP
+func (eventDB *EventDB) CopyBasicFieldsToEventWOP(event *EventWOP) {
+	event.ID = int(eventDB.ID)
 	// insertion point for checkout of basic fields (back repo to stage)
 	event.Name = eventDB.Name_Data.String
 	event.Duration = time.Duration(eventDB.Duration_Data.Int64)
@@ -369,6 +411,38 @@ func (backRepoEvent *BackRepoEventStruct) Backup(dirPath string) {
 	err = ioutil.WriteFile(filename, file, 0644)
 	if err != nil {
 		log.Panic("Cannot write the json Event file", err.Error())
+	}
+}
+
+// Backup generates a json file from a slice of all EventDB instances in the backrepo
+func (backRepoEvent *BackRepoEventStruct) BackupXL(file *xlsx.File) {
+
+	// organize the map into an array with increasing IDs, in order to have repoductible
+	// backup file
+	forBackup := make([]*EventDB, 0)
+	for _, eventDB := range *backRepoEvent.Map_EventDBID_EventDB {
+		forBackup = append(forBackup, eventDB)
+	}
+
+	sort.Slice(forBackup[:], func(i, j int) bool {
+		return forBackup[i].ID < forBackup[j].ID
+	})
+
+	sh, err := file.AddSheet("Event")
+	if err != nil {
+		log.Panic("Cannot add XL file", err.Error())
+	}
+	_ = sh
+
+	row := sh.AddRow()
+	row.WriteSlice(&Event_Fields, -1)
+	for _, eventDB := range forBackup {
+
+		var eventWOP EventWOP
+		eventDB.CopyBasicFieldsToEventWOP(&eventWOP)
+
+		row := sh.AddRow()
+		row.WriteStruct(&eventWOP, -1)
 	}
 }
 

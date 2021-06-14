@@ -13,7 +13,9 @@ import (
 	"sort"
 	"time"
 
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
+
+	"github.com/tealeg/xlsx/v3"
 
 	"github.com/fullstack-lang/gongsim/go/models"
 )
@@ -92,6 +94,45 @@ type EngineDBs []EngineDB
 type EngineDBResponse struct {
 	EngineDB
 }
+
+// EngineWOP is a Engine without pointers
+// it holds the same basic fields but pointers are encoded into uint
+type EngineWOP struct {
+	ID int
+
+	// insertion for WOP basic fields
+
+	Name string
+
+	EndTime string
+
+	CurrentTime string
+
+	SecondsSinceStart float64
+
+	Fired int
+
+	ControlMode models.ControlMode
+
+	State models.EngineState
+
+	Speed float64
+	// insertion for WOP pointer fields
+}
+
+var Engine_Fields = []string{
+	// insertion for WOP basic fields
+	"ID",
+	"Name",
+	"EndTime",
+	"CurrentTime",
+	"SecondsSinceStart",
+	"Fired",
+	"ControlMode",
+	"State",
+	"Speed",
+}
+
 
 type BackRepoEngineStruct struct {
 	// stores EngineDB according to their gorm ID
@@ -282,6 +323,7 @@ func (backRepoEngine *BackRepoEngineStruct) CheckoutPhaseOneInstance(engineDB *E
 		(*backRepoEngine.Map_EnginePtr_EngineDBID)[engine] = engineDB.ID
 
 		// append model store with the new element
+		engine.Name = engineDB.Name_Data.String
 		engine.Stage()
 	}
 	engineDB.CopyBasicFieldsToEngine(engine)
@@ -343,7 +385,7 @@ func (backRepo *BackRepoStruct) CheckoutEngine(engine *models.Engine) {
 	}
 }
 
-// CopyBasicFieldsToEngineDB is used to copy basic fields between the Stage or the CRUD to the back repo
+// CopyBasicFieldsFromEngine
 func (engineDB *EngineDB) CopyBasicFieldsFromEngine(engine *models.Engine) {
 	// insertion point for fields commit
 	engineDB.Name_Data.String = engine.Name
@@ -372,9 +414,51 @@ func (engineDB *EngineDB) CopyBasicFieldsFromEngine(engine *models.Engine) {
 
 }
 
-// CopyBasicFieldsToEngineDB is used to copy basic fields between the Stage or the CRUD to the back repo
-func (engineDB *EngineDB) CopyBasicFieldsToEngine(engine *models.Engine) {
+// CopyBasicFieldsFromEngineWOP
+func (engineDB *EngineDB) CopyBasicFieldsFromEngineWOP(engine *EngineWOP) {
+	// insertion point for fields commit
+	engineDB.Name_Data.String = engine.Name
+	engineDB.Name_Data.Valid = true
 
+	engineDB.EndTime_Data.String = engine.EndTime
+	engineDB.EndTime_Data.Valid = true
+
+	engineDB.CurrentTime_Data.String = engine.CurrentTime
+	engineDB.CurrentTime_Data.Valid = true
+
+	engineDB.SecondsSinceStart_Data.Float64 = engine.SecondsSinceStart
+	engineDB.SecondsSinceStart_Data.Valid = true
+
+	engineDB.Fired_Data.Int64 = int64(engine.Fired)
+	engineDB.Fired_Data.Valid = true
+
+	engineDB.ControlMode_Data.String = string(engine.ControlMode)
+	engineDB.ControlMode_Data.Valid = true
+
+	engineDB.State_Data.String = string(engine.State)
+	engineDB.State_Data.Valid = true
+
+	engineDB.Speed_Data.Float64 = engine.Speed
+	engineDB.Speed_Data.Valid = true
+
+}
+
+// CopyBasicFieldsToEngine
+func (engineDB *EngineDB) CopyBasicFieldsToEngine(engine *models.Engine) {
+	// insertion point for checkout of basic fields (back repo to stage)
+	engine.Name = engineDB.Name_Data.String
+	engine.EndTime = engineDB.EndTime_Data.String
+	engine.CurrentTime = engineDB.CurrentTime_Data.String
+	engine.SecondsSinceStart = engineDB.SecondsSinceStart_Data.Float64
+	engine.Fired = int(engineDB.Fired_Data.Int64)
+	engine.ControlMode = models.ControlMode(engineDB.ControlMode_Data.String)
+	engine.State = models.EngineState(engineDB.State_Data.String)
+	engine.Speed = engineDB.Speed_Data.Float64
+}
+
+// CopyBasicFieldsToEngineWOP
+func (engineDB *EngineDB) CopyBasicFieldsToEngineWOP(engine *EngineWOP) {
+	engine.ID = int(engineDB.ID)
 	// insertion point for checkout of basic fields (back repo to stage)
 	engine.Name = engineDB.Name_Data.String
 	engine.EndTime = engineDB.EndTime_Data.String
@@ -411,6 +495,38 @@ func (backRepoEngine *BackRepoEngineStruct) Backup(dirPath string) {
 	err = ioutil.WriteFile(filename, file, 0644)
 	if err != nil {
 		log.Panic("Cannot write the json Engine file", err.Error())
+	}
+}
+
+// Backup generates a json file from a slice of all EngineDB instances in the backrepo
+func (backRepoEngine *BackRepoEngineStruct) BackupXL(file *xlsx.File) {
+
+	// organize the map into an array with increasing IDs, in order to have repoductible
+	// backup file
+	forBackup := make([]*EngineDB, 0)
+	for _, engineDB := range *backRepoEngine.Map_EngineDBID_EngineDB {
+		forBackup = append(forBackup, engineDB)
+	}
+
+	sort.Slice(forBackup[:], func(i, j int) bool {
+		return forBackup[i].ID < forBackup[j].ID
+	})
+
+	sh, err := file.AddSheet("Engine")
+	if err != nil {
+		log.Panic("Cannot add XL file", err.Error())
+	}
+	_ = sh
+
+	row := sh.AddRow()
+	row.WriteSlice(&Engine_Fields, -1)
+	for _, engineDB := range forBackup {
+
+		var engineWOP EngineWOP
+		engineDB.CopyBasicFieldsToEngineWOP(&engineWOP)
+
+		row := sh.AddRow()
+		row.WriteStruct(&engineWOP, -1)
 	}
 }
 

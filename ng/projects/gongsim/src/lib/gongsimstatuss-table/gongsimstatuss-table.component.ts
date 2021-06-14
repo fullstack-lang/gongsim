@@ -20,7 +20,7 @@ import { FrontRepoService, FrontRepo } from '../front-repo.service'
 
 // generated table component
 @Component({
-  selector: 'app-gongsimstatuss-table',
+  selector: 'app-gongsimstatusstable',
   templateUrl: './gongsimstatuss-table.component.html',
   styleUrls: ['./gongsimstatuss-table.component.css'],
 })
@@ -47,6 +47,34 @@ export class GongsimStatussTableComponent implements OnInit {
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
   ngAfterViewInit() {
+
+	// enable sorting on all fields (including pointers and reverse pointer)
+	this.matTableDataSource.sortingDataAccessor = (gongsimstatusDB: GongsimStatusDB, property: string) => {
+		switch (property) {
+				// insertion point for specific sorting accessor
+				default:
+					return GongsimStatusDB[property];
+		}
+	}; 
+
+	// enable filtering on all fields (including pointers and reverse pointer, which is not done by default)
+	this.matTableDataSource.filterPredicate = (gongsimstatusDB: GongsimStatusDB, filter: string) => {
+
+		// filtering is based on finding a lower case filter into a concatenated string
+		// the gongsimstatusDB properties
+		let mergedContent = ""
+
+		// insertion point for merging of fields
+		mergedContent += gongsimstatusDB.Name.toLowerCase()
+		mergedContent += gongsimstatusDB.CurrentCommand.toLowerCase()
+		mergedContent += gongsimstatusDB.CompletionDate.toLowerCase()
+		mergedContent += gongsimstatusDB.CurrentSpeedCommand.toLowerCase()
+		mergedContent += gongsimstatusDB.SpeedCommandCompletionDate.toLowerCase()
+
+		let isSelected = mergedContent.includes(filter.toLowerCase())
+		return isSelected
+	};
+
     this.matTableDataSource.sort = this.sort;
     this.matTableDataSource.paginator = this.paginator;
   }
@@ -151,14 +179,14 @@ export class GongsimStatussTableComponent implements OnInit {
 
   // display gongsimstatus in router
   displayGongsimStatusInRouter(gongsimstatusID: number) {
-    this.router.navigate(["gongsimstatus-display", gongsimstatusID])
+    this.router.navigate(["github_com_fullstack_lang_gongsim_go-" + "gongsimstatus-display", gongsimstatusID])
   }
 
   // set editor outlet
   setEditorRouterOutlet(gongsimstatusID: number) {
     this.router.navigate([{
       outlets: {
-        editor: ["gongsimstatus-detail", gongsimstatusID]
+        github_com_fullstack_lang_gongsim_go_editor: ["github_com_fullstack_lang_gongsim_go-" + "gongsimstatus-detail", gongsimstatusID]
       }
     }]);
   }
@@ -167,7 +195,7 @@ export class GongsimStatussTableComponent implements OnInit {
   setPresentationRouterOutlet(gongsimstatusID: number) {
     this.router.navigate([{
       outlets: {
-        presentation: ["gongsimstatus-presentation", gongsimstatusID]
+        github_com_fullstack_lang_gongsim_go_presentation: ["github_com_fullstack_lang_gongsim_go-" + "gongsimstatus-presentation", gongsimstatusID]
       }
     }]);
   }

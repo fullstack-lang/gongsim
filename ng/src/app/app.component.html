@@ -5,7 +5,13 @@
         </lib-engine-control>
     </as-split-area>
     <as-split-area size="90">
-        <canvas #canvas width="1700" height="700"></canvas>
+        <as-split direction="vertical">
+            <as-split-area size="40">
+                <app-gongsim-splitter></app-gongsim-splitter>
+            </as-split-area>
+            <as-split-area size="60">
+                <canvas #canvas width="1700" height="700"></canvas>
+            </as-split-area>
+        </as-split>
     </as-split-area>
-
 </as-split>

@@ -41,17 +41,19 @@ func main() {
 	r.Use(cors.Default())
 
 	// setup GORM
-	db := orm.SetupModels(*logDBFlag, "./test.db")
-	// mandatory, otherwise, bizarre errors occurs
-	db.DB().SetMaxOpenConns(1)
+	db := orm.SetupModels(*logDBFlag, ":memory:")
+	dbDB, err := db.DB()
 
+	// since gongsim is a multi threaded application. It is important to set up
+	// only one open connexion at a time
+	if err != nil {
+		panic("cannot access DB of db" + err.Error())
+	}
+	dbDB.SetMaxOpenConns(1)
 	orm.BackRepo.Init(db)
 
 	controllers.RegisterControllers(r)
-
 	models.EngineSingloton.ControlMode = models.CLIENT_CONTROL
-
-	orm.BackRepo.Init(db)
 
 	// seven days of simulation
 	models.EngineSingloton.SetStartTime(time.Date(1676, time.January, 1, 0, 0, 0, 0, time.UTC))
@@ -66,7 +68,6 @@ func main() {
 
 	// PLUMBING n°1: callback for treating model specific action. In this case, see specific engine
 	var simulation models.Simulation
-	simulation.DB = db
 	models.EngineSingloton.Simulation = &simulation
 
 	// append a dummy agent to feed the discrete event engine with at least an event
@@ -76,7 +77,7 @@ func main() {
 	models.EngineSingloton.AppendAgent(dummyAgent)
 	var step models.UpdateState
 	step.SetFireTime(models.EngineSingloton.GetStartTime())
-	step.Period = 1 * time.Second //
+	step.Period = 60 * time.Second //
 	step.Name = "update of planetary motion"
 	dummyAgent.QueueEvent(&step)
 

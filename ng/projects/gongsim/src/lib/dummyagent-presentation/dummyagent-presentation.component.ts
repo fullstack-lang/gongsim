@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup} from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 
 import { DummyAgentDB } from '../dummyagent-db'
 import { DummyAgentService } from '../dummyagent.service'
+
+import { FrontRepoService, FrontRepo } from '../front-repo.service'
 
 import { Router, RouterState, ActivatedRoute } from '@angular/router';
 
@@ -25,9 +27,13 @@ export class DummyAgentPresentationComponent implements OnInit {
 	dataSource = ELEMENT_DATA;
 
 	dummyagent: DummyAgentDB;
+
+	// front repo
+	frontRepo: FrontRepo
  
 	constructor(
 		private dummyagentService: DummyAgentService,
+		private frontRepoService: FrontRepoService,
 		private route: ActivatedRoute,
 		private router: Router,
 	) {
@@ -51,22 +57,22 @@ export class DummyAgentPresentationComponent implements OnInit {
 
 	getDummyAgent(): void {
 		const id = +this.route.snapshot.paramMap.get('id');
-		this.dummyagentService.getDummyAgent(id)
-			.subscribe(
-				dummyagent => {
-					this.dummyagent = dummyagent
+		this.frontRepoService.pull().subscribe(
+			frontRepo => {
+				this.frontRepo = frontRepo
 
-					// insertion point for recovery of durations
+				this.dummyagent = this.frontRepo.DummyAgents.get(id)
 
-				}
-			);
+				// insertion point for recovery of durations
+			}
+		);
 	}
 
 	// set presentation outlet
 	setPresentationRouterOutlet(structName: string, ID: number) {
 		this.router.navigate([{
 			outlets: {
-				presentation: [structName + "-presentation", ID]
+				github_com_fullstack_lang_gongsim_go_presentation: ["github_com_fullstack_lang_gongsim_go-" + structName + "-presentation", ID]
 			}
 		}]);
 	}
@@ -75,7 +81,7 @@ export class DummyAgentPresentationComponent implements OnInit {
 	setEditorRouterOutlet(ID: number) {
 		this.router.navigate([{
 			outlets: {
-				editor: ["dummyagent-detail", ID]
+				github_com_fullstack_lang_gongsim_go_editor: ["github_com_fullstack_lang_gongsim_go-" + "dummyagent-detail", ID]
 			}
 		}]);
 	}

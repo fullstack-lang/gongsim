@@ -20,7 +20,7 @@ import { FrontRepoService, FrontRepo } from '../front-repo.service'
 
 // generated table component
 @Component({
-  selector: 'app-events-table',
+  selector: 'app-eventstable',
   templateUrl: './events-table.component.html',
   styleUrls: ['./events-table.component.css'],
 })
@@ -47,6 +47,30 @@ export class EventsTableComponent implements OnInit {
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
   ngAfterViewInit() {
+
+	// enable sorting on all fields (including pointers and reverse pointer)
+	this.matTableDataSource.sortingDataAccessor = (eventDB: EventDB, property: string) => {
+		switch (property) {
+				// insertion point for specific sorting accessor
+				default:
+					return EventDB[property];
+		}
+	}; 
+
+	// enable filtering on all fields (including pointers and reverse pointer, which is not done by default)
+	this.matTableDataSource.filterPredicate = (eventDB: EventDB, filter: string) => {
+
+		// filtering is based on finding a lower case filter into a concatenated string
+		// the eventDB properties
+		let mergedContent = ""
+
+		// insertion point for merging of fields
+		mergedContent += eventDB.Name.toLowerCase()
+
+		let isSelected = mergedContent.includes(filter.toLowerCase())
+		return isSelected
+	};
+
     this.matTableDataSource.sort = this.sort;
     this.matTableDataSource.paginator = this.paginator;
   }
@@ -152,14 +176,14 @@ export class EventsTableComponent implements OnInit {
 
   // display event in router
   displayEventInRouter(eventID: number) {
-    this.router.navigate(["event-display", eventID])
+    this.router.navigate(["github_com_fullstack_lang_gongsim_go-" + "event-display", eventID])
   }
 
   // set editor outlet
   setEditorRouterOutlet(eventID: number) {
     this.router.navigate([{
       outlets: {
-        editor: ["event-detail", eventID]
+        github_com_fullstack_lang_gongsim_go_editor: ["github_com_fullstack_lang_gongsim_go-" + "event-detail", eventID]
       }
     }]);
   }
@@ -168,7 +192,7 @@ export class EventsTableComponent implements OnInit {
   setPresentationRouterOutlet(eventID: number) {
     this.router.navigate([{
       outlets: {
-        presentation: ["event-presentation", eventID]
+        github_com_fullstack_lang_gongsim_go_presentation: ["github_com_fullstack_lang_gongsim_go-" + "event-presentation", eventID]
       }
     }]);
   }

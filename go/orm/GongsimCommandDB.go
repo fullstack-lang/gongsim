@@ -13,7 +13,9 @@ import (
 	"sort"
 	"time"
 
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
+
+	"github.com/tealeg/xlsx/v3"
 
 	"github.com/fullstack-lang/gongsim/go/models"
 )
@@ -83,6 +85,36 @@ type GongsimCommandDBs []GongsimCommandDB
 type GongsimCommandDBResponse struct {
 	GongsimCommandDB
 }
+
+// GongsimCommandWOP is a GongsimCommand without pointers
+// it holds the same basic fields but pointers are encoded into uint
+type GongsimCommandWOP struct {
+	ID int
+
+	// insertion for WOP basic fields
+
+	Name string
+
+	Command models.GongsimCommandType
+
+	CommandDate string
+
+	SpeedCommandType models.SpeedCommandType
+
+	DateSpeedCommand string
+	// insertion for WOP pointer fields
+}
+
+var GongsimCommand_Fields = []string{
+	// insertion for WOP basic fields
+	"ID",
+	"Name",
+	"Command",
+	"CommandDate",
+	"SpeedCommandType",
+	"DateSpeedCommand",
+}
+
 
 type BackRepoGongsimCommandStruct struct {
 	// stores GongsimCommandDB according to their gorm ID
@@ -273,6 +305,7 @@ func (backRepoGongsimCommand *BackRepoGongsimCommandStruct) CheckoutPhaseOneInst
 		(*backRepoGongsimCommand.Map_GongsimCommandPtr_GongsimCommandDBID)[gongsimcommand] = gongsimcommandDB.ID
 
 		// append model store with the new element
+		gongsimcommand.Name = gongsimcommandDB.Name_Data.String
 		gongsimcommand.Stage()
 	}
 	gongsimcommandDB.CopyBasicFieldsToGongsimCommand(gongsimcommand)
@@ -334,7 +367,7 @@ func (backRepo *BackRepoStruct) CheckoutGongsimCommand(gongsimcommand *models.Go
 	}
 }
 
-// CopyBasicFieldsToGongsimCommandDB is used to copy basic fields between the Stage or the CRUD to the back repo
+// CopyBasicFieldsFromGongsimCommand
 func (gongsimcommandDB *GongsimCommandDB) CopyBasicFieldsFromGongsimCommand(gongsimcommand *models.GongsimCommand) {
 	// insertion point for fields commit
 	gongsimcommandDB.Name_Data.String = gongsimcommand.Name
@@ -354,9 +387,39 @@ func (gongsimcommandDB *GongsimCommandDB) CopyBasicFieldsFromGongsimCommand(gong
 
 }
 
-// CopyBasicFieldsToGongsimCommandDB is used to copy basic fields between the Stage or the CRUD to the back repo
-func (gongsimcommandDB *GongsimCommandDB) CopyBasicFieldsToGongsimCommand(gongsimcommand *models.GongsimCommand) {
+// CopyBasicFieldsFromGongsimCommandWOP
+func (gongsimcommandDB *GongsimCommandDB) CopyBasicFieldsFromGongsimCommandWOP(gongsimcommand *GongsimCommandWOP) {
+	// insertion point for fields commit
+	gongsimcommandDB.Name_Data.String = gongsimcommand.Name
+	gongsimcommandDB.Name_Data.Valid = true
 
+	gongsimcommandDB.Command_Data.String = string(gongsimcommand.Command)
+	gongsimcommandDB.Command_Data.Valid = true
+
+	gongsimcommandDB.CommandDate_Data.String = gongsimcommand.CommandDate
+	gongsimcommandDB.CommandDate_Data.Valid = true
+
+	gongsimcommandDB.SpeedCommandType_Data.String = string(gongsimcommand.SpeedCommandType)
+	gongsimcommandDB.SpeedCommandType_Data.Valid = true
+
+	gongsimcommandDB.DateSpeedCommand_Data.String = gongsimcommand.DateSpeedCommand
+	gongsimcommandDB.DateSpeedCommand_Data.Valid = true
+
+}
+
+// CopyBasicFieldsToGongsimCommand
+func (gongsimcommandDB *GongsimCommandDB) CopyBasicFieldsToGongsimCommand(gongsimcommand *models.GongsimCommand) {
+	// insertion point for checkout of basic fields (back repo to stage)
+	gongsimcommand.Name = gongsimcommandDB.Name_Data.String
+	gongsimcommand.Command = models.GongsimCommandType(gongsimcommandDB.Command_Data.String)
+	gongsimcommand.CommandDate = gongsimcommandDB.CommandDate_Data.String
+	gongsimcommand.SpeedCommandType = models.SpeedCommandType(gongsimcommandDB.SpeedCommandType_Data.String)
+	gongsimcommand.DateSpeedCommand = gongsimcommandDB.DateSpeedCommand_Data.String
+}
+
+// CopyBasicFieldsToGongsimCommandWOP
+func (gongsimcommandDB *GongsimCommandDB) CopyBasicFieldsToGongsimCommandWOP(gongsimcommand *GongsimCommandWOP) {
+	gongsimcommand.ID = int(gongsimcommandDB.ID)
 	// insertion point for checkout of basic fields (back repo to stage)
 	gongsimcommand.Name = gongsimcommandDB.Name_Data.String
 	gongsimcommand.Command = models.GongsimCommandType(gongsimcommandDB.Command_Data.String)
@@ -390,6 +453,38 @@ func (backRepoGongsimCommand *BackRepoGongsimCommandStruct) Backup(dirPath strin
 	err = ioutil.WriteFile(filename, file, 0644)
 	if err != nil {
 		log.Panic("Cannot write the json GongsimCommand file", err.Error())
+	}
+}
+
+// Backup generates a json file from a slice of all GongsimCommandDB instances in the backrepo
+func (backRepoGongsimCommand *BackRepoGongsimCommandStruct) BackupXL(file *xlsx.File) {
+
+	// organize the map into an array with increasing IDs, in order to have repoductible
+	// backup file
+	forBackup := make([]*GongsimCommandDB, 0)
+	for _, gongsimcommandDB := range *backRepoGongsimCommand.Map_GongsimCommandDBID_GongsimCommandDB {
+		forBackup = append(forBackup, gongsimcommandDB)
+	}
+
+	sort.Slice(forBackup[:], func(i, j int) bool {
+		return forBackup[i].ID < forBackup[j].ID
+	})
+
+	sh, err := file.AddSheet("GongsimCommand")
+	if err != nil {
+		log.Panic("Cannot add XL file", err.Error())
+	}
+	_ = sh
+
+	row := sh.AddRow()
+	row.WriteSlice(&GongsimCommand_Fields, -1)
+	for _, gongsimcommandDB := range forBackup {
+
+		var gongsimcommandWOP GongsimCommandWOP
+		gongsimcommandDB.CopyBasicFieldsToGongsimCommandWOP(&gongsimcommandWOP)
+
+		row := sh.AddRow()
+		row.WriteStruct(&gongsimcommandWOP, -1)
 	}
 }
 
