@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"runtime/pprof"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -22,6 +23,11 @@ import (
 var (
 	logDBFlag  = flag.Bool("logDB", false, "log mode for db")
 	logGINFlag = flag.Bool("logGIN", false, "log mode for gin")
+
+	play         = flag.Bool("play", false, "start rigth away")
+	displayWatch = flag.Bool("displayWatch", false, "if true, print current status every 1/2 seconds")
+
+	cpuprofile = flag.String("cpuprofile", "", "write cpu profile to `file`")
 )
 
 func main() {
@@ -31,6 +37,19 @@ func main() {
 
 	// parse program arguments
 	flag.Parse()
+
+	if *cpuprofile != "" {
+		models.CpuProfile = true
+		f, err := os.Create(*cpuprofile)
+		if err != nil {
+			log.Fatal("could not create CPU profile: ", err)
+		}
+		defer f.Close() // error handling omitted for example
+		if err := pprof.StartCPUProfile(f); err != nil {
+			log.Fatal("could not start CPU profile: ", err)
+		}
+		defer pprof.StopCPUProfile()
+	}
 
 	// setup controlers
 	if !*logGINFlag {
@@ -77,9 +96,17 @@ func main() {
 	models.EngineSingloton.AppendAgent(dummyAgent)
 	var step models.UpdateState
 	step.SetFireTime(models.EngineSingloton.GetStartTime())
-	step.Period = 60 * time.Second //
+	step.Period = 1 * time.Second //
 	step.Name = "update of planetary motion"
 	dummyAgent.QueueEvent(&step)
+
+	// start right away
+	if *play {
+		models.GongsimCommandSingloton.Command = models.COMMAND_PLAY
+	}
+	if *displayWatch {
+		models.DisplayWatch = true
+	}
 
 	// commit simulation stage
 	models.Stage.Commit()
