@@ -2,6 +2,7 @@ package models
 
 import (
 	"log"
+	"runtime/pprof"
 	"time"
 )
 
@@ -17,6 +18,8 @@ func (gongsimCommand *GongsimCommand) watcher() {
 	// checkoutSchedulerPeriod is the period of the "checkout scheduler"
 	watcherPeriod := 500 * time.Millisecond
 	var WatcherSchedulerPeriod = time.NewTicker(watcherPeriod)
+
+	realtimeSimStart := time.Now()
 	for {
 		select {
 		case t := <-WatcherSchedulerPeriod.C:
@@ -30,6 +33,11 @@ func (gongsimCommand *GongsimCommand) watcher() {
 					EngineSingloton.currentTime.Format(layout), EngineSingloton.State, measuredSimSpeed, EngineSingloton.Speed)
 			}
 			lastSimTime = EngineSingloton.currentTime
+
+			if time.Since(realtimeSimStart) > 20*time.Second {
+				pprof.StopCPUProfile()
+				log.Println("generated CPU profile")
+			}
 		}
 	}
 }

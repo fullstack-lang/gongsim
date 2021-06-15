@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"runtime/pprof"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -25,6 +26,8 @@ var (
 
 	play         = flag.Bool("play", false, "start rigth away")
 	displayWatch = flag.Bool("displayWatch", false, "if true, print current status every 1/2 seconds")
+
+	cpuprofile = flag.String("cpuprofile", "", "write cpu profile to `file`")
 )
 
 func main() {
@@ -34,6 +37,18 @@ func main() {
 
 	// parse program arguments
 	flag.Parse()
+
+	if *cpuprofile != "" {
+		f, err := os.Create(*cpuprofile)
+		if err != nil {
+			log.Fatal("could not create CPU profile: ", err)
+		}
+		defer f.Close() // error handling omitted for example
+		if err := pprof.StartCPUProfile(f); err != nil {
+			log.Fatal("could not start CPU profile: ", err)
+		}
+		defer pprof.StopCPUProfile()
+	}
 
 	// setup controlers
 	if !*logGINFlag {
