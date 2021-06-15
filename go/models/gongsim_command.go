@@ -294,34 +294,50 @@ func (gongsimCommand *GongsimCommand) SetupGongsimThreads() *GongsimCommand {
 
 				if nextMode == RELATIVE_SPEED {
 
-					// log.Printf(lastSimTime.String() + " " + nextSimTime.String())
-					if nextSimTime.Sub(EngineSingloton.GetCurrentTime()) > 0 {
-						simTimeAdvance := nextSimTime.Sub(EngineSingloton.GetCurrentTime())
+					realtimeDurationBetweenHorizons := 500 * time.Millisecond
 
-						sleepDuration := time.Duration(float64(simTimeAdvance) / EngineSingloton.Speed)
-						// log.Printf("total sleep duration " + sleepDuration.String())
+					EngineSingloton.nextRealtimeHorizon = time.Now().Add(realtimeDurationBetweenHorizons)
+					EngineSingloton.nextSimulatedTimeHorizon =
+						EngineSingloton.currentTime.Add(time.Duration(EngineSingloton.Speed) * realtimeDurationBetweenHorizons)
 
-						// in order for the end user to see progress in the simulation time
-						// the egine time is updated periodicaly
-						maxSleepAtATime := time.Duration(500 * time.Millisecond)
-
-						cumulatedSleepTime := time.Duration(0 * time.Millisecond)
-						for cumulatedSleepTime < sleepDuration && gongsimCommand.Command == COMMAND_PLAY {
-							sleepTime := Min(sleepDuration-cumulatedSleepTime, maxSleepAtATime)
-							// log.Printf("Stepped sleep time " + sleepTime.String() + " cumulated " + cumulatedSleepTime.String())
-							time.Sleep(sleepTime)
-							cumulatedSleepTime += sleepTime
-
-							// update engine current time
-							progressInSimulatedTimeInMiliseconds := EngineSingloton.Speed *
-								float64(sleepTime.Milliseconds())
-							EngineSingloton.SetCurrentTime(EngineSingloton.GetCurrentTime().Add(
-								time.Duration(progressInSimulatedTimeInMiliseconds) * time.Millisecond))
-							// log.Printf("Engine current time " + EngineSingloton.CurrentTime.String())
-							EngineSingloton.Commit()
-						}
+					for nextSimTime.Before(EngineSingloton.nextSimulatedTimeHorizon) {
+						_, nextSimTime, _ = EngineSingloton.FireNextEvent()
 					}
-					_, nextSimTime, _ = EngineSingloton.FireNextEvent()
+					EngineSingloton.currentTime = EngineSingloton.nextSimulatedTimeHorizon
+
+					sleepTime := EngineSingloton.nextRealtimeHorizon.Sub(time.Now())
+					time.Sleep(sleepTime)
+
+					EngineSingloton.Commit()
+
+					// // log.Printf(lastSimTime.String() + " " + nextSimTime.String())
+					// if nextSimTime.Sub(EngineSingloton.GetCurrentTime()) > 0 {
+					// 	simTimeAdvance := nextSimTime.Sub(EngineSingloton.GetCurrentTime())
+
+					// 	sleepDuration := time.Duration(float64(simTimeAdvance) / EngineSingloton.Speed)
+					// 	// log.Printf("total sleep duration " + sleepDuration.String())
+
+					// 	// in order for the end user to see progress in the simulation time
+					// 	// the egine time is updated periodicaly
+					// 	maxSleepAtATime := time.Duration(500 * time.Millisecond)
+
+					// 	cumulatedSleepTime := time.Duration(0 * time.Millisecond)
+					// 	for cumulatedSleepTime < sleepDuration && gongsimCommand.Command == COMMAND_PLAY {
+					// 		sleepTime := Min(sleepDuration-cumulatedSleepTime, maxSleepAtATime)
+					// 		// log.Printf("Stepped sleep time " + sleepTime.String() + " cumulated " + cumulatedSleepTime.String())
+					// 		time.Sleep(sleepTime)
+					// 		cumulatedSleepTime += sleepTime
+
+					// 		// update engine current time
+					// 		progressInSimulatedTimeInMiliseconds := EngineSingloton.Speed *
+					// 			float64(sleepTime.Milliseconds())
+					// 		EngineSingloton.SetCurrentTime(EngineSingloton.GetCurrentTime().Add(
+					// 			time.Duration(progressInSimulatedTimeInMiliseconds) * time.Millisecond))
+					// 		// log.Printf("Engine current time " + EngineSingloton.CurrentTime.String())
+					// 		EngineSingloton.Commit()
+					// 	}
+					// }
+					// _, nextSimTime, _ = EngineSingloton.FireNextEvent()
 				} else { // FULL SPEED
 					if engineStopMode == TEN_MINUTES {
 						for nextSimTime.Before(currentTimePlus10Minute) {

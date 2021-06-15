@@ -50,9 +50,6 @@ type Engine struct {
 	// on the engine events
 	Simulation SimulationInterface `gorm:"-"`
 
-	// Speed compared to realtime
-	Speed float64
-
 	// management of commits
 	//
 	// the engine is reponsible for performing commits of agents to the back repo
@@ -67,6 +64,20 @@ type Engine struct {
 
 	// swagger:ignore
 	lastCheckoutDate time.Time
+
+	//
+	// management of realtime simulation (PLAY mode)
+	//
+
+	// Speed compared to realtime
+	Speed float64
+
+	// when in PLAY mode, both horizon provides input to the main thread to fire events and to compute the sleep time
+	// neccessary to cadence the simulation at the desired speed
+	// in PLAY mode, the simulation goes from one horizon to the next
+	// both horizon are set up by the
+	nextRealtimeHorizon      time.Time
+	nextSimulatedTimeHorizon time.Time
 }
 
 // swagger:enum ControlMode

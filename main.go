@@ -39,6 +39,7 @@ func main() {
 	flag.Parse()
 
 	if *cpuprofile != "" {
+		models.CpuProfile = true
 		f, err := os.Create(*cpuprofile)
 		if err != nil {
 			log.Fatal("could not create CPU profile: ", err)

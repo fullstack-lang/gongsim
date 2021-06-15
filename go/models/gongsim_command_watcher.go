@@ -9,6 +9,7 @@ import (
 var lastSimTime = EngineSingloton.currentTime
 
 var DisplayWatch bool
+var CpuProfile bool
 
 // the watcher thread inspects the status of the simulation
 func (gongsimCommand *GongsimCommand) watcher() {
@@ -26,17 +27,22 @@ func (gongsimCommand *GongsimCommand) watcher() {
 
 			_ = t
 
-			const layout = "Jan 2, 2006 at 15:04:05 (MST)"
+			// const layout = "Jan 2, 2006 at 15:04:05 (MST)"
+			const layout = "15:04:05.999"
 			measuredSimSpeed := float64(EngineSingloton.currentTime.Sub(lastSimTime)) / float64(watcherPeriod)
 			if DisplayWatch {
-				log.Printf("simulated time is %s, status %s, speed %f, speed request %f",
-					EngineSingloton.currentTime.Format(layout), EngineSingloton.State, measuredSimSpeed, EngineSingloton.Speed)
+				log.Printf("time %s, next %s, status %s, speed %f, speed request %f, Sim %s, Ho %s",
+					time.Now().Format(layout), EngineSingloton.nextRealtimeHorizon.Format(layout),
+					EngineSingloton.State, measuredSimSpeed, EngineSingloton.Speed,
+					EngineSingloton.currentTime.Format(layout), EngineSingloton.nextSimulatedTimeHorizon.Format(layout))
 			}
 			lastSimTime = EngineSingloton.currentTime
 
-			if time.Since(realtimeSimStart) > 20*time.Second {
-				pprof.StopCPUProfile()
-				log.Println("generated CPU profile")
+			if CpuProfile {
+				if time.Since(realtimeSimStart) > 20*time.Second {
+					pprof.StopCPUProfile()
+					log.Println("generated CPU profile")
+				}
 			}
 		}
 	}
