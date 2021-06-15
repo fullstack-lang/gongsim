@@ -169,6 +169,7 @@ func (gongsimCommand *GongsimCommand) SetupGongsimThreads() *GongsimCommand {
 	go gongsimCommand.commandPooler()
 	go gongsimCommand.commitScheduler()
 	go gongsimCommand.checkoutScheduler()
+	go gongsimCommand.watcher()
 
 	go func() {
 

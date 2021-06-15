@@ -17,7 +17,17 @@
             "request": "launch",
             "mode": "auto",
             "program": "${workspaceFolder}",
+            "args": []
+        },
+        {
+            "name": "go run gongsim & play",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}",
             "args": [
+                "-play",
+                "-displayWatch"
             ]
         },
     ]
