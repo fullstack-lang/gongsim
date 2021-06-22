@@ -933,6 +933,11 @@ paths:
           $ref: '#/responses/genericError'
       tags:
       - gongsimstatuss
+  /pushfromfrontnb:
+    get:
+      operationId: GetLastPushFromFrontNb
+      tags:
+      - backrepo
   /updatestates:
     get:
       description: Get all updatestates
