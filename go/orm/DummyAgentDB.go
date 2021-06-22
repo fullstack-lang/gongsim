@@ -81,7 +81,7 @@ type DummyAgentDBResponse struct {
 	DummyAgentDB
 }
 
-// DummyAgentWOP is a DummyAgent without pointers
+// DummyAgentWOP is a DummyAgent without pointers (WOP is an acronym for "Without Pointers")
 // it holds the same basic fields but pointers are encoded into uint
 type DummyAgentWOP struct {
 	ID int
@@ -100,7 +100,6 @@ var DummyAgent_Fields = []string{
 	"TechName",
 	"Name",
 }
-
 
 type BackRepoDummyAgentStruct struct {
 	// stores DummyAgentDB according to their gorm ID
@@ -267,9 +266,8 @@ func (backRepoDummyAgent *BackRepoDummyAgentStruct) CommitPhaseTwoInstance(backR
 
 // BackRepoDummyAgent.CheckoutPhaseOne Checkouts all BackRepo instances to the Stage
 //
-// Phase One is the creation of instance in the stage
-//
-// NOTE: the is supposed to have been reset before
+// Phase One will result in having instances on the stage aligned with the back repo
+// pointers are not initialized yet (this is for pahse two)
 //
 func (backRepoDummyAgent *BackRepoDummyAgentStruct) CheckoutPhaseOne() (Error error) {
 
@@ -279,9 +277,34 @@ func (backRepoDummyAgent *BackRepoDummyAgentStruct) CheckoutPhaseOne() (Error er
 		return query.Error
 	}
 
+	// list of instances to be removed
+	// start from the initial map on the stage and remove instances that have been checked out
+	dummyagentInstancesToBeRemovedFromTheStage := make(map[*models.DummyAgent]struct{})
+	for key, value := range models.Stage.DummyAgents {
+		dummyagentInstancesToBeRemovedFromTheStage[key] = value
+	}
+
 	// copy orm objects to the the map
 	for _, dummyagentDB := range dummyagentDBArray {
 		backRepoDummyAgent.CheckoutPhaseOneInstance(&dummyagentDB)
+
+		// do not remove this instance from the stage, therefore
+		// remove instance from the list of instances to be be removed from the stage
+		dummyagent, ok := (*backRepoDummyAgent.Map_DummyAgentDBID_DummyAgentPtr)[dummyagentDB.ID]
+		if ok {
+			delete(dummyagentInstancesToBeRemovedFromTheStage, dummyagent)
+		}
+	}
+
+	// remove from stage and back repo's 3 maps all dummyagents that are not in the checkout
+	for dummyagent := range dummyagentInstancesToBeRemovedFromTheStage {
+		dummyagent.Unstage()
+
+		// remove instance from the back repo 3 maps
+		dummyagentID := (*backRepoDummyAgent.Map_DummyAgentPtr_DummyAgentDBID)[dummyagent]
+		delete((*backRepoDummyAgent.Map_DummyAgentPtr_DummyAgentDBID), dummyagent)
+		delete((*backRepoDummyAgent.Map_DummyAgentDBID_DummyAgentDB), dummyagentID)
+		delete((*backRepoDummyAgent.Map_DummyAgentDBID_DummyAgentPtr), dummyagentID)
 	}
 
 	return
@@ -506,7 +529,7 @@ func (backRepoDummyAgent *BackRepoDummyAgentStruct) RestorePhaseOne(dirPath stri
 // to compute new index
 func (backRepoDummyAgent *BackRepoDummyAgentStruct) RestorePhaseTwo() {
 
-	for _, dummyagentDB := range (*backRepoDummyAgent.Map_DummyAgentDBID_DummyAgentDB) {
+	for _, dummyagentDB := range *backRepoDummyAgent.Map_DummyAgentDBID_DummyAgentDB {
 
 		// next line of code is to avert unused variable compilation error
 		_ = dummyagentDB

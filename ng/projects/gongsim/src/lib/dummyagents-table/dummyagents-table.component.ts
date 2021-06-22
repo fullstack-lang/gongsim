@@ -52,8 +52,14 @@ export class DummyAgentsTableComponent implements OnInit {
 	this.matTableDataSource.sortingDataAccessor = (dummyagentDB: DummyAgentDB, property: string) => {
 		switch (property) {
 				// insertion point for specific sorting accessor
-  			case 'Engine':
+			case 'TechName':
+				return dummyagentDB.TechName;
+
+			case 'Engine':
 				return (dummyagentDB.Engine ? dummyagentDB.Engine.Name : '');
+
+			case 'Name':
+				return dummyagentDB.Name;
 
 				default:
 					return DummyAgentDB[property];

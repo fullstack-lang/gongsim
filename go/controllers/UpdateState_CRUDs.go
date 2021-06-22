@@ -122,7 +122,7 @@ func PostUpdateState(c *gin.Context) {
 
 	// a POST is equivalent to a back repo commit increase
 	// (this will be improved with implementation of unit of work design pattern)
-	orm.BackRepo.IncrementCommitNb()
+	orm.BackRepo.IncrementPushFromFrontNb()
 
 	c.JSON(http.StatusOK, updatestateDB)
 }
@@ -205,7 +205,7 @@ func UpdateUpdateState(c *gin.Context) {
 
 	// an UPDATE generates a back repo commit increase
 	// (this will be improved with implementation of unit of work design pattern)
-	orm.BackRepo.IncrementCommitNb()
+	orm.BackRepo.IncrementPushFromFrontNb()
 
 	// return status OK with the marshalling of the the updatestateDB
 	c.JSON(http.StatusOK, updatestateDB)
@@ -237,7 +237,7 @@ func DeleteUpdateState(c *gin.Context) {
 
 	// a DELETE generates a back repo commit increase
 	// (this will be improved with implementation of unit of work design pattern)
-	orm.BackRepo.IncrementCommitNb()
+	orm.BackRepo.IncrementPushFromFrontNb()
 
 	c.JSON(http.StatusOK, gin.H{"data": true})
 }

@@ -80,7 +80,7 @@ type UpdateStateDBResponse struct {
 	UpdateStateDB
 }
 
-// UpdateStateWOP is a UpdateState without pointers
+// UpdateStateWOP is a UpdateState without pointers (WOP is an acronym for "Without Pointers")
 // it holds the same basic fields but pointers are encoded into uint
 type UpdateStateWOP struct {
 	ID int
@@ -102,7 +102,6 @@ var UpdateState_Fields = []string{
 	"Duration",
 	"Period",
 }
-
 
 type BackRepoUpdateStateStruct struct {
 	// stores UpdateStateDB according to their gorm ID
@@ -261,9 +260,8 @@ func (backRepoUpdateState *BackRepoUpdateStateStruct) CommitPhaseTwoInstance(bac
 
 // BackRepoUpdateState.CheckoutPhaseOne Checkouts all BackRepo instances to the Stage
 //
-// Phase One is the creation of instance in the stage
-//
-// NOTE: the is supposed to have been reset before
+// Phase One will result in having instances on the stage aligned with the back repo
+// pointers are not initialized yet (this is for pahse two)
 //
 func (backRepoUpdateState *BackRepoUpdateStateStruct) CheckoutPhaseOne() (Error error) {
 
@@ -273,9 +271,34 @@ func (backRepoUpdateState *BackRepoUpdateStateStruct) CheckoutPhaseOne() (Error 
 		return query.Error
 	}
 
+	// list of instances to be removed
+	// start from the initial map on the stage and remove instances that have been checked out
+	updatestateInstancesToBeRemovedFromTheStage := make(map[*models.UpdateState]struct{})
+	for key, value := range models.Stage.UpdateStates {
+		updatestateInstancesToBeRemovedFromTheStage[key] = value
+	}
+
 	// copy orm objects to the the map
 	for _, updatestateDB := range updatestateDBArray {
 		backRepoUpdateState.CheckoutPhaseOneInstance(&updatestateDB)
+
+		// do not remove this instance from the stage, therefore
+		// remove instance from the list of instances to be be removed from the stage
+		updatestate, ok := (*backRepoUpdateState.Map_UpdateStateDBID_UpdateStatePtr)[updatestateDB.ID]
+		if ok {
+			delete(updatestateInstancesToBeRemovedFromTheStage, updatestate)
+		}
+	}
+
+	// remove from stage and back repo's 3 maps all updatestates that are not in the checkout
+	for updatestate := range updatestateInstancesToBeRemovedFromTheStage {
+		updatestate.Unstage()
+
+		// remove instance from the back repo 3 maps
+		updatestateID := (*backRepoUpdateState.Map_UpdateStatePtr_UpdateStateDBID)[updatestate]
+		delete((*backRepoUpdateState.Map_UpdateStatePtr_UpdateStateDBID), updatestate)
+		delete((*backRepoUpdateState.Map_UpdateStateDBID_UpdateStateDB), updatestateID)
+		delete((*backRepoUpdateState.Map_UpdateStateDBID_UpdateStatePtr), updatestateID)
 	}
 
 	return
@@ -504,7 +527,7 @@ func (backRepoUpdateState *BackRepoUpdateStateStruct) RestorePhaseOne(dirPath st
 // to compute new index
 func (backRepoUpdateState *BackRepoUpdateStateStruct) RestorePhaseTwo() {
 
-	for _, updatestateDB := range (*backRepoUpdateState.Map_UpdateStateDBID_UpdateStateDB) {
+	for _, updatestateDB := range *backRepoUpdateState.Map_UpdateStateDBID_UpdateStateDB {
 
 		// next line of code is to avert unused variable compilation error
 		_ = updatestateDB

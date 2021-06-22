@@ -12,22 +12,22 @@ var __member __void
 // StageStruct enables storage of staged instances
 // swagger:ignore
 type StageStruct struct { // insertion point for definition of arrays registering instances
-	DummyAgents map[*DummyAgent]struct{}
+	DummyAgents           map[*DummyAgent]struct{}
 	DummyAgents_mapString map[string]*DummyAgent
 
-	Engines map[*Engine]struct{}
+	Engines           map[*Engine]struct{}
 	Engines_mapString map[string]*Engine
 
-	Events map[*Event]struct{}
+	Events           map[*Event]struct{}
 	Events_mapString map[string]*Event
 
-	GongsimCommands map[*GongsimCommand]struct{}
+	GongsimCommands           map[*GongsimCommand]struct{}
 	GongsimCommands_mapString map[string]*GongsimCommand
 
-	GongsimStatuss map[*GongsimStatus]struct{}
+	GongsimStatuss           map[*GongsimStatus]struct{}
 	GongsimStatuss_mapString map[string]*GongsimStatus
 
-	UpdateStates map[*UpdateState]struct{}
+	UpdateStates           map[*UpdateState]struct{}
 	UpdateStates_mapString map[string]*UpdateState
 
 	AllModelsStructCreateCallback AllModelsStructCreateInterface
@@ -65,26 +65,27 @@ type BackRepoInterface interface {
 	CommitUpdateState(updatestate *UpdateState)
 	CheckoutUpdateState(updatestate *UpdateState)
 	GetLastCommitNb() uint
+	GetLastPushFromFrontNb() uint
 }
 
 // swagger:ignore instructs the gong compiler (gongc) to avoid this particular struct
 var Stage StageStruct = StageStruct{ // insertion point for array initiatialisation
-	DummyAgents: make(map[*DummyAgent]struct{}, 0),
+	DummyAgents:           make(map[*DummyAgent]struct{}, 0),
 	DummyAgents_mapString: make(map[string]*DummyAgent, 0),
 
-	Engines: make(map[*Engine]struct{}, 0),
+	Engines:           make(map[*Engine]struct{}, 0),
 	Engines_mapString: make(map[string]*Engine, 0),
 
-	Events: make(map[*Event]struct{}, 0),
+	Events:           make(map[*Event]struct{}, 0),
 	Events_mapString: make(map[string]*Event, 0),
 
-	GongsimCommands: make(map[*GongsimCommand]struct{}, 0),
+	GongsimCommands:           make(map[*GongsimCommand]struct{}, 0),
 	GongsimCommands_mapString: make(map[string]*GongsimCommand, 0),
 
-	GongsimStatuss: make(map[*GongsimStatus]struct{}, 0),
+	GongsimStatuss:           make(map[*GongsimStatus]struct{}, 0),
 	GongsimStatuss_mapString: make(map[string]*GongsimStatus, 0),
 
-	UpdateStates: make(map[*UpdateState]struct{}, 0),
+	UpdateStates:           make(map[*UpdateState]struct{}, 0),
 	UpdateStates_mapString: make(map[string]*UpdateState, 0),
 
 	// end of insertion point
@@ -147,7 +148,7 @@ func (stage *StageStruct) getDummyAgentOrderedStructWithNameField() []*DummyAgen
 func (dummyagent *DummyAgent) Stage() *DummyAgent {
 	Stage.DummyAgents[dummyagent] = __member
 	Stage.DummyAgents_mapString[dummyagent.Name] = dummyagent
-	
+
 	return dummyagent
 }
 
@@ -249,7 +250,7 @@ func (stage *StageStruct) getEngineOrderedStructWithNameField() []*Engine {
 func (engine *Engine) Stage() *Engine {
 	Stage.Engines[engine] = __member
 	Stage.Engines_mapString[engine.Name] = engine
-	
+
 	return engine
 }
 
@@ -351,7 +352,7 @@ func (stage *StageStruct) getEventOrderedStructWithNameField() []*Event {
 func (event *Event) Stage() *Event {
 	Stage.Events[event] = __member
 	Stage.Events_mapString[event.Name] = event
-	
+
 	return event
 }
 
@@ -453,7 +454,7 @@ func (stage *StageStruct) getGongsimCommandOrderedStructWithNameField() []*Gongs
 func (gongsimcommand *GongsimCommand) Stage() *GongsimCommand {
 	Stage.GongsimCommands[gongsimcommand] = __member
 	Stage.GongsimCommands_mapString[gongsimcommand.Name] = gongsimcommand
-	
+
 	return gongsimcommand
 }
 
@@ -555,7 +556,7 @@ func (stage *StageStruct) getGongsimStatusOrderedStructWithNameField() []*Gongsi
 func (gongsimstatus *GongsimStatus) Stage() *GongsimStatus {
 	Stage.GongsimStatuss[gongsimstatus] = __member
 	Stage.GongsimStatuss_mapString[gongsimstatus.Name] = gongsimstatus
-	
+
 	return gongsimstatus
 }
 
@@ -657,7 +658,7 @@ func (stage *StageStruct) getUpdateStateOrderedStructWithNameField() []*UpdateSt
 func (updatestate *UpdateState) Stage() *UpdateState {
 	Stage.UpdateStates[updatestate] = __member
 	Stage.UpdateStates_mapString[updatestate.Name] = updatestate
-	
+
 	return updatestate
 }
 

@@ -77,7 +77,7 @@ type EventDBResponse struct {
 	EventDB
 }
 
-// EventWOP is a Event without pointers
+// EventWOP is a Event without pointers (WOP is an acronym for "Without Pointers")
 // it holds the same basic fields but pointers are encoded into uint
 type EventWOP struct {
 	ID int
@@ -96,7 +96,6 @@ var Event_Fields = []string{
 	"Name",
 	"Duration",
 }
-
 
 type BackRepoEventStruct struct {
 	// stores EventDB according to their gorm ID
@@ -255,9 +254,8 @@ func (backRepoEvent *BackRepoEventStruct) CommitPhaseTwoInstance(backRepo *BackR
 
 // BackRepoEvent.CheckoutPhaseOne Checkouts all BackRepo instances to the Stage
 //
-// Phase One is the creation of instance in the stage
-//
-// NOTE: the is supposed to have been reset before
+// Phase One will result in having instances on the stage aligned with the back repo
+// pointers are not initialized yet (this is for pahse two)
 //
 func (backRepoEvent *BackRepoEventStruct) CheckoutPhaseOne() (Error error) {
 
@@ -267,9 +265,34 @@ func (backRepoEvent *BackRepoEventStruct) CheckoutPhaseOne() (Error error) {
 		return query.Error
 	}
 
+	// list of instances to be removed
+	// start from the initial map on the stage and remove instances that have been checked out
+	eventInstancesToBeRemovedFromTheStage := make(map[*models.Event]struct{})
+	for key, value := range models.Stage.Events {
+		eventInstancesToBeRemovedFromTheStage[key] = value
+	}
+
 	// copy orm objects to the the map
 	for _, eventDB := range eventDBArray {
 		backRepoEvent.CheckoutPhaseOneInstance(&eventDB)
+
+		// do not remove this instance from the stage, therefore
+		// remove instance from the list of instances to be be removed from the stage
+		event, ok := (*backRepoEvent.Map_EventDBID_EventPtr)[eventDB.ID]
+		if ok {
+			delete(eventInstancesToBeRemovedFromTheStage, event)
+		}
+	}
+
+	// remove from stage and back repo's 3 maps all events that are not in the checkout
+	for event := range eventInstancesToBeRemovedFromTheStage {
+		event.Unstage()
+
+		// remove instance from the back repo 3 maps
+		eventID := (*backRepoEvent.Map_EventPtr_EventDBID)[event]
+		delete((*backRepoEvent.Map_EventPtr_EventDBID), event)
+		delete((*backRepoEvent.Map_EventDBID_EventDB), eventID)
+		delete((*backRepoEvent.Map_EventDBID_EventPtr), eventID)
 	}
 
 	return
@@ -490,7 +513,7 @@ func (backRepoEvent *BackRepoEventStruct) RestorePhaseOne(dirPath string) {
 // to compute new index
 func (backRepoEvent *BackRepoEventStruct) RestorePhaseTwo() {
 
-	for _, eventDB := range (*backRepoEvent.Map_EventDBID_EventDB) {
+	for _, eventDB := range *backRepoEvent.Map_EventDBID_EventDB {
 
 		// next line of code is to avert unused variable compilation error
 		_ = eventDB

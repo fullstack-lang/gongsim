@@ -95,7 +95,7 @@ type EngineDBResponse struct {
 	EngineDB
 }
 
-// EngineWOP is a Engine without pointers
+// EngineWOP is a Engine without pointers (WOP is an acronym for "Without Pointers")
 // it holds the same basic fields but pointers are encoded into uint
 type EngineWOP struct {
 	ID int
@@ -132,7 +132,6 @@ var Engine_Fields = []string{
 	"State",
 	"Speed",
 }
-
 
 type BackRepoEngineStruct struct {
 	// stores EngineDB according to their gorm ID
@@ -291,9 +290,8 @@ func (backRepoEngine *BackRepoEngineStruct) CommitPhaseTwoInstance(backRepo *Bac
 
 // BackRepoEngine.CheckoutPhaseOne Checkouts all BackRepo instances to the Stage
 //
-// Phase One is the creation of instance in the stage
-//
-// NOTE: the is supposed to have been reset before
+// Phase One will result in having instances on the stage aligned with the back repo
+// pointers are not initialized yet (this is for pahse two)
 //
 func (backRepoEngine *BackRepoEngineStruct) CheckoutPhaseOne() (Error error) {
 
@@ -303,9 +301,34 @@ func (backRepoEngine *BackRepoEngineStruct) CheckoutPhaseOne() (Error error) {
 		return query.Error
 	}
 
+	// list of instances to be removed
+	// start from the initial map on the stage and remove instances that have been checked out
+	engineInstancesToBeRemovedFromTheStage := make(map[*models.Engine]struct{})
+	for key, value := range models.Stage.Engines {
+		engineInstancesToBeRemovedFromTheStage[key] = value
+	}
+
 	// copy orm objects to the the map
 	for _, engineDB := range engineDBArray {
 		backRepoEngine.CheckoutPhaseOneInstance(&engineDB)
+
+		// do not remove this instance from the stage, therefore
+		// remove instance from the list of instances to be be removed from the stage
+		engine, ok := (*backRepoEngine.Map_EngineDBID_EnginePtr)[engineDB.ID]
+		if ok {
+			delete(engineInstancesToBeRemovedFromTheStage, engine)
+		}
+	}
+
+	// remove from stage and back repo's 3 maps all engines that are not in the checkout
+	for engine := range engineInstancesToBeRemovedFromTheStage {
+		engine.Unstage()
+
+		// remove instance from the back repo 3 maps
+		engineID := (*backRepoEngine.Map_EnginePtr_EngineDBID)[engine]
+		delete((*backRepoEngine.Map_EnginePtr_EngineDBID), engine)
+		delete((*backRepoEngine.Map_EngineDBID_EngineDB), engineID)
+		delete((*backRepoEngine.Map_EngineDBID_EnginePtr), engineID)
 	}
 
 	return
@@ -574,7 +597,7 @@ func (backRepoEngine *BackRepoEngineStruct) RestorePhaseOne(dirPath string) {
 // to compute new index
 func (backRepoEngine *BackRepoEngineStruct) RestorePhaseTwo() {
 
-	for _, engineDB := range (*backRepoEngine.Map_EngineDBID_EngineDB) {
+	for _, engineDB := range *backRepoEngine.Map_EngineDBID_EngineDB {
 
 		// next line of code is to avert unused variable compilation error
 		_ = engineDB

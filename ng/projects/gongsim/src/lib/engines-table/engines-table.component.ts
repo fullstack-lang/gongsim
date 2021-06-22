@@ -52,6 +52,30 @@ export class EnginesTableComponent implements OnInit {
 	this.matTableDataSource.sortingDataAccessor = (engineDB: EngineDB, property: string) => {
 		switch (property) {
 				// insertion point for specific sorting accessor
+			case 'Name':
+				return engineDB.Name;
+
+			case 'EndTime':
+				return engineDB.EndTime;
+
+			case 'CurrentTime':
+				return engineDB.CurrentTime;
+
+			case 'SecondsSinceStart':
+				return engineDB.SecondsSinceStart;
+
+			case 'Fired':
+				return engineDB.Fired;
+
+			case 'ControlMode':
+				return engineDB.ControlMode;
+
+			case 'State':
+				return engineDB.State;
+
+			case 'Speed':
+				return engineDB.Speed;
+
 				default:
 					return EngineDB[property];
 		}

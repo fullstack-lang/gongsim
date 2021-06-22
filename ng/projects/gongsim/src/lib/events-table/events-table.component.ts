@@ -52,6 +52,12 @@ export class EventsTableComponent implements OnInit {
 	this.matTableDataSource.sortingDataAccessor = (eventDB: EventDB, property: string) => {
 		switch (property) {
 				// insertion point for specific sorting accessor
+			case 'Name':
+				return eventDB.Name;
+
+			case 'Duration':
+				return eventDB.Duration;
+
 				default:
 					return EventDB[property];
 		}

@@ -52,6 +52,15 @@ export class UpdateStatesTableComponent implements OnInit {
 	this.matTableDataSource.sortingDataAccessor = (updatestateDB: UpdateStateDB, property: string) => {
 		switch (property) {
 				// insertion point for specific sorting accessor
+			case 'Name':
+				return updatestateDB.Name;
+
+			case 'Duration':
+				return updatestateDB.Duration;
+
+			case 'Period':
+				return updatestateDB.Period;
+
 				default:
 					return UpdateStateDB[property];
 		}

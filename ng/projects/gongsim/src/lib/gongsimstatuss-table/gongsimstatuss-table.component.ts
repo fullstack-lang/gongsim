@@ -52,6 +52,21 @@ export class GongsimStatussTableComponent implements OnInit {
 	this.matTableDataSource.sortingDataAccessor = (gongsimstatusDB: GongsimStatusDB, property: string) => {
 		switch (property) {
 				// insertion point for specific sorting accessor
+			case 'Name':
+				return gongsimstatusDB.Name;
+
+			case 'CurrentCommand':
+				return gongsimstatusDB.CurrentCommand;
+
+			case 'CompletionDate':
+				return gongsimstatusDB.CompletionDate;
+
+			case 'CurrentSpeedCommand':
+				return gongsimstatusDB.CurrentSpeedCommand;
+
+			case 'SpeedCommandCompletionDate':
+				return gongsimstatusDB.SpeedCommandCompletionDate;
+
 				default:
 					return GongsimStatusDB[property];
 		}
