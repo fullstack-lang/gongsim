@@ -1,82 +1,79 @@
-<div *ngIf="updatestate" class="details">
+<form *ngIf="updatestate" class="details">
     <h1 class="details__title">updatestate</h1>
     <!-- insertion point for fields specific code -->
-    <!-- -->
-    <div class="details__item">
-        <form>
-            <mat-form-field>
+    <mat-grid-list *ngIf='!isATextArea("Name")' cols="4" rowHeight="6:1">
+        <mat-grid-tile [colspan]="3">
+            <mat-form-field mat-form-field class="detail-full-width">
                 <mat-label>Name</mat-label>
                 <input name="" [ngModelOptions]="{standalone: true}" matInput [(ngModel)]="updatestate.Name">
             </mat-form-field>
-        </form>
-    </div>
+        </mat-grid-tile>
+        <mat-grid-tile>
+            <button mat-raised-button (click)="toggleTextArea('Name')">
+                <mat-icon>
+                    expand_more
+                </mat-icon>
+            </button>
+        </mat-grid-tile>
+    </mat-grid-list>
+    <mat-form-field *ngIf='isATextArea("Name")' mat-form-field class="detail-full-width">
+        <mat-label>Name</mat-label>
+        <textarea name="" [ngModelOptions]="{standalone: true}" matInput [(ngModel)]="updatestate.Name"></textarea>
+    </mat-form-field>
+
     <!-- -->
-    <div class="details__item">
-        <mat-grid-list cols="3" rowHeight="4:1">
-            <mat-grid-tile>
-                <form>
-                    <mat-form-field class="details_hours_width">
-                        <mat-label>Duration Hours</mat-label>
-                        <input type="number" [ngModelOptions]="{standalone: true}" matInput
-                            [(ngModel)]="Duration_Hours">
-                    </mat-form-field>
-                </form>
-            </mat-grid-tile>
-            <mat-grid-tile>
-                <form>
-                    <mat-form-field class="details_minutes_width">
-                        <mat-label>Duration Minutes</mat-label>
-                        <input type="number" [ngModelOptions]="{standalone: true}" matInput
-                            [(ngModel)]="Duration_Minutes">
-                    </mat-form-field>
-                </form>
-            </mat-grid-tile>
-            <mat-grid-tile>
-                <form>
-                    <mat-form-field class="details_seconds_width">
-                        <mat-label>Duration Seconds</mat-label>
-                        <input type="number" [ngModelOptions]="{standalone: true}" matInput
-                            [(ngModel)]="Duration_Seconds">
-                    </mat-form-field>
-                </form>
-            </mat-grid-tile>
-        </mat-grid-list>
-    </div>
+    <mat-grid-list cols="3" rowHeight="4:1">
+        <mat-grid-tile>
+            <mat-form-field class="details_hours_width">
+                <mat-label>Duration Hours</mat-label>
+                <input type="number" [ngModelOptions]="{standalone: true}" matInput
+                    [(ngModel)]="Duration_Hours">
+            </mat-form-field>
+        </mat-grid-tile>
+        <mat-grid-tile>
+            <mat-form-field class="details_minutes_width">
+                <mat-label>Duration Minutes</mat-label>
+                <input type="number" [ngModelOptions]="{standalone: true}" matInput
+                    [(ngModel)]="Duration_Minutes">
+            </mat-form-field>
+        </mat-grid-tile>
+        <mat-grid-tile>
+            <mat-form-field class="details_seconds_width">
+                <mat-label>Duration Seconds</mat-label>
+                <input type="number" [ngModelOptions]="{standalone: true}" matInput
+                    [(ngModel)]="Duration_Seconds">
+            </mat-form-field>
+        </mat-grid-tile>
+    </mat-grid-list>
+
     <!-- -->
-    <div class="details__item">
-        <mat-grid-list cols="3" rowHeight="4:1">
-            <mat-grid-tile>
-                <form>
-                    <mat-form-field class="details_hours_width">
-                        <mat-label>Period Hours</mat-label>
-                        <input type="number" [ngModelOptions]="{standalone: true}" matInput
-                            [(ngModel)]="Period_Hours">
-                    </mat-form-field>
-                </form>
-            </mat-grid-tile>
-            <mat-grid-tile>
-                <form>
-                    <mat-form-field class="details_minutes_width">
-                        <mat-label>Period Minutes</mat-label>
-                        <input type="number" [ngModelOptions]="{standalone: true}" matInput
-                            [(ngModel)]="Period_Minutes">
-                    </mat-form-field>
-                </form>
-            </mat-grid-tile>
-            <mat-grid-tile>
-                <form>
-                    <mat-form-field class="details_seconds_width">
-                        <mat-label>Period Seconds</mat-label>
-                        <input type="number" [ngModelOptions]="{standalone: true}" matInput
-                            [(ngModel)]="Period_Seconds">
-                    </mat-form-field>
-                </form>
-            </mat-grid-tile>
-        </mat-grid-list>
-    </div>
+    <mat-grid-list cols="3" rowHeight="4:1">
+        <mat-grid-tile>
+            <mat-form-field class="details_hours_width">
+                <mat-label>Period Hours</mat-label>
+                <input type="number" [ngModelOptions]="{standalone: true}" matInput
+                    [(ngModel)]="Period_Hours">
+            </mat-form-field>
+        </mat-grid-tile>
+        <mat-grid-tile>
+            <mat-form-field class="details_minutes_width">
+                <mat-label>Period Minutes</mat-label>
+                <input type="number" [ngModelOptions]="{standalone: true}" matInput
+                    [(ngModel)]="Period_Minutes">
+            </mat-form-field>
+        </mat-grid-tile>
+        <mat-grid-tile>
+            <mat-form-field class="details_seconds_width">
+                <mat-label>Period Seconds</mat-label>
+                <input type="number" [ngModelOptions]="{standalone: true}" matInput
+                    [(ngModel)]="Period_Seconds">
+            </mat-form-field>
+        </mat-grid-tile>
+    </mat-grid-list>
+
     <div class="details__save">
         <button mat-raised-button color="primary" (click)="save()">
 			Save updatestate
 		</button>
     </div>
-</div>
+</form>
