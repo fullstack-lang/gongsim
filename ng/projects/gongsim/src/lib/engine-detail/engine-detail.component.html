@@ -1,8 +1,8 @@
 <form *ngIf="engine" class="details">
-    <h1 class="details__title">engine</h1>
+    <h2 class="details__title">engine</h2>
     <!-- insertion point for fields specific code -->
-    <mat-grid-list *ngIf='!isATextArea("Name")' cols="4" rowHeight="6:1">
-        <mat-grid-tile [colspan]="3">
+    <mat-grid-list *ngIf='!isATextArea("Name")' cols="5" rowHeight="2:1">
+        <mat-grid-tile [colspan]="4">
             <mat-form-field mat-form-field class="detail-full-width">
                 <mat-label>Name</mat-label>
                 <input name="" [ngModelOptions]="{standalone: true}" matInput [(ngModel)]="engine.Name">
@@ -21,8 +21,8 @@
         <textarea name="" [ngModelOptions]="{standalone: true}" matInput [(ngModel)]="engine.Name"></textarea>
     </mat-form-field>
 
-    <mat-grid-list *ngIf='!isATextArea("EndTime")' cols="4" rowHeight="6:1">
-        <mat-grid-tile [colspan]="3">
+    <mat-grid-list *ngIf='!isATextArea("EndTime")' cols="5" rowHeight="2:1">
+        <mat-grid-tile [colspan]="4">
             <mat-form-field mat-form-field class="detail-full-width">
                 <mat-label>EndTime</mat-label>
                 <input name="" [ngModelOptions]="{standalone: true}" matInput [(ngModel)]="engine.EndTime">
@@ -41,8 +41,8 @@
         <textarea name="" [ngModelOptions]="{standalone: true}" matInput [(ngModel)]="engine.EndTime"></textarea>
     </mat-form-field>
 
-    <mat-grid-list *ngIf='!isATextArea("CurrentTime")' cols="4" rowHeight="6:1">
-        <mat-grid-tile [colspan]="3">
+    <mat-grid-list *ngIf='!isATextArea("CurrentTime")' cols="5" rowHeight="2:1">
+        <mat-grid-tile [colspan]="4">
             <mat-form-field mat-form-field class="detail-full-width">
                 <mat-label>CurrentTime</mat-label>
                 <input name="" [ngModelOptions]="{standalone: true}" matInput [(ngModel)]="engine.CurrentTime">

@@ -39,6 +39,7 @@ interface GongNode {
   children?: GongNode[];
   type: GongNodeType;
   structName: string;
+  associationField: string;
   associatedStructName: string;
   id: number;
   uniqueIdPerStack: number;
@@ -54,6 +55,7 @@ interface GongFlatNode {
   level: number;
   type: GongNodeType;
   structName: string;
+  associationField: string;
   associatedStructName: string;
   id: number;
   uniqueIdPerStack: number;
@@ -88,6 +90,7 @@ export class SidebarComponent implements OnInit {
       level: level,
       type: node.type,
       structName: node.structName,
+      associationField: node.associationField,
       associatedStructName: node.associatedStructName,
       id: node.id,
       uniqueIdPerStack: node.uniqueIdPerStack,
@@ -246,6 +249,7 @@ export class SidebarComponent implements OnInit {
         id: 0,
         uniqueIdPerStack: 13 * nonInstanceNodeId,
         structName: "DummyAgent",
+        associationField: "",
         associatedStructName: "",
         children: new Array<GongNode>()
       }
@@ -270,6 +274,7 @@ export class SidebarComponent implements OnInit {
             id: dummyagentDB.ID,
             uniqueIdPerStack: getDummyAgentUniqueID(dummyagentDB.ID),
             structName: "DummyAgent",
+            associationField: "",
             associatedStructName: "",
             children: new Array<GongNode>()
           }
@@ -285,7 +290,8 @@ export class SidebarComponent implements OnInit {
             id: dummyagentDB.ID,
             uniqueIdPerStack: 17 * nonInstanceNodeId,
             structName: "DummyAgent",
-            associatedStructName: "",
+            associationField: "Engine",
+            associatedStructName: "Engine",
             children: new Array<GongNode>()
           }
           nonInstanceNodeId = nonInstanceNodeId + 1
@@ -303,6 +309,7 @@ export class SidebarComponent implements OnInit {
                 3 * getDummyAgentUniqueID(dummyagentDB.ID)
                 + 5 * getEngineUniqueID(dummyagentDB.Engine.ID),
               structName: "Engine",
+              associationField: "",
               associatedStructName: "",
               children: new Array<GongNode>()
             }
@@ -321,6 +328,7 @@ export class SidebarComponent implements OnInit {
         id: 0,
         uniqueIdPerStack: 13 * nonInstanceNodeId,
         structName: "Engine",
+        associationField: "",
         associatedStructName: "",
         children: new Array<GongNode>()
       }
@@ -345,6 +353,7 @@ export class SidebarComponent implements OnInit {
             id: engineDB.ID,
             uniqueIdPerStack: getEngineUniqueID(engineDB.ID),
             structName: "Engine",
+            associationField: "",
             associatedStructName: "",
             children: new Array<GongNode>()
           }
@@ -363,6 +372,7 @@ export class SidebarComponent implements OnInit {
         id: 0,
         uniqueIdPerStack: 13 * nonInstanceNodeId,
         structName: "Event",
+        associationField: "",
         associatedStructName: "",
         children: new Array<GongNode>()
       }
@@ -387,6 +397,7 @@ export class SidebarComponent implements OnInit {
             id: eventDB.ID,
             uniqueIdPerStack: getEventUniqueID(eventDB.ID),
             structName: "Event",
+            associationField: "",
             associatedStructName: "",
             children: new Array<GongNode>()
           }
@@ -405,6 +416,7 @@ export class SidebarComponent implements OnInit {
         id: 0,
         uniqueIdPerStack: 13 * nonInstanceNodeId,
         structName: "GongsimCommand",
+        associationField: "",
         associatedStructName: "",
         children: new Array<GongNode>()
       }
@@ -429,6 +441,7 @@ export class SidebarComponent implements OnInit {
             id: gongsimcommandDB.ID,
             uniqueIdPerStack: getGongsimCommandUniqueID(gongsimcommandDB.ID),
             structName: "GongsimCommand",
+            associationField: "",
             associatedStructName: "",
             children: new Array<GongNode>()
           }
@@ -447,6 +460,7 @@ export class SidebarComponent implements OnInit {
         id: 0,
         uniqueIdPerStack: 13 * nonInstanceNodeId,
         structName: "GongsimStatus",
+        associationField: "",
         associatedStructName: "",
         children: new Array<GongNode>()
       }
@@ -471,6 +485,7 @@ export class SidebarComponent implements OnInit {
             id: gongsimstatusDB.ID,
             uniqueIdPerStack: getGongsimStatusUniqueID(gongsimstatusDB.ID),
             structName: "GongsimStatus",
+            associationField: "",
             associatedStructName: "",
             children: new Array<GongNode>()
           }
@@ -489,6 +504,7 @@ export class SidebarComponent implements OnInit {
         id: 0,
         uniqueIdPerStack: 13 * nonInstanceNodeId,
         structName: "UpdateState",
+        associationField: "",
         associatedStructName: "",
         children: new Array<GongNode>()
       }
@@ -513,6 +529,7 @@ export class SidebarComponent implements OnInit {
             id: updatestateDB.ID,
             uniqueIdPerStack: getUpdateStateUniqueID(updatestateDB.ID),
             structName: "UpdateState",
+            associationField: "",
             associatedStructName: "",
             children: new Array<GongNode>()
           }
@@ -593,7 +610,7 @@ export class SidebarComponent implements OnInit {
   setEditorSpecialRouterOutlet( node: GongFlatNode) {
     this.router.navigate([{
       outlets: {
-        github_com_fullstack_lang_gongsim_go_editor: ["github_com_fullstack_lang_gongsim_go-" + node.associatedStructName.toLowerCase() + "-adder", node.id, node.structName + "_" + node.name]
+        github_com_fullstack_lang_gongsim_go_editor: ["github_com_fullstack_lang_gongsim_go-" + node.associatedStructName.toLowerCase() + "-adder", node.id, node.structName, node.associationField]
       }
     }]);
   }

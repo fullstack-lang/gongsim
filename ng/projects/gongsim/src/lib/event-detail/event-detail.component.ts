@@ -17,6 +17,14 @@ import { MatDialog, MAT_DIALOG_DATA, MatDialogRef, MatDialogConfig } from '@angu
 
 import { NullInt64 } from '../front-repo.service'
 
+// EventDetailComponent is initilizaed from different routes
+// EventDetailComponentState detail different cases 
+enum EventDetailComponentState {
+	CREATE_INSTANCE,
+	UPDATE_INSTANCE,
+	// insertion point for declarations of enum values of state
+}
+
 @Component({
 	selector: 'app-event-detail',
 	templateUrl: './event-detail.component.html',
@@ -40,6 +48,17 @@ export class EventDetailComponent implements OnInit {
 	// if true, it is inputed with a <textarea ...> </textarea>
 	mapFields_displayAsTextArea = new Map<string, boolean>()
 
+	// the state at initialization (CREATION, UPDATE or CREATE with one association set)
+	state: EventDetailComponentState
+
+	// in UDPATE state, if is the id of the instance to update
+	// in CREATE state with one association set, this is the id of the associated instance
+	id: number
+
+	// in CREATE state with one association set, this is the id of the associated instance
+	originStruct: string
+	originStructFieldName: string
+
 	constructor(
 		private eventService: EventService,
 		private frontRepoService: FrontRepoService,
@@ -50,6 +69,27 @@ export class EventDetailComponent implements OnInit {
 	}
 
 	ngOnInit(): void {
+
+		// compute state
+		this.id = +this.route.snapshot.paramMap.get('id');
+		this.originStruct = this.route.snapshot.paramMap.get('originStruct');
+		this.originStructFieldName = this.route.snapshot.paramMap.get('originStructFieldName');
+
+		const association = this.route.snapshot.paramMap.get('association');
+		if (this.id == 0) {
+			this.state = EventDetailComponentState.CREATE_INSTANCE
+		} else {
+			if (this.originStruct == undefined) {
+				this.state = EventDetailComponentState.UPDATE_INSTANCE
+			} else {
+				switch (this.originStructFieldName) {
+					// insertion point for state computation
+					default:
+						console.log(this.originStructFieldName + " is unkown association")
+				}
+			}
+		}
+
 		this.getEvent()
 
 		// observable for changes in structs
@@ -65,16 +105,21 @@ export class EventDetailComponent implements OnInit {
 	}
 
 	getEvent(): void {
-		const id = +this.route.snapshot.paramMap.get('id');
-		const association = this.route.snapshot.paramMap.get('association');
 
 		this.frontRepoService.pull().subscribe(
 			frontRepo => {
 				this.frontRepo = frontRepo
-				if (id != 0 && association == undefined) {
-					this.event = frontRepo.Events.get(id)
-				} else {
-					this.event = new (EventDB)
+
+				switch (this.state) {
+					case EventDetailComponentState.CREATE_INSTANCE:
+						this.event = new (EventDB)
+						break;
+					case EventDetailComponentState.UPDATE_INSTANCE:
+						this.event = frontRepo.Events.get(this.id)
+						break;
+					// insertion point for init of association field
+					default:
+						console.log(this.state + " is unkown state")
 				}
 
 				// insertion point for recovery of form controls value for bool fields
@@ -89,8 +134,6 @@ export class EventDetailComponent implements OnInit {
 	}
 
 	save(): void {
-		const id = +this.route.snapshot.paramMap.get('id');
-		const association = this.route.snapshot.paramMap.get('association');
 
 		// some fields needs to be translated into serializable forms
 		// pointers fields, after the translation, are nulled in order to perform serialization
@@ -102,26 +145,21 @@ export class EventDetailComponent implements OnInit {
 			this.Duration_Seconds * (1000 * 1000 * 1000)
 
 		// save from the front pointer space to the non pointer space for serialization
-		if (association == undefined) {
-			// insertion point for translation/nullation of each pointers
-		}
 
-		if (id != 0 && association == undefined) {
+		// insertion point for translation/nullation of each pointers
 
-			this.eventService.updateEvent(this.event)
-				.subscribe(event => {
-					this.eventService.EventServiceChanged.next("update")
+		switch (this.state) {
+			case EventDetailComponentState.UPDATE_INSTANCE:
+				this.eventService.updateEvent(this.event)
+					.subscribe(event => {
+						this.eventService.EventServiceChanged.next("update")
+					});
+				break;
+			default:
+				this.eventService.postEvent(this.event).subscribe(event => {
+					this.eventService.EventServiceChanged.next("post")
+					this.event = {} // reset fields
 				});
-		} else {
-			switch (association) {
-				// insertion point for saving value of ONE_MANY association reverse pointer
-			}
-			this.eventService.postEvent(this.event).subscribe(event => {
-
-				this.eventService.EventServiceChanged.next("post")
-
-				this.event = {} // reset fields
-			});
 		}
 	}
 

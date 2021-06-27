@@ -1,8 +1,8 @@
 <form *ngIf="gongsimcommand" class="details">
-    <h1 class="details__title">gongsimcommand</h1>
+    <h2 class="details__title">gongsimcommand</h2>
     <!-- insertion point for fields specific code -->
-    <mat-grid-list *ngIf='!isATextArea("Name")' cols="4" rowHeight="6:1">
-        <mat-grid-tile [colspan]="3">
+    <mat-grid-list *ngIf='!isATextArea("Name")' cols="5" rowHeight="2:1">
+        <mat-grid-tile [colspan]="4">
             <mat-form-field mat-form-field class="detail-full-width">
                 <mat-label>Name</mat-label>
                 <input name="" [ngModelOptions]="{standalone: true}" matInput [(ngModel)]="gongsimcommand.Name">
@@ -31,8 +31,8 @@
         </mat-select>
     </mat-form-field>
 
-    <mat-grid-list *ngIf='!isATextArea("CommandDate")' cols="4" rowHeight="6:1">
-        <mat-grid-tile [colspan]="3">
+    <mat-grid-list *ngIf='!isATextArea("CommandDate")' cols="5" rowHeight="2:1">
+        <mat-grid-tile [colspan]="4">
             <mat-form-field mat-form-field class="detail-full-width">
                 <mat-label>CommandDate</mat-label>
                 <input name="" [ngModelOptions]="{standalone: true}" matInput [(ngModel)]="gongsimcommand.CommandDate">
@@ -61,8 +61,8 @@
         </mat-select>
     </mat-form-field>
 
-    <mat-grid-list *ngIf='!isATextArea("DateSpeedCommand")' cols="4" rowHeight="6:1">
-        <mat-grid-tile [colspan]="3">
+    <mat-grid-list *ngIf='!isATextArea("DateSpeedCommand")' cols="5" rowHeight="2:1">
+        <mat-grid-tile [colspan]="4">
             <mat-form-field mat-form-field class="detail-full-width">
                 <mat-label>DateSpeedCommand</mat-label>
                 <input name="" [ngModelOptions]="{standalone: true}" matInput [(ngModel)]="gongsimcommand.DateSpeedCommand">
