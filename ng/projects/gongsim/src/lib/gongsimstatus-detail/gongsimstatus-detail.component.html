@@ -2,7 +2,7 @@
     <h2 class="details__title">gongsimstatus</h2>
     <!-- insertion point for fields specific code -->
     <mat-grid-list *ngIf='!isATextArea("Name")' cols="5" rowHeight="2:1">
-        <mat-grid-tile [colspan]="4">
+        <mat-grid-tile [colspan]="3">
             <mat-form-field mat-form-field class="detail-full-width">
                 <mat-label>Name</mat-label>
                 <input name="" [ngModelOptions]="{standalone: true}" matInput [(ngModel)]="gongsimstatus.Name">
@@ -32,7 +32,7 @@
     </mat-form-field>
 
     <mat-grid-list *ngIf='!isATextArea("CompletionDate")' cols="5" rowHeight="2:1">
-        <mat-grid-tile [colspan]="4">
+        <mat-grid-tile [colspan]="3">
             <mat-form-field mat-form-field class="detail-full-width">
                 <mat-label>CompletionDate</mat-label>
                 <input name="" [ngModelOptions]="{standalone: true}" matInput [(ngModel)]="gongsimstatus.CompletionDate">
@@ -62,7 +62,7 @@
     </mat-form-field>
 
     <mat-grid-list *ngIf='!isATextArea("SpeedCommandCompletionDate")' cols="5" rowHeight="2:1">
-        <mat-grid-tile [colspan]="4">
+        <mat-grid-tile [colspan]="3">
             <mat-form-field mat-form-field class="detail-full-width">
                 <mat-label>SpeedCommandCompletionDate</mat-label>
                 <input name="" [ngModelOptions]="{standalone: true}" matInput [(ngModel)]="gongsimstatus.SpeedCommandCompletionDate">
@@ -83,7 +83,7 @@
 
     <div class="details__save">
         <button mat-raised-button color="primary" (click)="save()">
-			Save gongsimstatus
-		</button>
+            Save gongsimstatus
+        </button>
     </div>
 </form>

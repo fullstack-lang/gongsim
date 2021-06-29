@@ -7,7 +7,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { MatButton } from '@angular/material/button'
 
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog'
-import { DialogData } from '../front-repo.service'
+import { DialogData, FrontRepoService, FrontRepo, NullInt64, SelectionMode } from '../front-repo.service'
 import { SelectionModel } from '@angular/cdk/collections';
 
 const allowMultiSelect = true;
@@ -16,7 +16,13 @@ import { Router, RouterState } from '@angular/router';
 import { EventDB } from '../event-db'
 import { EventService } from '../event.service'
 
-import { FrontRepoService, FrontRepo } from '../front-repo.service'
+// TableComponent is initilizaed from different routes
+// TableComponentMode detail different cases 
+enum TableComponentMode {
+  DISPLAY_MODE,
+  ONE_MANY_ASSOCIATION_MODE,
+  MANY_MANY_ASSOCIATION_MODE,
+}
 
 // generated table component
 @Component({
@@ -26,6 +32,9 @@ import { FrontRepoService, FrontRepo } from '../front-repo.service'
 })
 export class EventsTableComponent implements OnInit {
 
+  // mode at invocation
+  mode: TableComponentMode
+
   // used if the component is called as a selection component of Event instances
   selection: SelectionModel<EventDB>;
   initialSelection = new Array<EventDB>();
@@ -33,7 +42,6 @@ export class EventsTableComponent implements OnInit {
   // the data source for the table
   events: EventDB[];
   matTableDataSource: MatTableDataSource<EventDB>
-
 
   // front repo, that will be referenced by this.events
   frontRepo: FrontRepo
@@ -48,34 +56,34 @@ export class EventsTableComponent implements OnInit {
 
   ngAfterViewInit() {
 
-	// enable sorting on all fields (including pointers and reverse pointer)
-	this.matTableDataSource.sortingDataAccessor = (eventDB: EventDB, property: string) => {
-		switch (property) {
-				// insertion point for specific sorting accessor
-			case 'Name':
-				return eventDB.Name;
+    // enable sorting on all fields (including pointers and reverse pointer)
+    this.matTableDataSource.sortingDataAccessor = (eventDB: EventDB, property: string) => {
+      switch (property) {
+        // insertion point for specific sorting accessor
+        case 'Name':
+          return eventDB.Name;
 
-			case 'Duration':
-				return eventDB.Duration;
+        case 'Duration':
+          return eventDB.Duration;
 
-				default:
-					return EventDB[property];
-		}
-	}; 
+        default:
+          return EventDB[property];
+      }
+    };
 
-	// enable filtering on all fields (including pointers and reverse pointer, which is not done by default)
-	this.matTableDataSource.filterPredicate = (eventDB: EventDB, filter: string) => {
+    // enable filtering on all fields (including pointers and reverse pointer, which is not done by default)
+    this.matTableDataSource.filterPredicate = (eventDB: EventDB, filter: string) => {
 
-		// filtering is based on finding a lower case filter into a concatenated string
-		// the eventDB properties
-		let mergedContent = ""
+      // filtering is based on finding a lower case filter into a concatenated string
+      // the eventDB properties
+      let mergedContent = ""
 
-		// insertion point for merging of fields
-		mergedContent += eventDB.Name.toLowerCase()
+      // insertion point for merging of fields
+      mergedContent += eventDB.Name.toLowerCase()
 
-		let isSelected = mergedContent.includes(filter.toLowerCase())
-		return isSelected
-	};
+      let isSelected = mergedContent.includes(filter.toLowerCase())
+      return isSelected
+    };
 
     this.matTableDataSource.sort = this.sort;
     this.matTableDataSource.paginator = this.paginator;
@@ -96,6 +104,22 @@ export class EventsTableComponent implements OnInit {
 
     private router: Router,
   ) {
+
+    // compute mode
+    if (dialogData == undefined) {
+      this.mode = TableComponentMode.DISPLAY_MODE
+    } else {
+      switch (dialogData.SelectionMode) {
+        case SelectionMode.ONE_MANY_ASSOCIATION_MODE:
+          this.mode = TableComponentMode.ONE_MANY_ASSOCIATION_MODE
+          break
+        case SelectionMode.MANY_MANY_ASSOCIATION_MODE:
+          this.mode = TableComponentMode.MANY_MANY_ASSOCIATION_MODE
+          break
+        default:
+      }
+    }
+
     // observable for changes in structs
     this.eventService.EventServiceChanged.subscribe(
       message => {
@@ -104,7 +128,7 @@ export class EventsTableComponent implements OnInit {
         }
       }
     )
-    if (dialogData == undefined) {
+    if (this.mode == TableComponentMode.DISPLAY_MODE) {
       this.displayedColumns = ['ID', 'Edit', 'Delete', // insertion point for columns to display
         "Name",
         "Duration",
@@ -141,7 +165,7 @@ export class EventsTableComponent implements OnInit {
         }
 
         // in case the component is called as a selection component
-        if (this.dialogData != undefined) {
+        if (this.mode == TableComponentMode.ONE_MANY_ASSOCIATION_MODE) {
           this.events.forEach(
             event => {
               let ID = this.dialogData.ID
@@ -151,6 +175,20 @@ export class EventsTableComponent implements OnInit {
               }
             }
           )
+          this.selection = new SelectionModel<EventDB>(allowMultiSelect, this.initialSelection);
+        }
+
+        if (this.mode == TableComponentMode.MANY_MANY_ASSOCIATION_MODE) {
+
+          let mapOfSourceInstances = this.frontRepo[this.dialogData.SourceStruct + "s"]
+          let sourceInstance = mapOfSourceInstances.get(this.dialogData.ID)
+
+          if (sourceInstance[this.dialogData.SourceField]) {
+            for (let associationInstance of sourceInstance[this.dialogData.SourceField]) {
+              let event = associationInstance[this.dialogData.IntermediateStructField]
+              this.initialSelection.push(event)
+            }
+          }
           this.selection = new SelectionModel<EventDB>(allowMultiSelect, this.initialSelection);
         }
 
@@ -219,36 +257,106 @@ export class EventsTableComponent implements OnInit {
 
   save() {
 
-    let toUpdate = new Set<EventDB>()
+    if (this.mode == TableComponentMode.ONE_MANY_ASSOCIATION_MODE) {
 
-    // reset all initial selection of event that belong to event through Anarrayofb
-    this.initialSelection.forEach(
-      event => {
-        event[this.dialogData.ReversePointer].Int64 = 0
-        event[this.dialogData.ReversePointer].Valid = true
-        toUpdate.add(event)
-      }
-    )
+      let toUpdate = new Set<EventDB>()
 
-    // from selection, set event that belong to event through Anarrayofb
-    this.selection.selected.forEach(
-      event => {
-        let ID = +this.dialogData.ID
-        event[this.dialogData.ReversePointer].Int64 = ID
-        event[this.dialogData.ReversePointer].Valid = true
-        toUpdate.add(event)
-      }
-    )
+      // reset all initial selection of event that belong to event
+      this.initialSelection.forEach(
+        event => {
+          event[this.dialogData.ReversePointer].Int64 = 0
+          event[this.dialogData.ReversePointer].Valid = true
+          toUpdate.add(event)
+        }
+      )
 
-    // update all event (only update selection & initial selection)
-    toUpdate.forEach(
-      event => {
-        this.eventService.updateEvent(event)
-          .subscribe(event => {
-            this.eventService.EventServiceChanged.next("update")
-          });
+      // from selection, set event that belong to event
+      this.selection.selected.forEach(
+        event => {
+          let ID = +this.dialogData.ID
+          event[this.dialogData.ReversePointer].Int64 = ID
+          event[this.dialogData.ReversePointer].Valid = true
+          toUpdate.add(event)
+        }
+      )
+
+      // update all event (only update selection & initial selection)
+      toUpdate.forEach(
+        event => {
+          this.eventService.updateEvent(event)
+            .subscribe(event => {
+              this.eventService.EventServiceChanged.next("update")
+            });
+        }
+      )
+    }
+
+    if (this.mode == TableComponentMode.MANY_MANY_ASSOCIATION_MODE) {
+
+      let mapOfSourceInstances = this.frontRepo[this.dialogData.SourceStruct + "s"]
+      let sourceInstance = mapOfSourceInstances.get(this.dialogData.ID)
+
+      // First, parse all instance of the association struct and remove the instance
+      // that have unselect
+      let unselectedEvent = new Set<number>()
+      for (let event of this.initialSelection) {
+        if (this.selection.selected.includes(event)) {
+          // console.log("event " + event.Name + " is still selected")
+        } else {
+          console.log("event " + event.Name + " has been unselected")
+          unselectedEvent.add(event.ID)
+          console.log("is unselected " + unselectedEvent.has(event.ID))
+        }
       }
-    )
+
+      // delete the association instance
+      if (sourceInstance[this.dialogData.SourceField]) {
+        for (let associationInstance of sourceInstance[this.dialogData.SourceField]) {
+          let event = associationInstance[this.dialogData.IntermediateStructField]
+          if (unselectedEvent.has(event.ID)) {
+
+            this.frontRepoService.deleteService( this.dialogData.IntermediateStruct, associationInstance )
+          }
+        }
+      }
+
+      // is the source array is emptyn create it
+      if (sourceInstance[this.dialogData.SourceField] == undefined) {
+        sourceInstance[this.dialogData.SourceField] = new Array<any>()
+      }
+
+      // second, parse all instance of the selected
+      if (sourceInstance[this.dialogData.SourceField]) {
+        this.selection.selected.forEach(
+          event => {
+            if (!this.initialSelection.includes(event)) {
+              // console.log("event " + event.Name + " has been added to the selection")
+
+              let associationInstance = {
+                Name: sourceInstance["Name"] + "-" + event.Name,
+              }
+
+              associationInstance[this.dialogData.IntermediateStructField+"ID"] = new NullInt64
+              associationInstance[this.dialogData.IntermediateStructField+"ID"].Int64 = event.ID
+              associationInstance[this.dialogData.IntermediateStructField+"ID"].Valid = true
+
+              associationInstance[this.dialogData.SourceStruct + "_" + this.dialogData.SourceField + "DBID"] = new NullInt64
+              associationInstance[this.dialogData.SourceStruct + "_" + this.dialogData.SourceField + "DBID"].Int64 = sourceInstance["ID"]
+              associationInstance[this.dialogData.SourceStruct + "_" + this.dialogData.SourceField + "DBID"].Valid = true
+
+              this.frontRepoService.postService( this.dialogData.IntermediateStruct, associationInstance )
+
+            } else {
+              // console.log("event " + event.Name + " is still selected")
+            }
+          }
+        )
+      }
+
+      // this.selection = new SelectionModel<EventDB>(allowMultiSelect, this.initialSelection);
+    }
+
+    // why pizza ?
     this.dialogRef.close('Pizza!');
   }
 }

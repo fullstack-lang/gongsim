@@ -2,7 +2,7 @@
     <h2 class="details__title">event</h2>
     <!-- insertion point for fields specific code -->
     <mat-grid-list *ngIf='!isATextArea("Name")' cols="5" rowHeight="2:1">
-        <mat-grid-tile [colspan]="4">
+        <mat-grid-tile [colspan]="3">
             <mat-form-field mat-form-field class="detail-full-width">
                 <mat-label>Name</mat-label>
                 <input name="" [ngModelOptions]="{standalone: true}" matInput [(ngModel)]="event.Name">
@@ -26,29 +26,26 @@
         <mat-grid-tile>
             <mat-form-field class="details_hours_width">
                 <mat-label>Duration Hours</mat-label>
-                <input type="number" [ngModelOptions]="{standalone: true}" matInput
-                    [(ngModel)]="Duration_Hours">
+                <input type="number" [ngModelOptions]="{standalone: true}" matInput [(ngModel)]="Duration_Hours">
             </mat-form-field>
         </mat-grid-tile>
         <mat-grid-tile>
             <mat-form-field class="details_minutes_width">
                 <mat-label>Duration Minutes</mat-label>
-                <input type="number" [ngModelOptions]="{standalone: true}" matInput
-                    [(ngModel)]="Duration_Minutes">
+                <input type="number" [ngModelOptions]="{standalone: true}" matInput [(ngModel)]="Duration_Minutes">
             </mat-form-field>
         </mat-grid-tile>
         <mat-grid-tile>
             <mat-form-field class="details_seconds_width">
                 <mat-label>Duration Seconds</mat-label>
-                <input type="number" [ngModelOptions]="{standalone: true}" matInput
-                    [(ngModel)]="Duration_Seconds">
+                <input type="number" [ngModelOptions]="{standalone: true}" matInput [(ngModel)]="Duration_Seconds">
             </mat-form-field>
         </mat-grid-tile>
     </mat-grid-list>
 
     <div class="details__save">
         <button mat-raised-button color="primary" (click)="save()">
-			Save event
-		</button>
+            Save event
+        </button>
     </div>
 </form>

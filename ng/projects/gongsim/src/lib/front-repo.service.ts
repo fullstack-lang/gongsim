@@ -52,16 +52,45 @@ export const FrontRepoSingloton = new (FrontRepo)
 
 // define the type of nullable Int64 in order to support back pointers IDs
 export class NullInt64 {
-    Int64: number
-    Valid: boolean
+  Int64: number
+  Valid: boolean
 }
 
-// define the interface for information that is forwarded from the calling instance to 
+// the table component is called in different ways
+//
+// DISPLAY or ASSOCIATION MODE
+//
+// in ASSOCIATION MODE, it is invoked within a diaglo and a Dialog Data item is used to
+// configure the component
+// DialogData define the interface for information that is forwarded from the calling instance to 
 // the select table
-export interface DialogData {
+export class DialogData {
   ID: number; // ID of the calling instance
+
+  // the reverse pointer is the name of the generated field on the destination
+  // struct of the ONE-MANY association
   ReversePointer: string; // field of {{Structname}} that serve as reverse pointer
   OrderingMode: boolean; // if true, this is for ordering items
+
+  // there are different selection mode : ONE_MANY or MANY_MANY
+  SelectionMode: SelectionMode;
+
+  // used if SelectionMode is MANY_MANY_ASSOCIATION_MODE
+  //
+  // In Gong, a MANY-MANY association is implemented as a ONE-ZERO/ONE followed by a ONE_MANY association
+  // 
+  // in the MANY_MANY_ASSOCIATION_MODE case, we need also the Struct and the FieldName that are
+  // at the end of the ONE-MANY association
+  SourceStruct: string;  // The "Aclass"
+  SourceField: string; // the "AnarrayofbUse"
+  IntermediateStruct: string; // the "AclassBclassUse" 
+  IntermediateStructField: string; // the "Bclass" as field
+  NextAssociationStruct: string; // the "Bclass"
+}
+
+export enum SelectionMode {
+  ONE_MANY_ASSOCIATION_MODE = "ONE_MANY_ASSOCIATION_MODE",
+  MANY_MANY_ASSOCIATION_MODE = "MANY_MANY_ASSOCIATION_MODE",
 }
 
 //
@@ -85,6 +114,26 @@ export class FrontRepoService {
     private gongsimstatusService: GongsimStatusService,
     private updatestateService: UpdateStateService,
   ) { }
+
+  // postService provides a post function for each struct name
+  postService(structName: string, instanceToBePosted: any) {
+    let service = this[structName.toLowerCase() + "Service"]
+    service["post" + structName](instanceToBePosted).subscribe(
+      instance => {
+        service[structName + "ServiceChanged"].next("post")
+      }
+    );
+  }
+
+  // deleteService provides a delete function for each struct name
+  deleteService(structName: string, instanceToBeDeleted: any) {
+    let service = this[structName.toLowerCase() + "Service"]
+    service["delete" + structName](instanceToBeDeleted).subscribe(
+      instance => {
+        service[structName + "ServiceChanged"].next("delete")
+      }
+    );
+  }
 
   // typing of observable can be messy in typescript. Therefore, one force the type
   observableFrontRepo: [ // insertion point sub template 
@@ -146,14 +195,14 @@ export class FrontRepoService {
 
             // clear the map that counts DummyAgent in the GET
             FrontRepoSingloton.DummyAgents_batch.clear()
-            
+
             dummyagents.forEach(
               dummyagent => {
                 FrontRepoSingloton.DummyAgents.set(dummyagent.ID, dummyagent)
                 FrontRepoSingloton.DummyAgents_batch.set(dummyagent.ID, dummyagent)
               }
             )
-            
+
             // clear dummyagents that are absent from the batch
             FrontRepoSingloton.DummyAgents.forEach(
               dummyagent => {
@@ -162,7 +211,7 @@ export class FrontRepoService {
                 }
               }
             )
-            
+
             // sort DummyAgents_array array
             FrontRepoSingloton.DummyAgents_array.sort((t1, t2) => {
               if (t1.Name > t2.Name) {
@@ -173,20 +222,20 @@ export class FrontRepoService {
               }
               return 0;
             });
-            
+
             // init the array
             FrontRepoSingloton.Engines_array = engines
 
             // clear the map that counts Engine in the GET
             FrontRepoSingloton.Engines_batch.clear()
-            
+
             engines.forEach(
               engine => {
                 FrontRepoSingloton.Engines.set(engine.ID, engine)
                 FrontRepoSingloton.Engines_batch.set(engine.ID, engine)
               }
             )
-            
+
             // clear engines that are absent from the batch
             FrontRepoSingloton.Engines.forEach(
               engine => {
@@ -195,7 +244,7 @@ export class FrontRepoService {
                 }
               }
             )
-            
+
             // sort Engines_array array
             FrontRepoSingloton.Engines_array.sort((t1, t2) => {
               if (t1.Name > t2.Name) {
@@ -206,20 +255,20 @@ export class FrontRepoService {
               }
               return 0;
             });
-            
+
             // init the array
             FrontRepoSingloton.Events_array = events
 
             // clear the map that counts Event in the GET
             FrontRepoSingloton.Events_batch.clear()
-            
+
             events.forEach(
               event => {
                 FrontRepoSingloton.Events.set(event.ID, event)
                 FrontRepoSingloton.Events_batch.set(event.ID, event)
               }
             )
-            
+
             // clear events that are absent from the batch
             FrontRepoSingloton.Events.forEach(
               event => {
@@ -228,7 +277,7 @@ export class FrontRepoService {
                 }
               }
             )
-            
+
             // sort Events_array array
             FrontRepoSingloton.Events_array.sort((t1, t2) => {
               if (t1.Name > t2.Name) {
@@ -239,20 +288,20 @@ export class FrontRepoService {
               }
               return 0;
             });
-            
+
             // init the array
             FrontRepoSingloton.GongsimCommands_array = gongsimcommands
 
             // clear the map that counts GongsimCommand in the GET
             FrontRepoSingloton.GongsimCommands_batch.clear()
-            
+
             gongsimcommands.forEach(
               gongsimcommand => {
                 FrontRepoSingloton.GongsimCommands.set(gongsimcommand.ID, gongsimcommand)
                 FrontRepoSingloton.GongsimCommands_batch.set(gongsimcommand.ID, gongsimcommand)
               }
             )
-            
+
             // clear gongsimcommands that are absent from the batch
             FrontRepoSingloton.GongsimCommands.forEach(
               gongsimcommand => {
@@ -261,7 +310,7 @@ export class FrontRepoService {
                 }
               }
             )
-            
+
             // sort GongsimCommands_array array
             FrontRepoSingloton.GongsimCommands_array.sort((t1, t2) => {
               if (t1.Name > t2.Name) {
@@ -272,20 +321,20 @@ export class FrontRepoService {
               }
               return 0;
             });
-            
+
             // init the array
             FrontRepoSingloton.GongsimStatuss_array = gongsimstatuss
 
             // clear the map that counts GongsimStatus in the GET
             FrontRepoSingloton.GongsimStatuss_batch.clear()
-            
+
             gongsimstatuss.forEach(
               gongsimstatus => {
                 FrontRepoSingloton.GongsimStatuss.set(gongsimstatus.ID, gongsimstatus)
                 FrontRepoSingloton.GongsimStatuss_batch.set(gongsimstatus.ID, gongsimstatus)
               }
             )
-            
+
             // clear gongsimstatuss that are absent from the batch
             FrontRepoSingloton.GongsimStatuss.forEach(
               gongsimstatus => {
@@ -294,7 +343,7 @@ export class FrontRepoService {
                 }
               }
             )
-            
+
             // sort GongsimStatuss_array array
             FrontRepoSingloton.GongsimStatuss_array.sort((t1, t2) => {
               if (t1.Name > t2.Name) {
@@ -305,20 +354,20 @@ export class FrontRepoService {
               }
               return 0;
             });
-            
+
             // init the array
             FrontRepoSingloton.UpdateStates_array = updatestates
 
             // clear the map that counts UpdateState in the GET
             FrontRepoSingloton.UpdateStates_batch.clear()
-            
+
             updatestates.forEach(
               updatestate => {
                 FrontRepoSingloton.UpdateStates.set(updatestate.ID, updatestate)
                 FrontRepoSingloton.UpdateStates_batch.set(updatestate.ID, updatestate)
               }
             )
-            
+
             // clear updatestates that are absent from the batch
             FrontRepoSingloton.UpdateStates.forEach(
               updatestate => {
@@ -327,7 +376,7 @@ export class FrontRepoService {
                 }
               }
             )
-            
+
             // sort UpdateStates_array array
             FrontRepoSingloton.UpdateStates_array.sort((t1, t2) => {
               if (t1.Name > t2.Name) {
@@ -338,7 +387,7 @@ export class FrontRepoService {
               }
               return 0;
             });
-            
+
 
             // 
             // Second Step: redeem pointers between instances (thanks to maps in the First Step)
@@ -427,7 +476,7 @@ export class FrontRepoService {
                 FrontRepoSingloton.DummyAgents.set(dummyagent.ID, dummyagent)
                 FrontRepoSingloton.DummyAgents_batch.set(dummyagent.ID, dummyagent)
 
-                // insertion point for redeeming ONE/ZERO-ONE associations 
+                // insertion point for redeeming ONE/ZERO-ONE associations
                 // insertion point for pointer field Engine redeeming
                 {
                   let _engine = FrontRepoSingloton.Engines.get(dummyagent.EngineID.Int64)
@@ -436,7 +485,7 @@ export class FrontRepoService {
                   }
                 }
 
-                // insertion point for redeeming ONE-MANY associations 
+                // insertion point for redeeming ONE-MANY associations
               }
             )
 
@@ -485,9 +534,9 @@ export class FrontRepoService {
                 FrontRepoSingloton.Engines.set(engine.ID, engine)
                 FrontRepoSingloton.Engines_batch.set(engine.ID, engine)
 
-                // insertion point for redeeming ONE/ZERO-ONE associations 
+                // insertion point for redeeming ONE/ZERO-ONE associations
 
-                // insertion point for redeeming ONE-MANY associations 
+                // insertion point for redeeming ONE-MANY associations
               }
             )
 
@@ -536,9 +585,9 @@ export class FrontRepoService {
                 FrontRepoSingloton.Events.set(event.ID, event)
                 FrontRepoSingloton.Events_batch.set(event.ID, event)
 
-                // insertion point for redeeming ONE/ZERO-ONE associations 
+                // insertion point for redeeming ONE/ZERO-ONE associations
 
-                // insertion point for redeeming ONE-MANY associations 
+                // insertion point for redeeming ONE-MANY associations
               }
             )
 
@@ -587,9 +636,9 @@ export class FrontRepoService {
                 FrontRepoSingloton.GongsimCommands.set(gongsimcommand.ID, gongsimcommand)
                 FrontRepoSingloton.GongsimCommands_batch.set(gongsimcommand.ID, gongsimcommand)
 
-                // insertion point for redeeming ONE/ZERO-ONE associations 
+                // insertion point for redeeming ONE/ZERO-ONE associations
 
-                // insertion point for redeeming ONE-MANY associations 
+                // insertion point for redeeming ONE-MANY associations
               }
             )
 
@@ -638,9 +687,9 @@ export class FrontRepoService {
                 FrontRepoSingloton.GongsimStatuss.set(gongsimstatus.ID, gongsimstatus)
                 FrontRepoSingloton.GongsimStatuss_batch.set(gongsimstatus.ID, gongsimstatus)
 
-                // insertion point for redeeming ONE/ZERO-ONE associations 
+                // insertion point for redeeming ONE/ZERO-ONE associations
 
-                // insertion point for redeeming ONE-MANY associations 
+                // insertion point for redeeming ONE-MANY associations
               }
             )
 
@@ -689,9 +738,9 @@ export class FrontRepoService {
                 FrontRepoSingloton.UpdateStates.set(updatestate.ID, updatestate)
                 FrontRepoSingloton.UpdateStates_batch.set(updatestate.ID, updatestate)
 
-                // insertion point for redeeming ONE/ZERO-ONE associations 
+                // insertion point for redeeming ONE/ZERO-ONE associations
 
-                // insertion point for redeeming ONE-MANY associations 
+                // insertion point for redeeming ONE-MANY associations
               }
             )
 
