@@ -163,8 +163,12 @@ func (gongsimCommand *GongsimCommand) checkoutScheduler() {
 	}
 }
 
+var Quit chan bool
+
 // SetupGongsimThreads schedules gongsim threads
 func (gongsimCommand *GongsimCommand) SetupGongsimThreads() *GongsimCommand {
+
+	Quit = make(chan bool)
 
 	go gongsimCommand.commandPooler()
 	go gongsimCommand.commitScheduler()
@@ -199,175 +203,179 @@ func (gongsimCommand *GongsimCommand) SetupGongsimThreads() *GongsimCommand {
 			*/
 			//
 			//
+			select {
+			case <-Quit:
+				return
+			default:
+				nextState = UNKOWN
+				_, nextSimTime, _ := EngineSingloton.GetNextEvent()
+				var currentTimePlus10Minute time.Time
 
-			nextState = UNKOWN
-			_, nextSimTime, _ := EngineSingloton.GetNextEvent()
-			var currentTimePlus10Minute time.Time
-
-			if EngineSingloton.nextCommitDate.After(EngineSingloton.lastCommitDate) {
-				// log.Printf("Commit agent states scheduled at event # %d and commit nb # %d",
-				// 	EngineSingloton.Fired,
-				// 	EngineSingloton.GetLastCommitNb())
-				nextState = COMMIT_AGENT_STATES
-			} else {
-				if EngineSingloton.nextCheckoutDate.After(EngineSingloton.lastCheckoutDate) {
-					log.Printf("Checkout agent states scheduled at event # %d and commit nb # %d",
-						EngineSingloton.Fired,
-						EngineSingloton.GetLastCommitNb())
-					nextState = CHECKOUT_AGENT_STATES
-				} else if nextSimTime.Before(EngineSingloton.GetEndTime()) {
-					switch gongsimCommand.Command {
-					case COMMAND_PLAY:
-						nextState = FIRE_ONE_EVENT
-						nextMode = RELATIVE_SPEED
-					case COMMAND_ADVANCE_10_MIN:
-						if commandCompletionDate != gongsimCommand.CommandDate {
-							nextState = FIRE_ONE_EVENT
-							nextMode = FULL_SPEED
-							engineStopMode = TEN_MINUTES
-							currentTimePlus10Minute = nextSimTime.Add(time.Minute * 10)
-							commandCompletionDate = gongsimCommand.CommandDate
-						} else {
-							nextState = SLEEP_100_MS
-						}
-					case COMMAND_FIRE_EVENT_TILL_STATES_CHANGE:
-						if commandCompletionDate != gongsimCommand.CommandDate {
-							nextState = FIRE_ONE_EVENT
-							nextMode = FULL_SPEED
-							engineStopMode = STATE_CHANGED
-							commandCompletionDate = gongsimCommand.CommandDate
-						} else {
-							nextState = SLEEP_100_MS
-						}
-					case COMMAND_RESET:
-						if commandCompletionDate != gongsimCommand.CommandDate {
-							nextState = RESET_SIMULATION
-							commandCompletionDate = gongsimCommand.CommandDate
-						} else {
-							nextState = SLEEP_100_MS
-						}
-					default:
-						nextState = SLEEP_100_MS
-					}
+				if EngineSingloton.nextCommitDate.After(EngineSingloton.lastCommitDate) {
+					// log.Printf("Commit agent states scheduled at event # %d and commit nb # %d",
+					// 	EngineSingloton.Fired,
+					// 	EngineSingloton.GetLastCommitNb())
+					nextState = COMMIT_AGENT_STATES
 				} else {
-					nextState = SLEEP_100_MS
-				}
-			}
-			if nextState == UNKOWN {
-				log.Panicln("Unkown end state for engine driver")
-			}
-
-			//
-			// perform what is expected in the state
-			//
-			switch nextState {
-			case RESET_SIMULATION:
-				// reset all agents
-				for _, agent := range EngineSingloton.Agents() {
-					agent.Reset()
-				}
-
-				// call specific Reset function
-				if EngineSingloton.Simulation != nil {
-					EngineSingloton.Simulation.Reset(EngineSingloton)
-				}
-				// commit the engine state
-				EngineSingloton.Commit()
-			case COMMIT_AGENT_STATES:
-				if EngineSingloton.Simulation != nil {
-					EngineSingloton.Simulation.CommitAgents(EngineSingloton)
-					EngineSingloton.lastCommitDate = EngineSingloton.nextCommitDate
-					simulationEventForLastEngineCommit = EngineSingloton.Fired
-					simulationCommitNbAfterLastEngineCommitOrCheckout = EngineSingloton.GetLastCommitNb()
-				}
-			case CHECKOUT_AGENT_STATES:
-				if EngineSingloton.Simulation != nil {
-					EngineSingloton.Simulation.CheckoutAgents(EngineSingloton)
-					EngineSingloton.lastCheckoutDate = EngineSingloton.nextCheckoutDate
-					simulationCommitNbAfterLastEngineCommitOrCheckout = EngineSingloton.GetLastCommitNb()
-				}
-			case FIRE_ONE_EVENT:
-				if EngineSingloton.State != RUNNING {
-					EngineSingloton.State = RUNNING
-					EngineSingloton.Commit()
-				}
-
-				if nextMode == RELATIVE_SPEED {
-
-					realtimeDurationBetweenHorizons := 500 * time.Millisecond
-
-					EngineSingloton.nextRealtimeHorizon = time.Now().Add(realtimeDurationBetweenHorizons)
-					EngineSingloton.nextSimulatedTimeHorizon =
-						EngineSingloton.currentTime.Add(time.Duration(EngineSingloton.Speed) * realtimeDurationBetweenHorizons)
-
-					for nextSimTime.Before(EngineSingloton.nextSimulatedTimeHorizon) {
-						_, nextSimTime, _ = EngineSingloton.FireNextEvent()
-					}
-					EngineSingloton.currentTime = EngineSingloton.nextSimulatedTimeHorizon
-
-					sleepTime := EngineSingloton.nextRealtimeHorizon.Sub(time.Now())
-					time.Sleep(sleepTime)
-
-					EngineSingloton.Commit()
-
-					// // log.Printf(lastSimTime.String() + " " + nextSimTime.String())
-					// if nextSimTime.Sub(EngineSingloton.GetCurrentTime()) > 0 {
-					// 	simTimeAdvance := nextSimTime.Sub(EngineSingloton.GetCurrentTime())
-
-					// 	sleepDuration := time.Duration(float64(simTimeAdvance) / EngineSingloton.Speed)
-					// 	// log.Printf("total sleep duration " + sleepDuration.String())
-
-					// 	// in order for the end user to see progress in the simulation time
-					// 	// the egine time is updated periodicaly
-					// 	maxSleepAtATime := time.Duration(500 * time.Millisecond)
-
-					// 	cumulatedSleepTime := time.Duration(0 * time.Millisecond)
-					// 	for cumulatedSleepTime < sleepDuration && gongsimCommand.Command == COMMAND_PLAY {
-					// 		sleepTime := Min(sleepDuration-cumulatedSleepTime, maxSleepAtATime)
-					// 		// log.Printf("Stepped sleep time " + sleepTime.String() + " cumulated " + cumulatedSleepTime.String())
-					// 		time.Sleep(sleepTime)
-					// 		cumulatedSleepTime += sleepTime
-
-					// 		// update engine current time
-					// 		progressInSimulatedTimeInMiliseconds := EngineSingloton.Speed *
-					// 			float64(sleepTime.Milliseconds())
-					// 		EngineSingloton.SetCurrentTime(EngineSingloton.GetCurrentTime().Add(
-					// 			time.Duration(progressInSimulatedTimeInMiliseconds) * time.Millisecond))
-					// 		// log.Printf("Engine current time " + EngineSingloton.CurrentTime.String())
-					// 		EngineSingloton.Commit()
-					// 	}
-					// }
-					// _, nextSimTime, _ = EngineSingloton.FireNextEvent()
-				} else { // FULL SPEED
-					if engineStopMode == TEN_MINUTES {
-						for nextSimTime.Before(currentTimePlus10Minute) {
-							_, nextSimTime, _ = EngineSingloton.FireNextEvent()
-						}
-					} else if engineStopMode == STATE_CHANGED {
-						hasAnyStateHasChanged := false
-						for nextSimTime.Before(EngineSingloton.GetEndTime()) && !hasAnyStateHasChanged {
-
-							_, nextSimTime, _ = EngineSingloton.FireNextEvent()
-
-							if EngineSingloton.Simulation != nil {
-								hasAnyStateHasChanged = EngineSingloton.Simulation.HasAnyStateChanged(EngineSingloton)
+					if EngineSingloton.nextCheckoutDate.After(EngineSingloton.lastCheckoutDate) {
+						log.Printf("Checkout agent states scheduled at event # %d and commit nb # %d",
+							EngineSingloton.Fired,
+							EngineSingloton.GetLastCommitNb())
+						nextState = CHECKOUT_AGENT_STATES
+					} else if nextSimTime.Before(EngineSingloton.GetEndTime()) {
+						switch gongsimCommand.Command {
+						case COMMAND_PLAY:
+							nextState = FIRE_ONE_EVENT
+							nextMode = RELATIVE_SPEED
+						case COMMAND_ADVANCE_10_MIN:
+							if commandCompletionDate != gongsimCommand.CommandDate {
+								nextState = FIRE_ONE_EVENT
+								nextMode = FULL_SPEED
+								engineStopMode = TEN_MINUTES
+								currentTimePlus10Minute = nextSimTime.Add(time.Minute * 10)
+								commandCompletionDate = gongsimCommand.CommandDate
+							} else {
+								nextState = SLEEP_100_MS
 							}
+						case COMMAND_FIRE_EVENT_TILL_STATES_CHANGE:
+							if commandCompletionDate != gongsimCommand.CommandDate {
+								nextState = FIRE_ONE_EVENT
+								nextMode = FULL_SPEED
+								engineStopMode = STATE_CHANGED
+								commandCompletionDate = gongsimCommand.CommandDate
+							} else {
+								nextState = SLEEP_100_MS
+							}
+						case COMMAND_RESET:
+							if commandCompletionDate != gongsimCommand.CommandDate {
+								nextState = RESET_SIMULATION
+								commandCompletionDate = gongsimCommand.CommandDate
+							} else {
+								nextState = SLEEP_100_MS
+							}
+						default:
+							nextState = SLEEP_100_MS
 						}
 					} else {
-						log.Panicf("should not reach this piont")
+						nextState = SLEEP_100_MS
+					}
+				}
+				if nextState == UNKOWN {
+					log.Panicln("Unkown end state for engine driver")
+				}
+
+				//
+				// perform what is expected in the state
+				//
+				switch nextState {
+				case RESET_SIMULATION:
+					// reset all agents
+					for _, agent := range EngineSingloton.Agents() {
+						agent.Reset()
 					}
 
-					// time has progressed, therefore an update is necessary
+					// call specific Reset function
+					if EngineSingloton.Simulation != nil {
+						EngineSingloton.Simulation.Reset(EngineSingloton)
+					}
+					// commit the engine state
 					EngineSingloton.Commit()
-				}
+				case COMMIT_AGENT_STATES:
+					if EngineSingloton.Simulation != nil {
+						EngineSingloton.Simulation.CommitAgents(EngineSingloton)
+						EngineSingloton.lastCommitDate = EngineSingloton.nextCommitDate
+						simulationEventForLastEngineCommit = EngineSingloton.Fired
+						simulationCommitNbAfterLastEngineCommitOrCheckout = EngineSingloton.GetLastCommitNb()
+					}
+				case CHECKOUT_AGENT_STATES:
+					if EngineSingloton.Simulation != nil {
+						EngineSingloton.Simulation.CheckoutAgents(EngineSingloton)
+						EngineSingloton.lastCheckoutDate = EngineSingloton.nextCheckoutDate
+						simulationCommitNbAfterLastEngineCommitOrCheckout = EngineSingloton.GetLastCommitNb()
+					}
+				case FIRE_ONE_EVENT:
+					if EngineSingloton.State != RUNNING {
+						EngineSingloton.State = RUNNING
+						EngineSingloton.Commit()
+					}
 
-			case SLEEP_100_MS:
-				if EngineSingloton.State != PAUSED {
-					EngineSingloton.State = PAUSED
-					EngineSingloton.Commit()
+					if nextMode == RELATIVE_SPEED {
+
+						realtimeDurationBetweenHorizons := 500 * time.Millisecond
+
+						EngineSingloton.nextRealtimeHorizon = time.Now().Add(realtimeDurationBetweenHorizons)
+						EngineSingloton.nextSimulatedTimeHorizon =
+							EngineSingloton.currentTime.Add(time.Duration(EngineSingloton.Speed) * realtimeDurationBetweenHorizons)
+
+						for nextSimTime.Before(EngineSingloton.nextSimulatedTimeHorizon) {
+							_, nextSimTime, _ = EngineSingloton.FireNextEvent()
+						}
+						EngineSingloton.currentTime = EngineSingloton.nextSimulatedTimeHorizon
+
+						sleepTime := EngineSingloton.nextRealtimeHorizon.Sub(time.Now())
+						time.Sleep(sleepTime)
+
+						EngineSingloton.Commit()
+
+						// // log.Printf(lastSimTime.String() + " " + nextSimTime.String())
+						// if nextSimTime.Sub(EngineSingloton.GetCurrentTime()) > 0 {
+						// 	simTimeAdvance := nextSimTime.Sub(EngineSingloton.GetCurrentTime())
+
+						// 	sleepDuration := time.Duration(float64(simTimeAdvance) / EngineSingloton.Speed)
+						// 	// log.Printf("total sleep duration " + sleepDuration.String())
+
+						// 	// in order for the end user to see progress in the simulation time
+						// 	// the egine time is updated periodicaly
+						// 	maxSleepAtATime := time.Duration(500 * time.Millisecond)
+
+						// 	cumulatedSleepTime := time.Duration(0 * time.Millisecond)
+						// 	for cumulatedSleepTime < sleepDuration && gongsimCommand.Command == COMMAND_PLAY {
+						// 		sleepTime := Min(sleepDuration-cumulatedSleepTime, maxSleepAtATime)
+						// 		// log.Printf("Stepped sleep time " + sleepTime.String() + " cumulated " + cumulatedSleepTime.String())
+						// 		time.Sleep(sleepTime)
+						// 		cumulatedSleepTime += sleepTime
+
+						// 		// update engine current time
+						// 		progressInSimulatedTimeInMiliseconds := EngineSingloton.Speed *
+						// 			float64(sleepTime.Milliseconds())
+						// 		EngineSingloton.SetCurrentTime(EngineSingloton.GetCurrentTime().Add(
+						// 			time.Duration(progressInSimulatedTimeInMiliseconds) * time.Millisecond))
+						// 		// log.Printf("Engine current time " + EngineSingloton.CurrentTime.String())
+						// 		EngineSingloton.Commit()
+						// 	}
+						// }
+						// _, nextSimTime, _ = EngineSingloton.FireNextEvent()
+					} else { // FULL SPEED
+						if engineStopMode == TEN_MINUTES {
+							for nextSimTime.Before(currentTimePlus10Minute) {
+								_, nextSimTime, _ = EngineSingloton.FireNextEvent()
+							}
+						} else if engineStopMode == STATE_CHANGED {
+							hasAnyStateHasChanged := false
+							for nextSimTime.Before(EngineSingloton.GetEndTime()) && !hasAnyStateHasChanged {
+
+								_, nextSimTime, _ = EngineSingloton.FireNextEvent()
+
+								if EngineSingloton.Simulation != nil {
+									hasAnyStateHasChanged = EngineSingloton.Simulation.HasAnyStateChanged(EngineSingloton)
+								}
+							}
+						} else {
+							log.Panicf("should not reach this piont")
+						}
+
+						// time has progressed, therefore an update is necessary
+						EngineSingloton.Commit()
+					}
+
+				case SLEEP_100_MS:
+					if EngineSingloton.State != PAUSED {
+						EngineSingloton.State = PAUSED
+						EngineSingloton.Commit()
+					}
+					time.Sleep(time.Duration(100 * time.Millisecond))
+				default:
 				}
-				time.Sleep(time.Duration(100 * time.Millisecond))
-			default:
 			}
 		}
 	}()
