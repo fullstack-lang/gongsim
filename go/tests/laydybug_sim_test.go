@@ -25,6 +25,8 @@ var AbsoluteSpeed = 1.0 / 60.0 // a ladybug is 1m par minute
 type LadybugSimulation struct {
 }
 
+var nbOfCollision = 0
+
 func (specificEngine *LadybugSimulation) EventFired(engine *models.Engine)              {}
 func (specificEngine *LadybugSimulation) HasAnyStateChanged(engine *models.Engine) bool { return true }
 func (specificEngine *LadybugSimulation) Reset(engine *models.Engine)                   {}
@@ -88,7 +90,8 @@ func (ladybug *Ladybug) FireNextEvent() {
 			sumOfSpeeds = sumOfSpeeds + math.Abs(otherLadybug.Speed)
 		}
 		if sumOfSpeeds == 0 {
-			log.Printf("Event %10d Time : %s, simulation over", eventNb, eventTime.Format("15:04:05.000000"))
+			log.Printf("Event %10d Time : %s, nbOfCollisions %d simulation over",
+				eventNb, eventTime.Format("15:04:05.000000"), nbOfCollision/2)
 			os.Exit(0)
 		}
 
@@ -129,6 +132,7 @@ func (ladybug *Ladybug) FireNextEvent() {
 					ladybug.Position = 10.0 + float64(ladybug.Id)*1.0
 				}
 
+				nbOfCollision = nbOfCollision + 1
 			}
 		}
 
@@ -146,7 +150,7 @@ func TestLadybugSim(t *testing.T) {
 
 	log.SetFlags(0)
 
-	rand.Seed(time.Now().UnixNano())
+	// rand.Seed(time.Now().UnixNano())
 
 	// Kills Engine Simulation goroutine
 	models.Quit <- true
