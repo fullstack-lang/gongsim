@@ -32,5 +32,23 @@
                 // "../simprof"
             ]
         },
+        {
+            "name": "go test TestLadybugSim",
+            "type": "go",
+            "request": "launch",
+            "mode": "test",
+            "program": "${workspaceFolder}/go/tests",
+            "dlvLoadConfig": {
+                "followPointers": true,
+                "maxVariableRecurse": 1,
+                "maxStringLen": 300,
+                "maxArrayValues": 64,
+                "maxStructFields": -1
+            },
+            "args": [
+                "-test.run",
+                "TestLadybugSim"
+            ]
+        },
     ]
 }
