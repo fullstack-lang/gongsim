@@ -185,6 +185,10 @@ func (engine *Engine) FireNextEvent() (agent AgentInterface, nextTimeEvent time.
 
 	agent, nextTimeEvent, event = engine.GetNextEvent()
 
+	if agent == nil {
+		return
+	}
+
 	agent.FireNextEvent()
 
 	engine.LastEvent = &event
