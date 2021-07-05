@@ -308,7 +308,12 @@ func (gongsimCommand *GongsimCommand) SetupGongsimThreads() *GongsimCommand {
 							EngineSingloton.currentTime.Add(time.Duration(EngineSingloton.Speed) * realtimeDurationBetweenHorizons)
 
 						for nextSimTime.Before(EngineSingloton.nextSimulatedTimeHorizon) {
-							_, nextSimTime, _ = EngineSingloton.FireNextEvent()
+							var agent AgentInterface
+							agent, nextSimTime, _ = EngineSingloton.FireNextEvent()
+
+							if agent == nil {
+								return
+							}
 						}
 						EngineSingloton.currentTime = EngineSingloton.nextSimulatedTimeHorizon
 
@@ -348,13 +353,23 @@ func (gongsimCommand *GongsimCommand) SetupGongsimThreads() *GongsimCommand {
 					} else { // FULL SPEED
 						if engineStopMode == TEN_MINUTES {
 							for nextSimTime.Before(currentTimePlus10Minute) {
-								_, nextSimTime, _ = EngineSingloton.FireNextEvent()
+								var agent AgentInterface
+								agent, nextSimTime, _ = EngineSingloton.FireNextEvent()
+
+								if agent == nil {
+									return
+								}
 							}
 						} else if engineStopMode == STATE_CHANGED {
 							hasAnyStateHasChanged := false
 							for nextSimTime.Before(EngineSingloton.GetEndTime()) && !hasAnyStateHasChanged {
 
-								_, nextSimTime, _ = EngineSingloton.FireNextEvent()
+								var agent AgentInterface
+								agent, nextSimTime, _ = EngineSingloton.FireNextEvent()
+
+								if agent == nil {
+									return
+								}
 
 								if EngineSingloton.Simulation != nil {
 									hasAnyStateHasChanged = EngineSingloton.Simulation.HasAnyStateChanged(EngineSingloton)

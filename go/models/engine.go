@@ -232,7 +232,12 @@ func (engine *Engine) RunTillAnyStateHasChanged() {
 	hasAnyStateHasChanged := false
 
 	for (!time.IsZero()) && time.Before(engine.endTime) && !hasAnyStateHasChanged {
-		engine.FireNextEvent()
+		var agent AgentInterface
+		agent, _, _ = engine.FireNextEvent()
+
+		if agent == nil {
+			return
+		}
 		_, time, _ = engine.GetNextEvent()
 		if engine.Simulation != nil {
 			hasAnyStateHasChanged = engine.Simulation.HasAnyStateChanged(engine)
