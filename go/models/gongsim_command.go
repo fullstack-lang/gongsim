@@ -305,7 +305,7 @@ func (gongsimCommand *GongsimCommand) SetupGongsimThreads() *GongsimCommand {
 
 						EngineSingloton.nextRealtimeHorizon = time.Now().Add(realtimeDurationBetweenHorizons)
 						EngineSingloton.nextSimulatedTimeHorizon =
-							EngineSingloton.currentTime.Add(time.Duration(EngineSingloton.Speed) * realtimeDurationBetweenHorizons)
+							EngineSingloton.currentTime.Add(time.Duration(int64(EngineSingloton.Speed * float64(realtimeDurationBetweenHorizons))))
 
 						for nextSimTime.Before(EngineSingloton.nextSimulatedTimeHorizon) {
 							var agent AgentInterface
