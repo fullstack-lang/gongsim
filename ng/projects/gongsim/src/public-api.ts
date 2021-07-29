@@ -18,7 +18,6 @@ export * from './lib/dummyagent-presentation/dummyagent-presentation.component'
 export * from './lib/dummyagent-sorting/dummyagent-sorting.component'
 export * from './lib/dummyagents-table/dummyagents-table.component'
 export * from './lib/dummyagent-db'
-export * from './lib/dummyagent-api'
 export * from './lib/dummyagent.service'
 
 export * from './lib/engine-detail/engine-detail.component'
@@ -26,7 +25,6 @@ export * from './lib/engine-presentation/engine-presentation.component'
 export * from './lib/engine-sorting/engine-sorting.component'
 export * from './lib/engines-table/engines-table.component'
 export * from './lib/engine-db'
-export * from './lib/engine-api'
 export * from './lib/engine.service'
 
 export * from './lib/event-detail/event-detail.component'
@@ -34,7 +32,6 @@ export * from './lib/event-presentation/event-presentation.component'
 export * from './lib/event-sorting/event-sorting.component'
 export * from './lib/events-table/events-table.component'
 export * from './lib/event-db'
-export * from './lib/event-api'
 export * from './lib/event.service'
 
 export * from './lib/gongsimcommand-detail/gongsimcommand-detail.component'
@@ -42,7 +39,6 @@ export * from './lib/gongsimcommand-presentation/gongsimcommand-presentation.com
 export * from './lib/gongsimcommand-sorting/gongsimcommand-sorting.component'
 export * from './lib/gongsimcommands-table/gongsimcommands-table.component'
 export * from './lib/gongsimcommand-db'
-export * from './lib/gongsimcommand-api'
 export * from './lib/gongsimcommand.service'
 
 export * from './lib/gongsimstatus-detail/gongsimstatus-detail.component'
@@ -50,7 +46,6 @@ export * from './lib/gongsimstatus-presentation/gongsimstatus-presentation.compo
 export * from './lib/gongsimstatus-sorting/gongsimstatus-sorting.component'
 export * from './lib/gongsimstatuss-table/gongsimstatuss-table.component'
 export * from './lib/gongsimstatus-db'
-export * from './lib/gongsimstatus-api'
 export * from './lib/gongsimstatus.service'
 
 export * from './lib/updatestate-detail/updatestate-detail.component'
@@ -58,7 +53,6 @@ export * from './lib/updatestate-presentation/updatestate-presentation.component
 export * from './lib/updatestate-sorting/updatestate-sorting.component'
 export * from './lib/updatestates-table/updatestates-table.component'
 export * from './lib/updatestate-db'
-export * from './lib/updatestate-api'
 export * from './lib/updatestate.service'
 
 
