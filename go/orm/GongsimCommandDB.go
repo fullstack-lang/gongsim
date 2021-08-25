@@ -21,8 +21,8 @@ import (
 )
 
 // dummy variable to have the import declaration wihthout compile failure (even if no code needing this import is generated)
-var dummy_GongsimCommand sql.NullBool
-var __GongsimCommand_time__dummyDeclaration time.Duration
+var dummy_GongsimCommand_sql sql.NullBool
+var dummy_GongsimCommand_time time.Duration
 var dummy_GongsimCommand_sort sort.Float64Slice
 
 // GongsimCommandAPI is the input in POST API

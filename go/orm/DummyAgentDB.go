@@ -21,8 +21,8 @@ import (
 )
 
 // dummy variable to have the import declaration wihthout compile failure (even if no code needing this import is generated)
-var dummy_DummyAgent sql.NullBool
-var __DummyAgent_time__dummyDeclaration time.Duration
+var dummy_DummyAgent_sql sql.NullBool
+var dummy_DummyAgent_time time.Duration
 var dummy_DummyAgent_sort sort.Float64Slice
 
 // DummyAgentAPI is the input in POST API
