@@ -32,7 +32,7 @@ export class EngineControlComponent implements OnInit {
   clientState = "PAUSED";
 
   currTime: number;
-  obsTimer: Observable<number> = timer(1000, 1000);
+  obsTimer: Observable<number> = timer(1000, 250);
 
   diagramIDForSamocStates: number
   diagramIDForNatoStates: number
