@@ -70,23 +70,23 @@ type BackRepoInterface interface {
 
 // swagger:ignore instructs the gong compiler (gongc) to avoid this particular struct
 var Stage StageStruct = StageStruct{ // insertion point for array initiatialisation
-	DummyAgents:           make(map[*DummyAgent]struct{}, 0),
-	DummyAgents_mapString: make(map[string]*DummyAgent, 0),
+	DummyAgents:           make(map[*DummyAgent]struct{}),
+	DummyAgents_mapString: make(map[string]*DummyAgent),
 
-	Engines:           make(map[*Engine]struct{}, 0),
-	Engines_mapString: make(map[string]*Engine, 0),
+	Engines:           make(map[*Engine]struct{}),
+	Engines_mapString: make(map[string]*Engine),
 
-	Events:           make(map[*Event]struct{}, 0),
-	Events_mapString: make(map[string]*Event, 0),
+	Events:           make(map[*Event]struct{}),
+	Events_mapString: make(map[string]*Event),
 
-	GongsimCommands:           make(map[*GongsimCommand]struct{}, 0),
-	GongsimCommands_mapString: make(map[string]*GongsimCommand, 0),
+	GongsimCommands:           make(map[*GongsimCommand]struct{}),
+	GongsimCommands_mapString: make(map[string]*GongsimCommand),
 
-	GongsimStatuss:           make(map[*GongsimStatus]struct{}, 0),
-	GongsimStatuss_mapString: make(map[string]*GongsimStatus, 0),
+	GongsimStatuss:           make(map[*GongsimStatus]struct{}),
+	GongsimStatuss_mapString: make(map[string]*GongsimStatus),
 
-	UpdateStates:           make(map[*UpdateState]struct{}, 0),
-	UpdateStates_mapString: make(map[string]*UpdateState, 0),
+	UpdateStates:           make(map[*UpdateState]struct{}),
+	UpdateStates_mapString: make(map[string]*UpdateState),
 
 	// end of insertion point
 }
@@ -764,23 +764,23 @@ type AllModelsStructDeleteInterface interface { // insertion point for Callbacks
 }
 
 func (stage *StageStruct) Reset() { // insertion point for array reset
-	stage.DummyAgents = make(map[*DummyAgent]struct{}, 0)
-	stage.DummyAgents_mapString = make(map[string]*DummyAgent, 0)
+	stage.DummyAgents = make(map[*DummyAgent]struct{})
+	stage.DummyAgents_mapString = make(map[string]*DummyAgent)
 
-	stage.Engines = make(map[*Engine]struct{}, 0)
-	stage.Engines_mapString = make(map[string]*Engine, 0)
+	stage.Engines = make(map[*Engine]struct{})
+	stage.Engines_mapString = make(map[string]*Engine)
 
-	stage.Events = make(map[*Event]struct{}, 0)
-	stage.Events_mapString = make(map[string]*Event, 0)
+	stage.Events = make(map[*Event]struct{})
+	stage.Events_mapString = make(map[string]*Event)
 
-	stage.GongsimCommands = make(map[*GongsimCommand]struct{}, 0)
-	stage.GongsimCommands_mapString = make(map[string]*GongsimCommand, 0)
+	stage.GongsimCommands = make(map[*GongsimCommand]struct{})
+	stage.GongsimCommands_mapString = make(map[string]*GongsimCommand)
 
-	stage.GongsimStatuss = make(map[*GongsimStatus]struct{}, 0)
-	stage.GongsimStatuss_mapString = make(map[string]*GongsimStatus, 0)
+	stage.GongsimStatuss = make(map[*GongsimStatus]struct{})
+	stage.GongsimStatuss_mapString = make(map[string]*GongsimStatus)
 
-	stage.UpdateStates = make(map[*UpdateState]struct{}, 0)
-	stage.UpdateStates_mapString = make(map[string]*UpdateState, 0)
+	stage.UpdateStates = make(map[*UpdateState]struct{})
+	stage.UpdateStates_mapString = make(map[string]*UpdateState)
 
 }
 
