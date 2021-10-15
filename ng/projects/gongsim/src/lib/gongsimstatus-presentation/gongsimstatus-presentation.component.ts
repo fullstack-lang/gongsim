@@ -23,13 +23,13 @@ export class GongsimStatusPresentationComponent implements OnInit {
 
 	// insertion point for declarations
 
-	displayedColumns: string[] = [];
-	dataSource = ELEMENT_DATA;
+	displayedColumns: string[] = []
+	dataSource = ELEMENT_DATA
 
-	gongsimstatus: GongsimStatusDB;
+	gongsimstatus: GongsimStatusDB = new (GongsimStatusDB)
 
 	// front repo
-	frontRepo: FrontRepo
+	frontRepo: FrontRepo = new (FrontRepo)
  
 	constructor(
 		private gongsimstatusService: GongsimStatusService,
@@ -56,12 +56,12 @@ export class GongsimStatusPresentationComponent implements OnInit {
 	}
 
 	getGongsimStatus(): void {
-		const id = +this.route.snapshot.paramMap.get('id');
+		const id = +this.route.snapshot.paramMap.get('id')!
 		this.frontRepoService.pull().subscribe(
 			frontRepo => {
 				this.frontRepo = frontRepo
 
-				this.gongsimstatus = this.frontRepo.GongsimStatuss.get(id)
+				this.gongsimstatus = this.frontRepo.GongsimStatuss.get(id)!
 
 				// insertion point for recovery of durations
 			}

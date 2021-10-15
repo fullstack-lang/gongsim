@@ -15,7 +15,7 @@ import { Router, RouterState, ActivatedRoute } from '@angular/router';
 
 import { MatDialog, MAT_DIALOG_DATA, MatDialogRef, MatDialogConfig } from '@angular/material/dialog';
 
-import { NullInt64 } from '../front-repo.service'
+import { NullInt64 } from '../null-int64'
 
 // UpdateStateDetailComponent is initilizaed from different routes
 // UpdateStateDetailComponentState detail different cases 
@@ -33,18 +33,18 @@ enum UpdateStateDetailComponentState {
 export class UpdateStateDetailComponent implements OnInit {
 
 	// insertion point for declarations
-	Duration_Hours: number
-	Duration_Minutes: number
-	Duration_Seconds: number
-	Period_Hours: number
-	Period_Minutes: number
-	Period_Seconds: number
+	Duration_Hours: number = 0
+	Duration_Minutes: number = 0
+	Duration_Seconds: number = 0
+	Period_Hours: number = 0
+	Period_Minutes: number = 0
+	Period_Seconds: number = 0
 
 	// the UpdateStateDB of interest
-	updatestate: UpdateStateDB;
+	updatestate: UpdateStateDB = new UpdateStateDB
 
 	// front repo
-	frontRepo: FrontRepo
+	frontRepo: FrontRepo = new FrontRepo
 
 	// this stores the information related to string fields
 	// if false, the field is inputed with an <input ...> form 
@@ -52,15 +52,15 @@ export class UpdateStateDetailComponent implements OnInit {
 	mapFields_displayAsTextArea = new Map<string, boolean>()
 
 	// the state at initialization (CREATION, UPDATE or CREATE with one association set)
-	state: UpdateStateDetailComponentState
+	state: UpdateStateDetailComponentState = UpdateStateDetailComponentState.CREATE_INSTANCE
 
 	// in UDPATE state, if is the id of the instance to update
 	// in CREATE state with one association set, this is the id of the associated instance
-	id: number
+	id: number = 0
 
 	// in CREATE state with one association set, this is the id of the associated instance
-	originStruct: string
-	originStructFieldName: string
+	originStruct: string = ""
+	originStructFieldName: string = ""
 
 	constructor(
 		private updatestateService: UpdateStateService,
@@ -74,9 +74,9 @@ export class UpdateStateDetailComponent implements OnInit {
 	ngOnInit(): void {
 
 		// compute state
-		this.id = +this.route.snapshot.paramMap.get('id');
-		this.originStruct = this.route.snapshot.paramMap.get('originStruct');
-		this.originStructFieldName = this.route.snapshot.paramMap.get('originStructFieldName');
+		this.id = +this.route.snapshot.paramMap.get('id')!;
+		this.originStruct = this.route.snapshot.paramMap.get('originStruct')!;
+		this.originStructFieldName = this.route.snapshot.paramMap.get('originStructFieldName')!;
 
 		const association = this.route.snapshot.paramMap.get('association');
 		if (this.id == 0) {
@@ -118,7 +118,9 @@ export class UpdateStateDetailComponent implements OnInit {
 						this.updatestate = new (UpdateStateDB)
 						break;
 					case UpdateStateDetailComponentState.UPDATE_INSTANCE:
-						this.updatestate = frontRepo.UpdateStates.get(this.id)
+						let updatestate = frontRepo.UpdateStates.get(this.id)
+						console.assert(updatestate != undefined, "missing updatestate with id:" + this.id)
+						this.updatestate = updatestate!
 						break;
 					// insertion point for init of association field
 					default:
@@ -169,7 +171,7 @@ export class UpdateStateDetailComponent implements OnInit {
 			default:
 				this.updatestateService.postUpdateState(this.updatestate).subscribe(updatestate => {
 					this.updatestateService.UpdateStateServiceChanged.next("post")
-					this.updatestate = {} // reset fields
+					this.updatestate = new (UpdateStateDB) // reset fields
 				});
 		}
 	}
@@ -178,7 +180,7 @@ export class UpdateStateDetailComponent implements OnInit {
 	// ONE-MANY association
 	// It uses the MapOfComponent provided by the front repo
 	openReverseSelection(AssociatedStruct: string, reverseField: string, selectionMode: string,
-		sourceField: string, intermediateStructField: string, nextAssociatedStruct: string ) {
+		sourceField: string, intermediateStructField: string, nextAssociatedStruct: string) {
 
 		console.log("mode " + selectionMode)
 
@@ -192,7 +194,7 @@ export class UpdateStateDetailComponent implements OnInit {
 		dialogConfig.height = "50%"
 		if (selectionMode == SelectionMode.ONE_MANY_ASSOCIATION_MODE) {
 
-			dialogData.ID = this.updatestate.ID
+			dialogData.ID = this.updatestate.ID!
 			dialogData.ReversePointer = reverseField
 			dialogData.OrderingMode = false
 			dialogData.SelectionMode = selectionMode
@@ -208,7 +210,7 @@ export class UpdateStateDetailComponent implements OnInit {
 			});
 		}
 		if (selectionMode == SelectionMode.MANY_MANY_ASSOCIATION_MODE) {
-			dialogData.ID = this.updatestate.ID
+			dialogData.ID = this.updatestate.ID!
 			dialogData.ReversePointer = reverseField
 			dialogData.OrderingMode = false
 			dialogData.SelectionMode = selectionMode
@@ -259,7 +261,7 @@ export class UpdateStateDetailComponent implements OnInit {
 		});
 	}
 
-	fillUpNameIfEmpty(event) {
+	fillUpNameIfEmpty(event: { value: { Name: string; }; }) {
 		if (this.updatestate.Name == undefined) {
 			this.updatestate.Name = event.value.Name
 		}
@@ -276,7 +278,7 @@ export class UpdateStateDetailComponent implements OnInit {
 
 	isATextArea(fieldName: string): boolean {
 		if (this.mapFields_displayAsTextArea.has(fieldName)) {
-			return this.mapFields_displayAsTextArea.get(fieldName)
+			return this.mapFields_displayAsTextArea.get(fieldName)!
 		} else {
 			return false
 		}

@@ -13,6 +13,9 @@ import { catchError, map, tap } from 'rxjs/operators';
 
 import { DummyAgentDB } from './dummyagent-db';
 
+// insertion point for imports
+import { EngineDB } from './engine-db'
+
 @Injectable({
   providedIn: 'root'
 })
@@ -35,14 +38,14 @@ export class DummyAgentService {
   ) {
     // path to the service share the same origin with the path to the document
     // get the origin in the URL to the document
-	let origin = this.document.location.origin
-    
-	// if debugging with ng, replace 4200 with 8080
-	origin = origin.replace("4200", "8080")
+    let origin = this.document.location.origin
+
+    // if debugging with ng, replace 4200 with 8080
+    origin = origin.replace("4200", "8080")
 
     // compute path to the service
     this.dummyagentsUrl = origin + '/api/github.com/fullstack-lang/gongsim/go/v1/dummyagents';
-   }
+  }
 
   /** GET dummyagents from the server */
   getDummyAgents(): Observable<DummyAgentDB[]> {
@@ -67,16 +70,16 @@ export class DummyAgentService {
   /** POST: add a new dummyagent to the server */
   postDummyAgent(dummyagentdb: DummyAgentDB): Observable<DummyAgentDB> {
 
-		// insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
-    dummyagentdb.Engine = {}
+    // insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
+    dummyagentdb.Engine = new EngineDB
 
-		return this.http.post<DummyAgentDB>(this.dummyagentsUrl, dummyagentdb, this.httpOptions).pipe(
-			tap(_ => {
-				// insertion point for restoration of reverse pointers
-				this.log(`posted dummyagentdb id=${dummyagentdb.ID}`)
-			}),
-			catchError(this.handleError<DummyAgentDB>('postDummyAgent'))
-		);
+    return this.http.post<DummyAgentDB>(this.dummyagentsUrl, dummyagentdb, this.httpOptions).pipe(
+      tap(_ => {
+        // insertion point for restoration of reverse pointers
+        this.log(`posted dummyagentdb id=${dummyagentdb.ID}`)
+      }),
+      catchError(this.handleError<DummyAgentDB>('postDummyAgent'))
+    );
   }
 
   /** DELETE: delete the dummyagentdb from the server */
@@ -96,9 +99,9 @@ export class DummyAgentService {
     const url = `${this.dummyagentsUrl}/${id}`;
 
     // insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
-    dummyagentdb.Engine = {}
+    dummyagentdb.Engine = new EngineDB
 
-    return this.http.put(url, dummyagentdb, this.httpOptions).pipe(
+    return this.http.put<DummyAgentDB>(url, dummyagentdb, this.httpOptions).pipe(
       tap(_ => {
         // insertion point for restoration of reverse pointers
         this.log(`updated dummyagentdb id=${dummyagentdb.ID}`)

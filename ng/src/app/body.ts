@@ -18,11 +18,11 @@ export class Body {
 
     constructor(private ctx: CanvasRenderingContext2D) { }
 
-    OrbitSemiMajoraxis: number // in meters
-    OrbitalPeriod: number // in seconds
-    Radius: number // in meters
+    OrbitSemiMajoraxis: number = 0// in meters
+    OrbitalPeriod: number = 0 // in seconds
+    Radius: number = 0// in meters
 
-    OrbitCenter: Body
+    OrbitCenter?: Body
 
     draw() {
         var radiusInPx = Math.max(this.Radius * pxPerMeters * bodiesRadiusExageration, 1)

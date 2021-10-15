@@ -2,6 +2,7 @@
 package controllers
 
 import (
+	"log"
 	"net/http"
 	"time"
 
@@ -47,7 +48,7 @@ type GongsimStatusInput struct {
 //        200: gongsimstatusDBsResponse
 func GetGongsimStatuss(c *gin.Context) {
 	db := orm.BackRepo.BackRepoGongsimStatus.GetDB()
-	
+
 	// source slice
 	var gongsimstatusDBs []orm.GongsimStatusDB
 	query := db.Find(&gongsimstatusDBs)
@@ -55,6 +56,7 @@ func GetGongsimStatuss(c *gin.Context) {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
 		returnError.Body.Message = query.Error.Error()
+		log.Println(query.Error.Error())
 		c.JSON(http.StatusBadRequest, returnError.Body)
 		return
 	}
@@ -102,6 +104,7 @@ func PostGongsimStatus(c *gin.Context) {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
 		returnError.Body.Message = err.Error()
+		log.Println(err.Error())
 		c.JSON(http.StatusBadRequest, returnError.Body)
 		return
 	}
@@ -116,6 +119,7 @@ func PostGongsimStatus(c *gin.Context) {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
 		returnError.Body.Message = query.Error.Error()
+		log.Println(query.Error.Error())
 		c.JSON(http.StatusBadRequest, returnError.Body)
 		return
 	}
@@ -145,6 +149,7 @@ func GetGongsimStatus(c *gin.Context) {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
 		returnError.Body.Message = err.Error()
+		log.Println(err.Error())
 		c.JSON(http.StatusBadRequest, returnError.Body)
 		return
 	}
@@ -179,6 +184,7 @@ func UpdateGongsimStatus(c *gin.Context) {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
 		returnError.Body.Message = query.Error.Error()
+		log.Println(query.Error.Error())
 		c.JSON(http.StatusBadRequest, returnError.Body)
 		return
 	}
@@ -186,6 +192,7 @@ func UpdateGongsimStatus(c *gin.Context) {
 	// Validate input
 	var input orm.GongsimStatusAPI
 	if err := c.ShouldBindJSON(&input); err != nil {
+		log.Println(err.Error())
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -199,6 +206,7 @@ func UpdateGongsimStatus(c *gin.Context) {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
 		returnError.Body.Message = query.Error.Error()
+		log.Println(query.Error.Error())
 		c.JSON(http.StatusBadRequest, returnError.Body)
 		return
 	}
@@ -228,6 +236,7 @@ func DeleteGongsimStatus(c *gin.Context) {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
 		returnError.Body.Message = err.Error()
+		log.Println(err.Error())
 		c.JSON(http.StatusBadRequest, returnError.Body)
 		return
 	}

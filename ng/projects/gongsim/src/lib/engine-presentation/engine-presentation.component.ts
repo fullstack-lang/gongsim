@@ -23,13 +23,13 @@ export class EnginePresentationComponent implements OnInit {
 
 	// insertion point for declarations
 
-	displayedColumns: string[] = [];
-	dataSource = ELEMENT_DATA;
+	displayedColumns: string[] = []
+	dataSource = ELEMENT_DATA
 
-	engine: EngineDB;
+	engine: EngineDB = new (EngineDB)
 
 	// front repo
-	frontRepo: FrontRepo
+	frontRepo: FrontRepo = new (FrontRepo)
  
 	constructor(
 		private engineService: EngineService,
@@ -56,12 +56,12 @@ export class EnginePresentationComponent implements OnInit {
 	}
 
 	getEngine(): void {
-		const id = +this.route.snapshot.paramMap.get('id');
+		const id = +this.route.snapshot.paramMap.get('id')!
 		this.frontRepoService.pull().subscribe(
 			frontRepo => {
 				this.frontRepo = frontRepo
 
-				this.engine = this.frontRepo.Engines.get(id)
+				this.engine = this.frontRepo.Engines.get(id)!
 
 				// insertion point for recovery of durations
 			}

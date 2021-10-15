@@ -23,21 +23,21 @@ export class UpdateStatePresentationComponent implements OnInit {
 
 	// insertion point for declarations
 	// fields from Duration
-	Duration_Hours: number
-	Duration_Minutes: number
-	Duration_Seconds: number
+	Duration_Hours: number = 0
+	Duration_Minutes: number = 0
+	Duration_Seconds: number = 0
 	// fields from Period
-	Period_Hours: number
-	Period_Minutes: number
-	Period_Seconds: number
+	Period_Hours: number = 0
+	Period_Minutes: number = 0
+	Period_Seconds: number = 0
 
-	displayedColumns: string[] = [];
-	dataSource = ELEMENT_DATA;
+	displayedColumns: string[] = []
+	dataSource = ELEMENT_DATA
 
-	updatestate: UpdateStateDB;
+	updatestate: UpdateStateDB = new (UpdateStateDB)
 
 	// front repo
-	frontRepo: FrontRepo
+	frontRepo: FrontRepo = new (FrontRepo)
  
 	constructor(
 		private updatestateService: UpdateStateService,
@@ -64,12 +64,12 @@ export class UpdateStatePresentationComponent implements OnInit {
 	}
 
 	getUpdateState(): void {
-		const id = +this.route.snapshot.paramMap.get('id');
+		const id = +this.route.snapshot.paramMap.get('id')!
 		this.frontRepoService.pull().subscribe(
 			frontRepo => {
 				this.frontRepo = frontRepo
 
-				this.updatestate = this.frontRepo.UpdateStates.get(id)
+				this.updatestate = this.frontRepo.UpdateStates.get(id)!
 
 				// insertion point for recovery of durations
 				// computation of Hours, Minutes, Seconds for Duration

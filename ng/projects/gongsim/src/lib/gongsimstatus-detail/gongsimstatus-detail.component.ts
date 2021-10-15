@@ -17,7 +17,7 @@ import { Router, RouterState, ActivatedRoute } from '@angular/router';
 
 import { MatDialog, MAT_DIALOG_DATA, MatDialogRef, MatDialogConfig } from '@angular/material/dialog';
 
-import { NullInt64 } from '../front-repo.service'
+import { NullInt64 } from '../null-int64'
 
 // GongsimStatusDetailComponent is initilizaed from different routes
 // GongsimStatusDetailComponentState detail different cases 
@@ -35,14 +35,14 @@ enum GongsimStatusDetailComponentState {
 export class GongsimStatusDetailComponent implements OnInit {
 
 	// insertion point for declarations
-	GongsimCommandTypeList: GongsimCommandTypeSelect[]
-	SpeedCommandTypeList: SpeedCommandTypeSelect[]
+	GongsimCommandTypeList: GongsimCommandTypeSelect[] = []
+	SpeedCommandTypeList: SpeedCommandTypeSelect[] = []
 
 	// the GongsimStatusDB of interest
-	gongsimstatus: GongsimStatusDB;
+	gongsimstatus: GongsimStatusDB = new GongsimStatusDB
 
 	// front repo
-	frontRepo: FrontRepo
+	frontRepo: FrontRepo = new FrontRepo
 
 	// this stores the information related to string fields
 	// if false, the field is inputed with an <input ...> form 
@@ -50,15 +50,15 @@ export class GongsimStatusDetailComponent implements OnInit {
 	mapFields_displayAsTextArea = new Map<string, boolean>()
 
 	// the state at initialization (CREATION, UPDATE or CREATE with one association set)
-	state: GongsimStatusDetailComponentState
+	state: GongsimStatusDetailComponentState = GongsimStatusDetailComponentState.CREATE_INSTANCE
 
 	// in UDPATE state, if is the id of the instance to update
 	// in CREATE state with one association set, this is the id of the associated instance
-	id: number
+	id: number = 0
 
 	// in CREATE state with one association set, this is the id of the associated instance
-	originStruct: string
-	originStructFieldName: string
+	originStruct: string = ""
+	originStructFieldName: string = ""
 
 	constructor(
 		private gongsimstatusService: GongsimStatusService,
@@ -72,9 +72,9 @@ export class GongsimStatusDetailComponent implements OnInit {
 	ngOnInit(): void {
 
 		// compute state
-		this.id = +this.route.snapshot.paramMap.get('id');
-		this.originStruct = this.route.snapshot.paramMap.get('originStruct');
-		this.originStructFieldName = this.route.snapshot.paramMap.get('originStructFieldName');
+		this.id = +this.route.snapshot.paramMap.get('id')!;
+		this.originStruct = this.route.snapshot.paramMap.get('originStruct')!;
+		this.originStructFieldName = this.route.snapshot.paramMap.get('originStructFieldName')!;
 
 		const association = this.route.snapshot.paramMap.get('association');
 		if (this.id == 0) {
@@ -118,7 +118,9 @@ export class GongsimStatusDetailComponent implements OnInit {
 						this.gongsimstatus = new (GongsimStatusDB)
 						break;
 					case GongsimStatusDetailComponentState.UPDATE_INSTANCE:
-						this.gongsimstatus = frontRepo.GongsimStatuss.get(this.id)
+						let gongsimstatus = frontRepo.GongsimStatuss.get(this.id)
+						console.assert(gongsimstatus != undefined, "missing gongsimstatus with id:" + this.id)
+						this.gongsimstatus = gongsimstatus!
 						break;
 					// insertion point for init of association field
 					default:
@@ -153,7 +155,7 @@ export class GongsimStatusDetailComponent implements OnInit {
 			default:
 				this.gongsimstatusService.postGongsimStatus(this.gongsimstatus).subscribe(gongsimstatus => {
 					this.gongsimstatusService.GongsimStatusServiceChanged.next("post")
-					this.gongsimstatus = {} // reset fields
+					this.gongsimstatus = new (GongsimStatusDB) // reset fields
 				});
 		}
 	}
@@ -162,7 +164,7 @@ export class GongsimStatusDetailComponent implements OnInit {
 	// ONE-MANY association
 	// It uses the MapOfComponent provided by the front repo
 	openReverseSelection(AssociatedStruct: string, reverseField: string, selectionMode: string,
-		sourceField: string, intermediateStructField: string, nextAssociatedStruct: string ) {
+		sourceField: string, intermediateStructField: string, nextAssociatedStruct: string) {
 
 		console.log("mode " + selectionMode)
 
@@ -176,7 +178,7 @@ export class GongsimStatusDetailComponent implements OnInit {
 		dialogConfig.height = "50%"
 		if (selectionMode == SelectionMode.ONE_MANY_ASSOCIATION_MODE) {
 
-			dialogData.ID = this.gongsimstatus.ID
+			dialogData.ID = this.gongsimstatus.ID!
 			dialogData.ReversePointer = reverseField
 			dialogData.OrderingMode = false
 			dialogData.SelectionMode = selectionMode
@@ -192,7 +194,7 @@ export class GongsimStatusDetailComponent implements OnInit {
 			});
 		}
 		if (selectionMode == SelectionMode.MANY_MANY_ASSOCIATION_MODE) {
-			dialogData.ID = this.gongsimstatus.ID
+			dialogData.ID = this.gongsimstatus.ID!
 			dialogData.ReversePointer = reverseField
 			dialogData.OrderingMode = false
 			dialogData.SelectionMode = selectionMode
@@ -243,7 +245,7 @@ export class GongsimStatusDetailComponent implements OnInit {
 		});
 	}
 
-	fillUpNameIfEmpty(event) {
+	fillUpNameIfEmpty(event: { value: { Name: string; }; }) {
 		if (this.gongsimstatus.Name == undefined) {
 			this.gongsimstatus.Name = event.value.Name
 		}
@@ -260,7 +262,7 @@ export class GongsimStatusDetailComponent implements OnInit {
 
 	isATextArea(fieldName: string): boolean {
 		if (this.mapFields_displayAsTextArea.has(fieldName)) {
-			return this.mapFields_displayAsTextArea.get(fieldName)
+			return this.mapFields_displayAsTextArea.get(fieldName)!
 		} else {
 			return false
 		}

@@ -13,6 +13,8 @@ import { catchError, map, tap } from 'rxjs/operators';
 
 import { GongsimStatusDB } from './gongsimstatus-db';
 
+// insertion point for imports
+
 @Injectable({
   providedIn: 'root'
 })
@@ -35,14 +37,14 @@ export class GongsimStatusService {
   ) {
     // path to the service share the same origin with the path to the document
     // get the origin in the URL to the document
-	let origin = this.document.location.origin
-    
-	// if debugging with ng, replace 4200 with 8080
-	origin = origin.replace("4200", "8080")
+    let origin = this.document.location.origin
+
+    // if debugging with ng, replace 4200 with 8080
+    origin = origin.replace("4200", "8080")
 
     // compute path to the service
     this.gongsimstatussUrl = origin + '/api/github.com/fullstack-lang/gongsim/go/v1/gongsimstatuss';
-   }
+  }
 
   /** GET gongsimstatuss from the server */
   getGongsimStatuss(): Observable<GongsimStatusDB[]> {
@@ -67,15 +69,15 @@ export class GongsimStatusService {
   /** POST: add a new gongsimstatus to the server */
   postGongsimStatus(gongsimstatusdb: GongsimStatusDB): Observable<GongsimStatusDB> {
 
-		// insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
+    // insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
 
-		return this.http.post<GongsimStatusDB>(this.gongsimstatussUrl, gongsimstatusdb, this.httpOptions).pipe(
-			tap(_ => {
-				// insertion point for restoration of reverse pointers
-				this.log(`posted gongsimstatusdb id=${gongsimstatusdb.ID}`)
-			}),
-			catchError(this.handleError<GongsimStatusDB>('postGongsimStatus'))
-		);
+    return this.http.post<GongsimStatusDB>(this.gongsimstatussUrl, gongsimstatusdb, this.httpOptions).pipe(
+      tap(_ => {
+        // insertion point for restoration of reverse pointers
+        this.log(`posted gongsimstatusdb id=${gongsimstatusdb.ID}`)
+      }),
+      catchError(this.handleError<GongsimStatusDB>('postGongsimStatus'))
+    );
   }
 
   /** DELETE: delete the gongsimstatusdb from the server */
@@ -96,7 +98,7 @@ export class GongsimStatusService {
 
     // insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
 
-    return this.http.put(url, gongsimstatusdb, this.httpOptions).pipe(
+    return this.http.put<GongsimStatusDB>(url, gongsimstatusdb, this.httpOptions).pipe(
       tap(_ => {
         // insertion point for restoration of reverse pointers
         this.log(`updated gongsimstatusdb id=${gongsimstatusdb.ID}`)
