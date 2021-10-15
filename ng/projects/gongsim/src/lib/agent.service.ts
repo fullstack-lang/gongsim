@@ -13,6 +13,9 @@ import { catchError, map, tap } from 'rxjs/operators';
 
 import { AgentDB } from './agent-db';
 
+// insertion point for imports
+import { EngineDB } from './engine-db'
+
 @Injectable({
   providedIn: 'root'
 })
@@ -35,14 +38,14 @@ export class AgentService {
   ) {
     // path to the service share the same origin with the path to the document
     // get the origin in the URL to the document
-	let origin = this.document.location.origin
-    
-	// if debugging with ng, replace 4200 with 8080
-	origin = origin.replace("4200", "8080")
+    let origin = this.document.location.origin
+
+    // if debugging with ng, replace 4200 with 8080
+    origin = origin.replace("4200", "8080")
 
     // compute path to the service
     this.agentsUrl = origin + '/api/github.com/fullstack-lang/gongsim/go/v1/agents';
-   }
+  }
 
   /** GET agents from the server */
   getAgents(): Observable<AgentDB[]> {
@@ -67,16 +70,16 @@ export class AgentService {
   /** POST: add a new agent to the server */
   postAgent(agentdb: AgentDB): Observable<AgentDB> {
 
-		// insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
-    agentdb.Engine = {}
+    // insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
+    agentdb.Engine = new EngineDB
 
-		return this.http.post<AgentDB>(this.agentsUrl, agentdb, this.httpOptions).pipe(
-			tap(_ => {
-				// insertion point for restoration of reverse pointers
-				this.log(`posted agentdb id=${agentdb.ID}`)
-			}),
-			catchError(this.handleError<AgentDB>('postAgent'))
-		);
+    return this.http.post<AgentDB>(this.agentsUrl, agentdb, this.httpOptions).pipe(
+      tap(_ => {
+        // insertion point for restoration of reverse pointers
+        this.log(`posted agentdb id=${agentdb.ID}`)
+      }),
+      catchError(this.handleError<AgentDB>('postAgent'))
+    );
   }
 
   /** DELETE: delete the agentdb from the server */
@@ -96,9 +99,9 @@ export class AgentService {
     const url = `${this.agentsUrl}/${id}`;
 
     // insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
-    agentdb.Engine = {}
+    agentdb.Engine = new EngineDB
 
-    return this.http.put(url, agentdb, this.httpOptions).pipe(
+    return this.http.put<AgentDB>(url, agentdb, this.httpOptions).pipe(
       tap(_ => {
         // insertion point for restoration of reverse pointers
         this.log(`updated agentdb id=${agentdb.ID}`)

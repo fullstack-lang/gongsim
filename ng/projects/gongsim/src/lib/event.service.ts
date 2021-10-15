@@ -13,6 +13,8 @@ import { catchError, map, tap } from 'rxjs/operators';
 
 import { EventDB } from './event-db';
 
+// insertion point for imports
+
 @Injectable({
   providedIn: 'root'
 })
@@ -35,14 +37,14 @@ export class EventService {
   ) {
     // path to the service share the same origin with the path to the document
     // get the origin in the URL to the document
-	let origin = this.document.location.origin
-    
-	// if debugging with ng, replace 4200 with 8080
-	origin = origin.replace("4200", "8080")
+    let origin = this.document.location.origin
+
+    // if debugging with ng, replace 4200 with 8080
+    origin = origin.replace("4200", "8080")
 
     // compute path to the service
     this.eventsUrl = origin + '/api/github.com/fullstack-lang/gongsim/go/v1/events';
-   }
+  }
 
   /** GET events from the server */
   getEvents(): Observable<EventDB[]> {
@@ -67,15 +69,15 @@ export class EventService {
   /** POST: add a new event to the server */
   postEvent(eventdb: EventDB): Observable<EventDB> {
 
-		// insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
+    // insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
 
-		return this.http.post<EventDB>(this.eventsUrl, eventdb, this.httpOptions).pipe(
-			tap(_ => {
-				// insertion point for restoration of reverse pointers
-				this.log(`posted eventdb id=${eventdb.ID}`)
-			}),
-			catchError(this.handleError<EventDB>('postEvent'))
-		);
+    return this.http.post<EventDB>(this.eventsUrl, eventdb, this.httpOptions).pipe(
+      tap(_ => {
+        // insertion point for restoration of reverse pointers
+        this.log(`posted eventdb id=${eventdb.ID}`)
+      }),
+      catchError(this.handleError<EventDB>('postEvent'))
+    );
   }
 
   /** DELETE: delete the eventdb from the server */
@@ -96,7 +98,7 @@ export class EventService {
 
     // insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
 
-    return this.http.put(url, eventdb, this.httpOptions).pipe(
+    return this.http.put<EventDB>(url, eventdb, this.httpOptions).pipe(
       tap(_ => {
         // insertion point for restoration of reverse pointers
         this.log(`updated eventdb id=${eventdb.ID}`)

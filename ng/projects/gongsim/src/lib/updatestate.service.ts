@@ -13,6 +13,8 @@ import { catchError, map, tap } from 'rxjs/operators';
 
 import { UpdateStateDB } from './updatestate-db';
 
+// insertion point for imports
+
 @Injectable({
   providedIn: 'root'
 })
@@ -35,14 +37,14 @@ export class UpdateStateService {
   ) {
     // path to the service share the same origin with the path to the document
     // get the origin in the URL to the document
-	let origin = this.document.location.origin
-    
-	// if debugging with ng, replace 4200 with 8080
-	origin = origin.replace("4200", "8080")
+    let origin = this.document.location.origin
+
+    // if debugging with ng, replace 4200 with 8080
+    origin = origin.replace("4200", "8080")
 
     // compute path to the service
     this.updatestatesUrl = origin + '/api/github.com/fullstack-lang/gongsim/go/v1/updatestates';
-   }
+  }
 
   /** GET updatestates from the server */
   getUpdateStates(): Observable<UpdateStateDB[]> {
@@ -67,15 +69,15 @@ export class UpdateStateService {
   /** POST: add a new updatestate to the server */
   postUpdateState(updatestatedb: UpdateStateDB): Observable<UpdateStateDB> {
 
-		// insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
+    // insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
 
-		return this.http.post<UpdateStateDB>(this.updatestatesUrl, updatestatedb, this.httpOptions).pipe(
-			tap(_ => {
-				// insertion point for restoration of reverse pointers
-				this.log(`posted updatestatedb id=${updatestatedb.ID}`)
-			}),
-			catchError(this.handleError<UpdateStateDB>('postUpdateState'))
-		);
+    return this.http.post<UpdateStateDB>(this.updatestatesUrl, updatestatedb, this.httpOptions).pipe(
+      tap(_ => {
+        // insertion point for restoration of reverse pointers
+        this.log(`posted updatestatedb id=${updatestatedb.ID}`)
+      }),
+      catchError(this.handleError<UpdateStateDB>('postUpdateState'))
+    );
   }
 
   /** DELETE: delete the updatestatedb from the server */
@@ -96,7 +98,7 @@ export class UpdateStateService {
 
     // insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
 
-    return this.http.put(url, updatestatedb, this.httpOptions).pipe(
+    return this.http.put<UpdateStateDB>(url, updatestatedb, this.httpOptions).pipe(
       tap(_ => {
         // insertion point for restoration of reverse pointers
         this.log(`updated updatestatedb id=${updatestatedb.ID}`)

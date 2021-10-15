@@ -23,13 +23,13 @@ export class GongsimCommandPresentationComponent implements OnInit {
 
 	// insertion point for declarations
 
-	displayedColumns: string[] = [];
-	dataSource = ELEMENT_DATA;
+	displayedColumns: string[] = []
+	dataSource = ELEMENT_DATA
 
-	gongsimcommand: GongsimCommandDB;
+	gongsimcommand: GongsimCommandDB = new (GongsimCommandDB)
 
 	// front repo
-	frontRepo: FrontRepo
+	frontRepo: FrontRepo = new (FrontRepo)
  
 	constructor(
 		private gongsimcommandService: GongsimCommandService,
@@ -56,12 +56,12 @@ export class GongsimCommandPresentationComponent implements OnInit {
 	}
 
 	getGongsimCommand(): void {
-		const id = +this.route.snapshot.paramMap.get('id');
+		const id = +this.route.snapshot.paramMap.get('id')!
 		this.frontRepoService.pull().subscribe(
 			frontRepo => {
 				this.frontRepo = frontRepo
 
-				this.gongsimcommand = this.frontRepo.GongsimCommands.get(id)
+				this.gongsimcommand = this.frontRepo.GongsimCommands.get(id)!
 
 				// insertion point for recovery of durations
 			}

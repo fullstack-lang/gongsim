@@ -15,37 +15,37 @@ import { GongsimCommandTypeList } from 'gongsim';
 })
 export class EngineControlComponent implements OnInit {
 
-  public engine: gongsim.EngineDB
-  public engineID: number
+  public engine: gongsim.EngineDB = new gongsim.EngineDB
+  public engineID: number = 0
 
-  lastEvent: string;
-  lastEventAgent: string;
+  lastEvent: string = ""
+  lastEventAgent: string = ""
 
-  nextEventAgent: string;
-  nextEventName: string;
-  nextEventTime: string;
+  nextEventAgent: string = ""
+  nextEventName: string = ""
+  nextEventTime: string = ""
 
-  engineEventNumber: number;
+  engineEventNumber: number = 0
 
   // animation fof the simulation
   speed = 36;
   clientState = "PAUSED";
 
-  currTime: number;
-  obsTimer: Observable<number> = timer(1000, 250);
+  currTime: number = 0
+  obsTimer: Observable<number> = timer(1000, 250)
 
-  diagramIDForSamocStates: number
-  diagramIDForNatoStates: number
+  diagramIDForSamocStates: number = 0
+  diagramIDForNatoStates: number = 0
 
   // engineUpdated is the call function
-  @Input() engineUpdatedCallbackFunction: (updateDisplay: boolean) => void;
-  @Input() simulationTitle: string;
+  @Input() engineUpdatedCallbackFunction?: (updateDisplay: boolean) => void
+  @Input() simulationTitle: string = ""
 
   // UpdateDisplay is set to true if the simulation is running or if 
   // the user has provided an input such as AdvanceTillStateChange
   UpdateDisplay = true
 
-  gongsimCommandSingloton: gongsim.GongsimCommandDB
+  gongsimCommandSingloton: gongsim.GongsimCommandDB = new gongsim.GongsimCommandDB
 
   constructor(
     private engineService: gongsim.EngineService,

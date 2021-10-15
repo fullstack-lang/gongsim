@@ -13,6 +13,8 @@ import { catchError, map, tap } from 'rxjs/operators';
 
 import { EngineDB } from './engine-db';
 
+// insertion point for imports
+
 @Injectable({
   providedIn: 'root'
 })
@@ -35,14 +37,14 @@ export class EngineService {
   ) {
     // path to the service share the same origin with the path to the document
     // get the origin in the URL to the document
-	let origin = this.document.location.origin
-    
-	// if debugging with ng, replace 4200 with 8080
-	origin = origin.replace("4200", "8080")
+    let origin = this.document.location.origin
+
+    // if debugging with ng, replace 4200 with 8080
+    origin = origin.replace("4200", "8080")
 
     // compute path to the service
     this.enginesUrl = origin + '/api/github.com/fullstack-lang/gongsim/go/v1/engines';
-   }
+  }
 
   /** GET engines from the server */
   getEngines(): Observable<EngineDB[]> {
@@ -67,15 +69,15 @@ export class EngineService {
   /** POST: add a new engine to the server */
   postEngine(enginedb: EngineDB): Observable<EngineDB> {
 
-		// insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
+    // insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
 
-		return this.http.post<EngineDB>(this.enginesUrl, enginedb, this.httpOptions).pipe(
-			tap(_ => {
-				// insertion point for restoration of reverse pointers
-				this.log(`posted enginedb id=${enginedb.ID}`)
-			}),
-			catchError(this.handleError<EngineDB>('postEngine'))
-		);
+    return this.http.post<EngineDB>(this.enginesUrl, enginedb, this.httpOptions).pipe(
+      tap(_ => {
+        // insertion point for restoration of reverse pointers
+        this.log(`posted enginedb id=${enginedb.ID}`)
+      }),
+      catchError(this.handleError<EngineDB>('postEngine'))
+    );
   }
 
   /** DELETE: delete the enginedb from the server */
@@ -96,7 +98,7 @@ export class EngineService {
 
     // insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
 
-    return this.http.put(url, enginedb, this.httpOptions).pipe(
+    return this.http.put<EngineDB>(url, enginedb, this.httpOptions).pipe(
       tap(_ => {
         // insertion point for restoration of reverse pointers
         this.log(`updated enginedb id=${enginedb.ID}`)

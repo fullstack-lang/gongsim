@@ -7,7 +7,8 @@ import { MatTableDataSource } from '@angular/material/table';
 import { MatButton } from '@angular/material/button'
 
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog'
-import { DialogData, FrontRepoService, FrontRepo, NullInt64, SelectionMode } from '../front-repo.service'
+import { DialogData, FrontRepoService, FrontRepo, SelectionMode } from '../front-repo.service'
+import { NullInt64 } from '../null-int64'
 import { SelectionModel } from '@angular/cdk/collections';
 
 const allowMultiSelect = true;
@@ -33,26 +34,28 @@ enum TableComponentMode {
 export class DummyAgentsTableComponent implements OnInit {
 
   // mode at invocation
-  mode: TableComponentMode
+  mode: TableComponentMode = TableComponentMode.DISPLAY_MODE
 
   // used if the component is called as a selection component of DummyAgent instances
-  selection: SelectionModel<DummyAgentDB>;
-  initialSelection = new Array<DummyAgentDB>();
+  selection: SelectionModel<DummyAgentDB> = new (SelectionModel)
+  initialSelection = new Array<DummyAgentDB>()
 
   // the data source for the table
-  dummyagents: DummyAgentDB[];
-  matTableDataSource: MatTableDataSource<DummyAgentDB>
+  dummyagents: DummyAgentDB[] = []
+  matTableDataSource: MatTableDataSource<DummyAgentDB> = new (MatTableDataSource)
 
   // front repo, that will be referenced by this.dummyagents
-  frontRepo: FrontRepo
+  frontRepo: FrontRepo = new (FrontRepo)
 
   // displayedColumns is referenced by the MatTable component for specify what columns
   // have to be displayed and in what order
   displayedColumns: string[];
 
   // for sorting & pagination
-  @ViewChild(MatSort) sort: MatSort;
-  @ViewChild(MatPaginator) paginator: MatPaginator;
+  @ViewChild(MatSort)
+  sort: MatSort | undefined
+  @ViewChild(MatPaginator)
+  paginator: MatPaginator | undefined;
 
   ngAfterViewInit() {
 
@@ -70,7 +73,8 @@ export class DummyAgentsTableComponent implements OnInit {
           return dummyagentDB.Name;
 
         default:
-          return DummyAgentDB[property];
+          console.assert(false, "Unknown field")
+          return "";
       }
     };
 
@@ -92,8 +96,8 @@ export class DummyAgentsTableComponent implements OnInit {
       return isSelected
     };
 
-    this.matTableDataSource.sort = this.sort;
-    this.matTableDataSource.paginator = this.paginator;
+    this.matTableDataSource.sort = this.sort!
+    this.matTableDataSource.paginator = this.paginator!
   }
 
   applyFilter(event: Event) {
@@ -171,7 +175,7 @@ export class DummyAgentsTableComponent implements OnInit {
           this.dummyagents.forEach(
             dummyagent => {
               let ID = this.dialogData.ID
-              let revPointer = dummyagent[this.dialogData.ReversePointer]
+              let revPointer = dummyagent[this.dialogData.ReversePointer as keyof DummyAgentDB] as unknown as NullInt64
               if (revPointer.Int64 == ID) {
                 this.initialSelection.push(dummyagent)
               }
@@ -182,15 +186,15 @@ export class DummyAgentsTableComponent implements OnInit {
 
         if (this.mode == TableComponentMode.MANY_MANY_ASSOCIATION_MODE) {
 
-          let mapOfSourceInstances = this.frontRepo[this.dialogData.SourceStruct + "s"]
-          let sourceInstance = mapOfSourceInstances.get(this.dialogData.ID)
+          let mapOfSourceInstances = this.frontRepo[this.dialogData.SourceStruct + "s" as keyof FrontRepo] as Map<number, DummyAgentDB>
+          let sourceInstance = mapOfSourceInstances.get(this.dialogData.ID)!
 
-          if (sourceInstance[this.dialogData.SourceField]) {
-            for (let associationInstance of sourceInstance[this.dialogData.SourceField]) {
-              let dummyagent = associationInstance[this.dialogData.IntermediateStructField]
-              this.initialSelection.push(dummyagent)
-            }
+          let sourceField = sourceInstance[this.dialogData.SourceField as keyof typeof sourceInstance]! as unknown as DummyAgentDB[]
+          for (let associationInstance of sourceField) {
+            let dummyagent = associationInstance[this.dialogData.IntermediateStructField as keyof typeof associationInstance] as unknown as DummyAgentDB
+            this.initialSelection.push(dummyagent)
           }
+
           this.selection = new SelectionModel<DummyAgentDB>(allowMultiSelect, this.initialSelection);
         }
 
@@ -266,8 +270,9 @@ export class DummyAgentsTableComponent implements OnInit {
       // reset all initial selection of dummyagent that belong to dummyagent
       this.initialSelection.forEach(
         dummyagent => {
-          dummyagent[this.dialogData.ReversePointer].Int64 = 0
-          dummyagent[this.dialogData.ReversePointer].Valid = true
+          let index = dummyagent[this.dialogData.ReversePointer as keyof DummyAgentDB] as unknown as NullInt64
+          index.Int64 = 0
+          index.Valid = true
           toUpdate.add(dummyagent)
         }
       )
@@ -275,9 +280,9 @@ export class DummyAgentsTableComponent implements OnInit {
       // from selection, set dummyagent that belong to dummyagent
       this.selection.selected.forEach(
         dummyagent => {
-          let ID = +this.dialogData.ID
-          dummyagent[this.dialogData.ReversePointer].Int64 = ID
-          dummyagent[this.dialogData.ReversePointer].Valid = true
+          let ID = this.dialogData.ID as number
+          let reversePointer = dummyagent[this.dialogData.ReversePointer  as keyof DummyAgentDB] as unknown as NullInt64
+          reversePointer.Int64 = ID
           toUpdate.add(dummyagent)
         }
       )
@@ -295,8 +300,9 @@ export class DummyAgentsTableComponent implements OnInit {
 
     if (this.mode == TableComponentMode.MANY_MANY_ASSOCIATION_MODE) {
 
-      let mapOfSourceInstances = this.frontRepo[this.dialogData.SourceStruct + "s"]
-      let sourceInstance = mapOfSourceInstances.get(this.dialogData.ID)
+      // get the source instance via the map of instances in the front repo
+      let mapOfSourceInstances = this.frontRepo[this.dialogData.SourceStruct + "s" as keyof FrontRepo] as Map<number, DummyAgentDB>
+      let sourceInstance = mapOfSourceInstances.get(this.dialogData.ID)!
 
       // First, parse all instance of the association struct and remove the instance
       // that have unselect
@@ -312,23 +318,21 @@ export class DummyAgentsTableComponent implements OnInit {
       }
 
       // delete the association instance
-      if (sourceInstance[this.dialogData.SourceField]) {
-        for (let associationInstance of sourceInstance[this.dialogData.SourceField]) {
-          let dummyagent = associationInstance[this.dialogData.IntermediateStructField]
-          if (unselectedDummyAgent.has(dummyagent.ID)) {
+      let associationInstance = sourceInstance[this.dialogData.SourceField as keyof typeof sourceInstance]
+      let dummyagent = associationInstance![this.dialogData.IntermediateStructField as keyof typeof associationInstance] as unknown as DummyAgentDB
+      if (unselectedDummyAgent.has(dummyagent.ID)) {
+        this.frontRepoService.deleteService(this.dialogData.IntermediateStruct, associationInstance)
 
-            this.frontRepoService.deleteService( this.dialogData.IntermediateStruct, associationInstance )
-          }
-        }
+
       }
 
-      // is the source array is emptyn create it
-      if (sourceInstance[this.dialogData.SourceField] == undefined) {
-        sourceInstance[this.dialogData.SourceField] = new Array<any>()
+      // is the source array is empty create it
+      if (sourceInstance[this.dialogData.SourceField as keyof typeof sourceInstance] == undefined) {
+        (sourceInstance[this.dialogData.SourceField as keyof typeof sourceInstance] as unknown as Array<DummyAgentDB>) = new Array<DummyAgentDB>()
       }
 
       // second, parse all instance of the selected
-      if (sourceInstance[this.dialogData.SourceField]) {
+      if (sourceInstance[this.dialogData.SourceField as keyof typeof sourceInstance]) {
         this.selection.selected.forEach(
           dummyagent => {
             if (!this.initialSelection.includes(dummyagent)) {
@@ -338,13 +342,11 @@ export class DummyAgentsTableComponent implements OnInit {
                 Name: sourceInstance["Name"] + "-" + dummyagent.Name,
               }
 
-              associationInstance[this.dialogData.IntermediateStructField+"ID"] = new NullInt64
-              associationInstance[this.dialogData.IntermediateStructField+"ID"].Int64 = dummyagent.ID
-              associationInstance[this.dialogData.IntermediateStructField+"ID"].Valid = true
+              let index = associationInstance[this.dialogData.IntermediateStructField+"ID" as keyof typeof associationInstance] as unknown as NullInt64
+              index.Int64 = dummyagent.ID
 
-              associationInstance[this.dialogData.SourceStruct + "_" + this.dialogData.SourceField + "DBID"] = new NullInt64
-              associationInstance[this.dialogData.SourceStruct + "_" + this.dialogData.SourceField + "DBID"].Int64 = sourceInstance["ID"]
-              associationInstance[this.dialogData.SourceStruct + "_" + this.dialogData.SourceField + "DBID"].Valid = true
+              let indexDB = associationInstance[this.dialogData.IntermediateStructField+"DBID" as keyof typeof associationInstance] as unknown as NullInt64
+              indexDB.Int64 = dummyagent.ID
 
               this.frontRepoService.postService( this.dialogData.IntermediateStruct, associationInstance )
 

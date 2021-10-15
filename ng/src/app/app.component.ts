@@ -12,17 +12,17 @@ import { Body } from './body';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
-  @ViewChild('canvas', { static: true }) canvas: ElementRef<HTMLCanvasElement>;
-  ctx: CanvasRenderingContext2D;
-  requestId;
-  interval;
+  @ViewChild('canvas', { static: true }) canvas?: ElementRef<HTMLCanvasElement>;
+  ctx: CanvasRenderingContext2D = new CanvasRenderingContext2D
+  requestId = 0
+  interval = 0
   bodies: Body[] = [];
 
   SecondsSinceStart = 0
 
-  Jupiter: Body
-  Io: Body
-  Earth: Body
+  Jupiter?: Body
+  Io?: Body
+  Earth?: Body
 
   ioWasOnTheLeftOfJupiterAtLastCalculation = true
   timeEndOfEclipse = 0
@@ -36,7 +36,7 @@ export class AppComponent implements OnInit {
 
   earthToIoNorm = 1.0
   earthToJupiterNorm = 1.0
-  sin: number;
+  sin: number = 0
 
   constructor(
     private engineService: gongsim.EngineService,
@@ -45,8 +45,8 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
 
-    this.ctx = this.canvas.nativeElement.getContext('2d');
-    this.ctx.fillStyle = 'red';
+    this.ctx = this.canvas!.nativeElement.getContext('2d')!
+    this.ctx.fillStyle = 'red'
 
     var Sun: Body = new Body(this.ctx)
     Sun.Radius = 696.342 * 1000 * 1000
@@ -96,7 +96,7 @@ export class AppComponent implements OnInit {
             // update position between two ticks
             for (this.SecondsSinceStart; this.SecondsSinceStart < engines[0].SecondsSinceStart; this.SecondsSinceStart++) {
               this.bodies.forEach((body: Body) => {
-                body.updatePosition(this.SecondsSinceStart, this.Earth);
+                body.updatePosition(this.SecondsSinceStart, this.Earth!);
               });
 
               var ioIsOnTheLeftOfJupiter = this.isIoOnLeftOfJupiter(false)
@@ -111,12 +111,12 @@ export class AppComponent implements OnInit {
 
                   if (this.durationBetweenEclipse > this.maxDurationBetweenEclipse) {
                     this.maxDurationBetweenEclipse = this.durationBetweenEclipse
-                    this.maxDurationBetweenEclipseSeconds = this.timeEndOfEclipse % this.Earth.OrbitalPeriod
+                    this.maxDurationBetweenEclipseSeconds = this.timeEndOfEclipse % this.Earth!.OrbitalPeriod
                   }
                   if (this.durationBetweenEclipse < this.minDurationBetweenEclipse) {
                     if (this.durationBetweenEclipse > 3600 * 24) {
                       this.minDurationBetweenEclipse = this.durationBetweenEclipse
-                      this.minDurationBetweenEclipseSeconds = this.timeEndOfEclipse % this.Earth.OrbitalPeriod
+                      this.minDurationBetweenEclipseSeconds = this.timeEndOfEclipse % this.Earth!.OrbitalPeriod
                     }
                   }
                 }
@@ -133,12 +133,12 @@ export class AppComponent implements OnInit {
   isIoOnLeftOfJupiter(display: boolean): boolean {
 
     let earthToIo: number[] = [
-      this.Io.offsetX - this.Earth.offsetX,
-      this.Io.offsetY - this.Earth.offsetY];
+      this.Io!.offsetX - this.Earth!.offsetX,
+      this.Io!.offsetY - this.Earth!.offsetY];
 
     let earthToJupiter: number[] = [
-      this.Jupiter.offsetX - this.Earth.offsetX,
-      this.Jupiter.offsetY - this.Earth.offsetY
+      this.Jupiter!.offsetX - this.Earth!.offsetX,
+      this.Jupiter!.offsetY - this.Earth!.offsetY
     ];
 
     this.earthToIoNorm = Math.sqrt(earthToIo[0] * earthToIo[0] + earthToIo[1] * earthToIo[1])

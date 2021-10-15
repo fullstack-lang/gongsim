@@ -23,17 +23,17 @@ export class EventPresentationComponent implements OnInit {
 
 	// insertion point for declarations
 	// fields from Duration
-	Duration_Hours: number
-	Duration_Minutes: number
-	Duration_Seconds: number
+	Duration_Hours: number = 0
+	Duration_Minutes: number = 0
+	Duration_Seconds: number = 0
 
-	displayedColumns: string[] = [];
-	dataSource = ELEMENT_DATA;
+	displayedColumns: string[] = []
+	dataSource = ELEMENT_DATA
 
-	event: EventDB;
+	event: EventDB = new (EventDB)
 
 	// front repo
-	frontRepo: FrontRepo
+	frontRepo: FrontRepo = new (FrontRepo)
  
 	constructor(
 		private eventService: EventService,
@@ -60,12 +60,12 @@ export class EventPresentationComponent implements OnInit {
 	}
 
 	getEvent(): void {
-		const id = +this.route.snapshot.paramMap.get('id');
+		const id = +this.route.snapshot.paramMap.get('id')!
 		this.frontRepoService.pull().subscribe(
 			frontRepo => {
 				this.frontRepo = frontRepo
 
-				this.event = this.frontRepo.Events.get(id)
+				this.event = this.frontRepo.Events.get(id)!
 
 				// insertion point for recovery of durations
 				// computation of Hours, Minutes, Seconds for Duration

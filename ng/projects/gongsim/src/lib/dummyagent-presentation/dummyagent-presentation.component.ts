@@ -23,13 +23,13 @@ export class DummyAgentPresentationComponent implements OnInit {
 
 	// insertion point for declarations
 
-	displayedColumns: string[] = [];
-	dataSource = ELEMENT_DATA;
+	displayedColumns: string[] = []
+	dataSource = ELEMENT_DATA
 
-	dummyagent: DummyAgentDB;
+	dummyagent: DummyAgentDB = new (DummyAgentDB)
 
 	// front repo
-	frontRepo: FrontRepo
+	frontRepo: FrontRepo = new (FrontRepo)
  
 	constructor(
 		private dummyagentService: DummyAgentService,
@@ -56,12 +56,12 @@ export class DummyAgentPresentationComponent implements OnInit {
 	}
 
 	getDummyAgent(): void {
-		const id = +this.route.snapshot.paramMap.get('id');
+		const id = +this.route.snapshot.paramMap.get('id')!
 		this.frontRepoService.pull().subscribe(
 			frontRepo => {
 				this.frontRepo = frontRepo
 
-				this.dummyagent = this.frontRepo.DummyAgents.get(id)
+				this.dummyagent = this.frontRepo.DummyAgents.get(id)!
 
 				// insertion point for recovery of durations
 			}

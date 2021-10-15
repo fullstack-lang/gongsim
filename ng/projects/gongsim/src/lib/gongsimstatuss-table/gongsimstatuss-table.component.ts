@@ -7,7 +7,8 @@ import { MatTableDataSource } from '@angular/material/table';
 import { MatButton } from '@angular/material/button'
 
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog'
-import { DialogData, FrontRepoService, FrontRepo, NullInt64, SelectionMode } from '../front-repo.service'
+import { DialogData, FrontRepoService, FrontRepo, SelectionMode } from '../front-repo.service'
+import { NullInt64 } from '../null-int64'
 import { SelectionModel } from '@angular/cdk/collections';
 
 const allowMultiSelect = true;
@@ -33,26 +34,28 @@ enum TableComponentMode {
 export class GongsimStatussTableComponent implements OnInit {
 
   // mode at invocation
-  mode: TableComponentMode
+  mode: TableComponentMode = TableComponentMode.DISPLAY_MODE
 
   // used if the component is called as a selection component of GongsimStatus instances
-  selection: SelectionModel<GongsimStatusDB>;
-  initialSelection = new Array<GongsimStatusDB>();
+  selection: SelectionModel<GongsimStatusDB> = new (SelectionModel)
+  initialSelection = new Array<GongsimStatusDB>()
 
   // the data source for the table
-  gongsimstatuss: GongsimStatusDB[];
-  matTableDataSource: MatTableDataSource<GongsimStatusDB>
+  gongsimstatuss: GongsimStatusDB[] = []
+  matTableDataSource: MatTableDataSource<GongsimStatusDB> = new (MatTableDataSource)
 
   // front repo, that will be referenced by this.gongsimstatuss
-  frontRepo: FrontRepo
+  frontRepo: FrontRepo = new (FrontRepo)
 
   // displayedColumns is referenced by the MatTable component for specify what columns
   // have to be displayed and in what order
   displayedColumns: string[];
 
   // for sorting & pagination
-  @ViewChild(MatSort) sort: MatSort;
-  @ViewChild(MatPaginator) paginator: MatPaginator;
+  @ViewChild(MatSort)
+  sort: MatSort | undefined
+  @ViewChild(MatPaginator)
+  paginator: MatPaginator | undefined;
 
   ngAfterViewInit() {
 
@@ -76,7 +79,8 @@ export class GongsimStatussTableComponent implements OnInit {
           return gongsimstatusDB.SpeedCommandCompletionDate;
 
         default:
-          return GongsimStatusDB[property];
+          console.assert(false, "Unknown field")
+          return "";
       }
     };
 
@@ -98,8 +102,8 @@ export class GongsimStatussTableComponent implements OnInit {
       return isSelected
     };
 
-    this.matTableDataSource.sort = this.sort;
-    this.matTableDataSource.paginator = this.paginator;
+    this.matTableDataSource.sort = this.sort!
+    this.matTableDataSource.paginator = this.paginator!
   }
 
   applyFilter(event: Event) {
@@ -181,7 +185,7 @@ export class GongsimStatussTableComponent implements OnInit {
           this.gongsimstatuss.forEach(
             gongsimstatus => {
               let ID = this.dialogData.ID
-              let revPointer = gongsimstatus[this.dialogData.ReversePointer]
+              let revPointer = gongsimstatus[this.dialogData.ReversePointer as keyof GongsimStatusDB] as unknown as NullInt64
               if (revPointer.Int64 == ID) {
                 this.initialSelection.push(gongsimstatus)
               }
@@ -192,15 +196,15 @@ export class GongsimStatussTableComponent implements OnInit {
 
         if (this.mode == TableComponentMode.MANY_MANY_ASSOCIATION_MODE) {
 
-          let mapOfSourceInstances = this.frontRepo[this.dialogData.SourceStruct + "s"]
-          let sourceInstance = mapOfSourceInstances.get(this.dialogData.ID)
+          let mapOfSourceInstances = this.frontRepo[this.dialogData.SourceStruct + "s" as keyof FrontRepo] as Map<number, GongsimStatusDB>
+          let sourceInstance = mapOfSourceInstances.get(this.dialogData.ID)!
 
-          if (sourceInstance[this.dialogData.SourceField]) {
-            for (let associationInstance of sourceInstance[this.dialogData.SourceField]) {
-              let gongsimstatus = associationInstance[this.dialogData.IntermediateStructField]
-              this.initialSelection.push(gongsimstatus)
-            }
+          let sourceField = sourceInstance[this.dialogData.SourceField as keyof typeof sourceInstance]! as unknown as GongsimStatusDB[]
+          for (let associationInstance of sourceField) {
+            let gongsimstatus = associationInstance[this.dialogData.IntermediateStructField as keyof typeof associationInstance] as unknown as GongsimStatusDB
+            this.initialSelection.push(gongsimstatus)
           }
+
           this.selection = new SelectionModel<GongsimStatusDB>(allowMultiSelect, this.initialSelection);
         }
 
@@ -276,8 +280,9 @@ export class GongsimStatussTableComponent implements OnInit {
       // reset all initial selection of gongsimstatus that belong to gongsimstatus
       this.initialSelection.forEach(
         gongsimstatus => {
-          gongsimstatus[this.dialogData.ReversePointer].Int64 = 0
-          gongsimstatus[this.dialogData.ReversePointer].Valid = true
+          let index = gongsimstatus[this.dialogData.ReversePointer as keyof GongsimStatusDB] as unknown as NullInt64
+          index.Int64 = 0
+          index.Valid = true
           toUpdate.add(gongsimstatus)
         }
       )
@@ -285,9 +290,9 @@ export class GongsimStatussTableComponent implements OnInit {
       // from selection, set gongsimstatus that belong to gongsimstatus
       this.selection.selected.forEach(
         gongsimstatus => {
-          let ID = +this.dialogData.ID
-          gongsimstatus[this.dialogData.ReversePointer].Int64 = ID
-          gongsimstatus[this.dialogData.ReversePointer].Valid = true
+          let ID = this.dialogData.ID as number
+          let reversePointer = gongsimstatus[this.dialogData.ReversePointer  as keyof GongsimStatusDB] as unknown as NullInt64
+          reversePointer.Int64 = ID
           toUpdate.add(gongsimstatus)
         }
       )
@@ -305,8 +310,9 @@ export class GongsimStatussTableComponent implements OnInit {
 
     if (this.mode == TableComponentMode.MANY_MANY_ASSOCIATION_MODE) {
 
-      let mapOfSourceInstances = this.frontRepo[this.dialogData.SourceStruct + "s"]
-      let sourceInstance = mapOfSourceInstances.get(this.dialogData.ID)
+      // get the source instance via the map of instances in the front repo
+      let mapOfSourceInstances = this.frontRepo[this.dialogData.SourceStruct + "s" as keyof FrontRepo] as Map<number, GongsimStatusDB>
+      let sourceInstance = mapOfSourceInstances.get(this.dialogData.ID)!
 
       // First, parse all instance of the association struct and remove the instance
       // that have unselect
@@ -322,23 +328,21 @@ export class GongsimStatussTableComponent implements OnInit {
       }
 
       // delete the association instance
-      if (sourceInstance[this.dialogData.SourceField]) {
-        for (let associationInstance of sourceInstance[this.dialogData.SourceField]) {
-          let gongsimstatus = associationInstance[this.dialogData.IntermediateStructField]
-          if (unselectedGongsimStatus.has(gongsimstatus.ID)) {
+      let associationInstance = sourceInstance[this.dialogData.SourceField as keyof typeof sourceInstance]
+      let gongsimstatus = associationInstance![this.dialogData.IntermediateStructField as keyof typeof associationInstance] as unknown as GongsimStatusDB
+      if (unselectedGongsimStatus.has(gongsimstatus.ID)) {
+        this.frontRepoService.deleteService(this.dialogData.IntermediateStruct, associationInstance)
 
-            this.frontRepoService.deleteService( this.dialogData.IntermediateStruct, associationInstance )
-          }
-        }
+
       }
 
-      // is the source array is emptyn create it
-      if (sourceInstance[this.dialogData.SourceField] == undefined) {
-        sourceInstance[this.dialogData.SourceField] = new Array<any>()
+      // is the source array is empty create it
+      if (sourceInstance[this.dialogData.SourceField as keyof typeof sourceInstance] == undefined) {
+        (sourceInstance[this.dialogData.SourceField as keyof typeof sourceInstance] as unknown as Array<GongsimStatusDB>) = new Array<GongsimStatusDB>()
       }
 
       // second, parse all instance of the selected
-      if (sourceInstance[this.dialogData.SourceField]) {
+      if (sourceInstance[this.dialogData.SourceField as keyof typeof sourceInstance]) {
         this.selection.selected.forEach(
           gongsimstatus => {
             if (!this.initialSelection.includes(gongsimstatus)) {
@@ -348,13 +352,11 @@ export class GongsimStatussTableComponent implements OnInit {
                 Name: sourceInstance["Name"] + "-" + gongsimstatus.Name,
               }
 
-              associationInstance[this.dialogData.IntermediateStructField+"ID"] = new NullInt64
-              associationInstance[this.dialogData.IntermediateStructField+"ID"].Int64 = gongsimstatus.ID
-              associationInstance[this.dialogData.IntermediateStructField+"ID"].Valid = true
+              let index = associationInstance[this.dialogData.IntermediateStructField+"ID" as keyof typeof associationInstance] as unknown as NullInt64
+              index.Int64 = gongsimstatus.ID
 
-              associationInstance[this.dialogData.SourceStruct + "_" + this.dialogData.SourceField + "DBID"] = new NullInt64
-              associationInstance[this.dialogData.SourceStruct + "_" + this.dialogData.SourceField + "DBID"].Int64 = sourceInstance["ID"]
-              associationInstance[this.dialogData.SourceStruct + "_" + this.dialogData.SourceField + "DBID"].Valid = true
+              let indexDB = associationInstance[this.dialogData.IntermediateStructField+"DBID" as keyof typeof associationInstance] as unknown as NullInt64
+              indexDB.Int64 = gongsimstatus.ID
 
               this.frontRepoService.postService( this.dialogData.IntermediateStruct, associationInstance )
 
