@@ -247,6 +247,7 @@ func (backRepoDummyAgent *BackRepoDummyAgentStruct) CommitPhaseTwoInstance(backR
 		if dummyagent.Engine != nil {
 			if EngineId, ok := (*backRepo.BackRepoEngine.Map_EnginePtr_EngineDBID)[dummyagent.Engine]; ok {
 				dummyagentDB.EngineID.Int64 = int64(EngineId)
+				dummyagentDB.EngineID.Valid = true
 			}
 		}
 
@@ -538,6 +539,7 @@ func (backRepoDummyAgent *BackRepoDummyAgentStruct) RestorePhaseTwo() {
 		// reindexing Engine field
 		if dummyagentDB.EngineID.Int64 != 0 {
 			dummyagentDB.EngineID.Int64 = int64(BackRepoEngineid_atBckpTime_newID[uint(dummyagentDB.EngineID.Int64)])
+			dummyagentDB.EngineID.Valid = true
 		}
 
 		// update databse with new index encoding

@@ -200,16 +200,14 @@ export class EnginesTableComponent implements OnInit {
 
         // in case the component is called as a selection component
         if (this.mode == TableComponentMode.ONE_MANY_ASSOCIATION_MODE) {
-          this.engines.forEach(
-            engine => {
-              let ID = this.dialogData.ID
-              let revPointer = engine[this.dialogData.ReversePointer as keyof EngineDB] as unknown as NullInt64
-              if (revPointer.Int64 == ID) {
-                this.initialSelection.push(engine)
-              }
+          for (let engine of this.engines) {
+            let ID = this.dialogData.ID
+            let revPointer = engine[this.dialogData.ReversePointer as keyof EngineDB] as unknown as NullInt64
+            if (revPointer.Int64 == ID) {
+              this.initialSelection.push(engine)
             }
-          )
-          this.selection = new SelectionModel<EngineDB>(allowMultiSelect, this.initialSelection);
+            this.selection = new SelectionModel<EngineDB>(allowMultiSelect, this.initialSelection);
+          }
         }
 
         if (this.mode == TableComponentMode.MANY_MANY_ASSOCIATION_MODE) {
@@ -296,34 +294,31 @@ export class EnginesTableComponent implements OnInit {
       let toUpdate = new Set<EngineDB>()
 
       // reset all initial selection of engine that belong to engine
-      this.initialSelection.forEach(
-        engine => {
-          let index = engine[this.dialogData.ReversePointer as keyof EngineDB] as unknown as NullInt64
-          index.Int64 = 0
-          index.Valid = true
-          toUpdate.add(engine)
-        }
-      )
+      for (let engine of this.initialSelection) {
+        let index = engine[this.dialogData.ReversePointer as keyof EngineDB] as unknown as NullInt64
+        index.Int64 = 0
+        index.Valid = true
+        toUpdate.add(engine)
+
+      }
 
       // from selection, set engine that belong to engine
-      this.selection.selected.forEach(
-        engine => {
-          let ID = this.dialogData.ID as number
-          let reversePointer = engine[this.dialogData.ReversePointer  as keyof EngineDB] as unknown as NullInt64
-          reversePointer.Int64 = ID
-          toUpdate.add(engine)
-        }
-      )
+      for (let engine of this.selection.selected) {
+        let ID = this.dialogData.ID as number
+        let reversePointer = engine[this.dialogData.ReversePointer as keyof EngineDB] as unknown as NullInt64
+        reversePointer.Int64 = ID
+        reversePointer.Valid = true
+        toUpdate.add(engine)
+      }
+
 
       // update all engine (only update selection & initial selection)
-      toUpdate.forEach(
-        engine => {
-          this.engineService.updateEngine(engine)
-            .subscribe(engine => {
-              this.engineService.EngineServiceChanged.next("update")
-            });
-        }
-      )
+      for (let engine of toUpdate) {
+        this.engineService.updateEngine(engine)
+          .subscribe(engine => {
+            this.engineService.EngineServiceChanged.next("update")
+          });
+      }
     }
 
     if (this.mode == TableComponentMode.MANY_MANY_ASSOCIATION_MODE) {
@@ -370,13 +365,15 @@ export class EnginesTableComponent implements OnInit {
                 Name: sourceInstance["Name"] + "-" + engine.Name,
               }
 
-              let index = associationInstance[this.dialogData.IntermediateStructField+"ID" as keyof typeof associationInstance] as unknown as NullInt64
+              let index = associationInstance[this.dialogData.IntermediateStructField + "ID" as keyof typeof associationInstance] as unknown as NullInt64
               index.Int64 = engine.ID
+              index.Valid = true
 
-              let indexDB = associationInstance[this.dialogData.IntermediateStructField+"DBID" as keyof typeof associationInstance] as unknown as NullInt64
+              let indexDB = associationInstance[this.dialogData.IntermediateStructField + "DBID" as keyof typeof associationInstance] as unknown as NullInt64
               indexDB.Int64 = engine.ID
+              index.Valid = true
 
-              this.frontRepoService.postService( this.dialogData.IntermediateStruct, associationInstance )
+              this.frontRepoService.postService(this.dialogData.IntermediateStruct, associationInstance)
 
             } else {
               // console.log("engine " + engine.Name + " is still selected")

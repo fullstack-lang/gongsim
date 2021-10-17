@@ -172,16 +172,14 @@ export class DummyAgentsTableComponent implements OnInit {
 
         // in case the component is called as a selection component
         if (this.mode == TableComponentMode.ONE_MANY_ASSOCIATION_MODE) {
-          this.dummyagents.forEach(
-            dummyagent => {
-              let ID = this.dialogData.ID
-              let revPointer = dummyagent[this.dialogData.ReversePointer as keyof DummyAgentDB] as unknown as NullInt64
-              if (revPointer.Int64 == ID) {
-                this.initialSelection.push(dummyagent)
-              }
+          for (let dummyagent of this.dummyagents) {
+            let ID = this.dialogData.ID
+            let revPointer = dummyagent[this.dialogData.ReversePointer as keyof DummyAgentDB] as unknown as NullInt64
+            if (revPointer.Int64 == ID) {
+              this.initialSelection.push(dummyagent)
             }
-          )
-          this.selection = new SelectionModel<DummyAgentDB>(allowMultiSelect, this.initialSelection);
+            this.selection = new SelectionModel<DummyAgentDB>(allowMultiSelect, this.initialSelection);
+          }
         }
 
         if (this.mode == TableComponentMode.MANY_MANY_ASSOCIATION_MODE) {
@@ -268,34 +266,31 @@ export class DummyAgentsTableComponent implements OnInit {
       let toUpdate = new Set<DummyAgentDB>()
 
       // reset all initial selection of dummyagent that belong to dummyagent
-      this.initialSelection.forEach(
-        dummyagent => {
-          let index = dummyagent[this.dialogData.ReversePointer as keyof DummyAgentDB] as unknown as NullInt64
-          index.Int64 = 0
-          index.Valid = true
-          toUpdate.add(dummyagent)
-        }
-      )
+      for (let dummyagent of this.initialSelection) {
+        let index = dummyagent[this.dialogData.ReversePointer as keyof DummyAgentDB] as unknown as NullInt64
+        index.Int64 = 0
+        index.Valid = true
+        toUpdate.add(dummyagent)
+
+      }
 
       // from selection, set dummyagent that belong to dummyagent
-      this.selection.selected.forEach(
-        dummyagent => {
-          let ID = this.dialogData.ID as number
-          let reversePointer = dummyagent[this.dialogData.ReversePointer  as keyof DummyAgentDB] as unknown as NullInt64
-          reversePointer.Int64 = ID
-          toUpdate.add(dummyagent)
-        }
-      )
+      for (let dummyagent of this.selection.selected) {
+        let ID = this.dialogData.ID as number
+        let reversePointer = dummyagent[this.dialogData.ReversePointer as keyof DummyAgentDB] as unknown as NullInt64
+        reversePointer.Int64 = ID
+        reversePointer.Valid = true
+        toUpdate.add(dummyagent)
+      }
+
 
       // update all dummyagent (only update selection & initial selection)
-      toUpdate.forEach(
-        dummyagent => {
-          this.dummyagentService.updateDummyAgent(dummyagent)
-            .subscribe(dummyagent => {
-              this.dummyagentService.DummyAgentServiceChanged.next("update")
-            });
-        }
-      )
+      for (let dummyagent of toUpdate) {
+        this.dummyagentService.updateDummyAgent(dummyagent)
+          .subscribe(dummyagent => {
+            this.dummyagentService.DummyAgentServiceChanged.next("update")
+          });
+      }
     }
 
     if (this.mode == TableComponentMode.MANY_MANY_ASSOCIATION_MODE) {
@@ -342,13 +337,15 @@ export class DummyAgentsTableComponent implements OnInit {
                 Name: sourceInstance["Name"] + "-" + dummyagent.Name,
               }
 
-              let index = associationInstance[this.dialogData.IntermediateStructField+"ID" as keyof typeof associationInstance] as unknown as NullInt64
+              let index = associationInstance[this.dialogData.IntermediateStructField + "ID" as keyof typeof associationInstance] as unknown as NullInt64
               index.Int64 = dummyagent.ID
+              index.Valid = true
 
-              let indexDB = associationInstance[this.dialogData.IntermediateStructField+"DBID" as keyof typeof associationInstance] as unknown as NullInt64
+              let indexDB = associationInstance[this.dialogData.IntermediateStructField + "DBID" as keyof typeof associationInstance] as unknown as NullInt64
               indexDB.Int64 = dummyagent.ID
+              index.Valid = true
 
-              this.frontRepoService.postService( this.dialogData.IntermediateStruct, associationInstance )
+              this.frontRepoService.postService(this.dialogData.IntermediateStruct, associationInstance)
 
             } else {
               // console.log("dummyagent " + dummyagent.Name + " is still selected")

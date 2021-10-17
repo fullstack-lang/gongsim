@@ -182,16 +182,14 @@ export class GongsimCommandsTableComponent implements OnInit {
 
         // in case the component is called as a selection component
         if (this.mode == TableComponentMode.ONE_MANY_ASSOCIATION_MODE) {
-          this.gongsimcommands.forEach(
-            gongsimcommand => {
-              let ID = this.dialogData.ID
-              let revPointer = gongsimcommand[this.dialogData.ReversePointer as keyof GongsimCommandDB] as unknown as NullInt64
-              if (revPointer.Int64 == ID) {
-                this.initialSelection.push(gongsimcommand)
-              }
+          for (let gongsimcommand of this.gongsimcommands) {
+            let ID = this.dialogData.ID
+            let revPointer = gongsimcommand[this.dialogData.ReversePointer as keyof GongsimCommandDB] as unknown as NullInt64
+            if (revPointer.Int64 == ID) {
+              this.initialSelection.push(gongsimcommand)
             }
-          )
-          this.selection = new SelectionModel<GongsimCommandDB>(allowMultiSelect, this.initialSelection);
+            this.selection = new SelectionModel<GongsimCommandDB>(allowMultiSelect, this.initialSelection);
+          }
         }
 
         if (this.mode == TableComponentMode.MANY_MANY_ASSOCIATION_MODE) {
@@ -278,34 +276,31 @@ export class GongsimCommandsTableComponent implements OnInit {
       let toUpdate = new Set<GongsimCommandDB>()
 
       // reset all initial selection of gongsimcommand that belong to gongsimcommand
-      this.initialSelection.forEach(
-        gongsimcommand => {
-          let index = gongsimcommand[this.dialogData.ReversePointer as keyof GongsimCommandDB] as unknown as NullInt64
-          index.Int64 = 0
-          index.Valid = true
-          toUpdate.add(gongsimcommand)
-        }
-      )
+      for (let gongsimcommand of this.initialSelection) {
+        let index = gongsimcommand[this.dialogData.ReversePointer as keyof GongsimCommandDB] as unknown as NullInt64
+        index.Int64 = 0
+        index.Valid = true
+        toUpdate.add(gongsimcommand)
+
+      }
 
       // from selection, set gongsimcommand that belong to gongsimcommand
-      this.selection.selected.forEach(
-        gongsimcommand => {
-          let ID = this.dialogData.ID as number
-          let reversePointer = gongsimcommand[this.dialogData.ReversePointer  as keyof GongsimCommandDB] as unknown as NullInt64
-          reversePointer.Int64 = ID
-          toUpdate.add(gongsimcommand)
-        }
-      )
+      for (let gongsimcommand of this.selection.selected) {
+        let ID = this.dialogData.ID as number
+        let reversePointer = gongsimcommand[this.dialogData.ReversePointer as keyof GongsimCommandDB] as unknown as NullInt64
+        reversePointer.Int64 = ID
+        reversePointer.Valid = true
+        toUpdate.add(gongsimcommand)
+      }
+
 
       // update all gongsimcommand (only update selection & initial selection)
-      toUpdate.forEach(
-        gongsimcommand => {
-          this.gongsimcommandService.updateGongsimCommand(gongsimcommand)
-            .subscribe(gongsimcommand => {
-              this.gongsimcommandService.GongsimCommandServiceChanged.next("update")
-            });
-        }
-      )
+      for (let gongsimcommand of toUpdate) {
+        this.gongsimcommandService.updateGongsimCommand(gongsimcommand)
+          .subscribe(gongsimcommand => {
+            this.gongsimcommandService.GongsimCommandServiceChanged.next("update")
+          });
+      }
     }
 
     if (this.mode == TableComponentMode.MANY_MANY_ASSOCIATION_MODE) {
@@ -352,13 +347,15 @@ export class GongsimCommandsTableComponent implements OnInit {
                 Name: sourceInstance["Name"] + "-" + gongsimcommand.Name,
               }
 
-              let index = associationInstance[this.dialogData.IntermediateStructField+"ID" as keyof typeof associationInstance] as unknown as NullInt64
+              let index = associationInstance[this.dialogData.IntermediateStructField + "ID" as keyof typeof associationInstance] as unknown as NullInt64
               index.Int64 = gongsimcommand.ID
+              index.Valid = true
 
-              let indexDB = associationInstance[this.dialogData.IntermediateStructField+"DBID" as keyof typeof associationInstance] as unknown as NullInt64
+              let indexDB = associationInstance[this.dialogData.IntermediateStructField + "DBID" as keyof typeof associationInstance] as unknown as NullInt64
               indexDB.Int64 = gongsimcommand.ID
+              index.Valid = true
 
-              this.frontRepoService.postService( this.dialogData.IntermediateStruct, associationInstance )
+              this.frontRepoService.postService(this.dialogData.IntermediateStruct, associationInstance)
 
             } else {
               // console.log("gongsimcommand " + gongsimcommand.Name + " is still selected")

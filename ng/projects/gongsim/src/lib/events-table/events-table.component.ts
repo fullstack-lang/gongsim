@@ -170,16 +170,14 @@ export class EventsTableComponent implements OnInit {
 
         // in case the component is called as a selection component
         if (this.mode == TableComponentMode.ONE_MANY_ASSOCIATION_MODE) {
-          this.events.forEach(
-            event => {
-              let ID = this.dialogData.ID
-              let revPointer = event[this.dialogData.ReversePointer as keyof EventDB] as unknown as NullInt64
-              if (revPointer.Int64 == ID) {
-                this.initialSelection.push(event)
-              }
+          for (let event of this.events) {
+            let ID = this.dialogData.ID
+            let revPointer = event[this.dialogData.ReversePointer as keyof EventDB] as unknown as NullInt64
+            if (revPointer.Int64 == ID) {
+              this.initialSelection.push(event)
             }
-          )
-          this.selection = new SelectionModel<EventDB>(allowMultiSelect, this.initialSelection);
+            this.selection = new SelectionModel<EventDB>(allowMultiSelect, this.initialSelection);
+          }
         }
 
         if (this.mode == TableComponentMode.MANY_MANY_ASSOCIATION_MODE) {
@@ -266,34 +264,31 @@ export class EventsTableComponent implements OnInit {
       let toUpdate = new Set<EventDB>()
 
       // reset all initial selection of event that belong to event
-      this.initialSelection.forEach(
-        event => {
-          let index = event[this.dialogData.ReversePointer as keyof EventDB] as unknown as NullInt64
-          index.Int64 = 0
-          index.Valid = true
-          toUpdate.add(event)
-        }
-      )
+      for (let event of this.initialSelection) {
+        let index = event[this.dialogData.ReversePointer as keyof EventDB] as unknown as NullInt64
+        index.Int64 = 0
+        index.Valid = true
+        toUpdate.add(event)
+
+      }
 
       // from selection, set event that belong to event
-      this.selection.selected.forEach(
-        event => {
-          let ID = this.dialogData.ID as number
-          let reversePointer = event[this.dialogData.ReversePointer  as keyof EventDB] as unknown as NullInt64
-          reversePointer.Int64 = ID
-          toUpdate.add(event)
-        }
-      )
+      for (let event of this.selection.selected) {
+        let ID = this.dialogData.ID as number
+        let reversePointer = event[this.dialogData.ReversePointer as keyof EventDB] as unknown as NullInt64
+        reversePointer.Int64 = ID
+        reversePointer.Valid = true
+        toUpdate.add(event)
+      }
+
 
       // update all event (only update selection & initial selection)
-      toUpdate.forEach(
-        event => {
-          this.eventService.updateEvent(event)
-            .subscribe(event => {
-              this.eventService.EventServiceChanged.next("update")
-            });
-        }
-      )
+      for (let event of toUpdate) {
+        this.eventService.updateEvent(event)
+          .subscribe(event => {
+            this.eventService.EventServiceChanged.next("update")
+          });
+      }
     }
 
     if (this.mode == TableComponentMode.MANY_MANY_ASSOCIATION_MODE) {
@@ -340,13 +335,15 @@ export class EventsTableComponent implements OnInit {
                 Name: sourceInstance["Name"] + "-" + event.Name,
               }
 
-              let index = associationInstance[this.dialogData.IntermediateStructField+"ID" as keyof typeof associationInstance] as unknown as NullInt64
+              let index = associationInstance[this.dialogData.IntermediateStructField + "ID" as keyof typeof associationInstance] as unknown as NullInt64
               index.Int64 = event.ID
+              index.Valid = true
 
-              let indexDB = associationInstance[this.dialogData.IntermediateStructField+"DBID" as keyof typeof associationInstance] as unknown as NullInt64
+              let indexDB = associationInstance[this.dialogData.IntermediateStructField + "DBID" as keyof typeof associationInstance] as unknown as NullInt64
               indexDB.Int64 = event.ID
+              index.Valid = true
 
-              this.frontRepoService.postService( this.dialogData.IntermediateStruct, associationInstance )
+              this.frontRepoService.postService(this.dialogData.IntermediateStruct, associationInstance)
 
             } else {
               // console.log("event " + event.Name + " is still selected")

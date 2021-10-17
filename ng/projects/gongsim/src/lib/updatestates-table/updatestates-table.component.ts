@@ -182,16 +182,14 @@ export class UpdateStatesTableComponent implements OnInit {
 
         // in case the component is called as a selection component
         if (this.mode == TableComponentMode.ONE_MANY_ASSOCIATION_MODE) {
-          this.updatestates.forEach(
-            updatestate => {
-              let ID = this.dialogData.ID
-              let revPointer = updatestate[this.dialogData.ReversePointer as keyof UpdateStateDB] as unknown as NullInt64
-              if (revPointer.Int64 == ID) {
-                this.initialSelection.push(updatestate)
-              }
+          for (let updatestate of this.updatestates) {
+            let ID = this.dialogData.ID
+            let revPointer = updatestate[this.dialogData.ReversePointer as keyof UpdateStateDB] as unknown as NullInt64
+            if (revPointer.Int64 == ID) {
+              this.initialSelection.push(updatestate)
             }
-          )
-          this.selection = new SelectionModel<UpdateStateDB>(allowMultiSelect, this.initialSelection);
+            this.selection = new SelectionModel<UpdateStateDB>(allowMultiSelect, this.initialSelection);
+          }
         }
 
         if (this.mode == TableComponentMode.MANY_MANY_ASSOCIATION_MODE) {
@@ -278,34 +276,31 @@ export class UpdateStatesTableComponent implements OnInit {
       let toUpdate = new Set<UpdateStateDB>()
 
       // reset all initial selection of updatestate that belong to updatestate
-      this.initialSelection.forEach(
-        updatestate => {
-          let index = updatestate[this.dialogData.ReversePointer as keyof UpdateStateDB] as unknown as NullInt64
-          index.Int64 = 0
-          index.Valid = true
-          toUpdate.add(updatestate)
-        }
-      )
+      for (let updatestate of this.initialSelection) {
+        let index = updatestate[this.dialogData.ReversePointer as keyof UpdateStateDB] as unknown as NullInt64
+        index.Int64 = 0
+        index.Valid = true
+        toUpdate.add(updatestate)
+
+      }
 
       // from selection, set updatestate that belong to updatestate
-      this.selection.selected.forEach(
-        updatestate => {
-          let ID = this.dialogData.ID as number
-          let reversePointer = updatestate[this.dialogData.ReversePointer  as keyof UpdateStateDB] as unknown as NullInt64
-          reversePointer.Int64 = ID
-          toUpdate.add(updatestate)
-        }
-      )
+      for (let updatestate of this.selection.selected) {
+        let ID = this.dialogData.ID as number
+        let reversePointer = updatestate[this.dialogData.ReversePointer as keyof UpdateStateDB] as unknown as NullInt64
+        reversePointer.Int64 = ID
+        reversePointer.Valid = true
+        toUpdate.add(updatestate)
+      }
+
 
       // update all updatestate (only update selection & initial selection)
-      toUpdate.forEach(
-        updatestate => {
-          this.updatestateService.updateUpdateState(updatestate)
-            .subscribe(updatestate => {
-              this.updatestateService.UpdateStateServiceChanged.next("update")
-            });
-        }
-      )
+      for (let updatestate of toUpdate) {
+        this.updatestateService.updateUpdateState(updatestate)
+          .subscribe(updatestate => {
+            this.updatestateService.UpdateStateServiceChanged.next("update")
+          });
+      }
     }
 
     if (this.mode == TableComponentMode.MANY_MANY_ASSOCIATION_MODE) {
@@ -352,13 +347,15 @@ export class UpdateStatesTableComponent implements OnInit {
                 Name: sourceInstance["Name"] + "-" + updatestate.Name,
               }
 
-              let index = associationInstance[this.dialogData.IntermediateStructField+"ID" as keyof typeof associationInstance] as unknown as NullInt64
+              let index = associationInstance[this.dialogData.IntermediateStructField + "ID" as keyof typeof associationInstance] as unknown as NullInt64
               index.Int64 = updatestate.ID
+              index.Valid = true
 
-              let indexDB = associationInstance[this.dialogData.IntermediateStructField+"DBID" as keyof typeof associationInstance] as unknown as NullInt64
+              let indexDB = associationInstance[this.dialogData.IntermediateStructField + "DBID" as keyof typeof associationInstance] as unknown as NullInt64
               indexDB.Int64 = updatestate.ID
+              index.Valid = true
 
-              this.frontRepoService.postService( this.dialogData.IntermediateStruct, associationInstance )
+              this.frontRepoService.postService(this.dialogData.IntermediateStruct, associationInstance)
 
             } else {
               // console.log("updatestate " + updatestate.Name + " is still selected")
