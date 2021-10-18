@@ -3,8 +3,7 @@ consumes:
 - application/json
 definitions:
   AgentInterface:
-    description: AgentInterface is the interface that must be followed by part of
-      the simulation
+    description: AgentInterface is the interface that must be followed by part of the simulation
     properties:
       Events:
         description: Events fire next Event
@@ -1041,8 +1040,7 @@ responses:
         format: uint64
         type: integer
       Name_Data:
-        description: Declation for basic field dummyagentDB.Name {{BasicKind}} (to
-          be completed)
+        description: Declation for basic field dummyagentDB.Name {{BasicKind}} (to be completed)
       TechName_Data:
         description: |-
           insertion for basic fields declaration
@@ -1062,21 +1060,17 @@ responses:
     description: EngineDBResponse provides response
     headers:
       ControlMode_Data:
-        description: Declation for basic field engineDB.ControlMode {{BasicKind}}
-          (to be completed)
+        description: Declation for basic field engineDB.ControlMode {{BasicKind}} (to be completed)
       CreatedAt:
         format: date-time
         type: string
       CurrentTime_Data:
-        description: Declation for basic field engineDB.CurrentTime {{BasicKind}}
-          (to be completed)
+        description: Declation for basic field engineDB.CurrentTime {{BasicKind}} (to be completed)
       DeletedAt: {}
       EndTime_Data:
-        description: Declation for basic field engineDB.EndTime {{BasicKind}} (to
-          be completed)
+        description: Declation for basic field engineDB.EndTime {{BasicKind}} (to be completed)
       Fired_Data:
-        description: Declation for basic field engineDB.Fired {{BasicKind}} (to be
-          completed)
+        description: Declation for basic field engineDB.Fired {{BasicKind}} (to be completed)
       ID:
         format: uint64
         type: integer
@@ -1085,14 +1079,11 @@ responses:
           insertion for basic fields declaration
           Declation for basic field engineDB.Name {{BasicKind}} (to be completed)
       SecondsSinceStart_Data:
-        description: Declation for basic field engineDB.SecondsSinceStart {{BasicKind}}
-          (to be completed)
+        description: Declation for basic field engineDB.SecondsSinceStart {{BasicKind}} (to be completed)
       Speed_Data:
-        description: Declation for basic field engineDB.Speed {{BasicKind}} (to be
-          completed)
+        description: Declation for basic field engineDB.Speed {{BasicKind}} (to be completed)
       State_Data:
-        description: Declation for basic field engineDB.State {{BasicKind}} (to be
-          completed)
+        description: Declation for basic field engineDB.State {{BasicKind}} (to be completed)
       UpdatedAt:
         format: date-time
         type: string
@@ -1112,8 +1103,7 @@ responses:
         type: string
       DeletedAt: {}
       Duration_Data:
-        description: Declation for basic field eventDB.Duration {{BasicKind}} (to
-          be completed)
+        description: Declation for basic field eventDB.Duration {{BasicKind}} (to be completed)
       ID:
         format: uint64
         type: integer
@@ -1150,17 +1140,14 @@ responses:
     description: GongsimCommandDBResponse provides response
     headers:
       Command_Data:
-        description: Declation for basic field gongsimcommandDB.Command {{BasicKind}}
-          (to be completed)
+        description: Declation for basic field gongsimcommandDB.Command {{BasicKind}} (to be completed)
       CommandDate_Data:
-        description: Declation for basic field gongsimcommandDB.CommandDate {{BasicKind}}
-          (to be completed)
+        description: Declation for basic field gongsimcommandDB.CommandDate {{BasicKind}} (to be completed)
       CreatedAt:
         format: date-time
         type: string
       DateSpeedCommand_Data:
-        description: Declation for basic field gongsimcommandDB.DateSpeedCommand {{BasicKind}}
-          (to be completed)
+        description: Declation for basic field gongsimcommandDB.DateSpeedCommand {{BasicKind}} (to be completed)
       DeletedAt: {}
       ID:
         format: uint64
@@ -1170,8 +1157,7 @@ responses:
           insertion for basic fields declaration
           Declation for basic field gongsimcommandDB.Name {{BasicKind}} (to be completed)
       SpeedCommandType_Data:
-        description: Declation for basic field gongsimcommandDB.SpeedCommandType {{BasicKind}}
-          (to be completed)
+        description: Declation for basic field gongsimcommandDB.SpeedCommandType {{BasicKind}} (to be completed)
       UpdatedAt:
         format: date-time
         type: string
@@ -1187,17 +1173,14 @@ responses:
     description: GongsimStatusDBResponse provides response
     headers:
       CompletionDate_Data:
-        description: Declation for basic field gongsimstatusDB.CompletionDate {{BasicKind}}
-          (to be completed)
+        description: Declation for basic field gongsimstatusDB.CompletionDate {{BasicKind}} (to be completed)
       CreatedAt:
         format: date-time
         type: string
       CurrentCommand_Data:
-        description: Declation for basic field gongsimstatusDB.CurrentCommand {{BasicKind}}
-          (to be completed)
+        description: Declation for basic field gongsimstatusDB.CurrentCommand {{BasicKind}} (to be completed)
       CurrentSpeedCommand_Data:
-        description: Declation for basic field gongsimstatusDB.CurrentSpeedCommand
-          {{BasicKind}} (to be completed)
+        description: Declation for basic field gongsimstatusDB.CurrentSpeedCommand {{BasicKind}} (to be completed)
       DeletedAt: {}
       ID:
         format: uint64
@@ -1207,8 +1190,7 @@ responses:
           insertion for basic fields declaration
           Declation for basic field gongsimstatusDB.Name {{BasicKind}} (to be completed)
       SpeedCommandCompletionDate_Data:
-        description: Declation for basic field gongsimstatusDB.SpeedCommandCompletionDate
-          {{BasicKind}} (to be completed)
+        description: Declation for basic field gongsimstatusDB.SpeedCommandCompletionDate {{BasicKind}} (to be completed)
       UpdatedAt:
         format: date-time
         type: string
@@ -1228,8 +1210,7 @@ responses:
         type: string
       DeletedAt: {}
       Duration_Data:
-        description: Declation for basic field updatestateDB.Duration {{BasicKind}}
-          (to be completed)
+        description: Declation for basic field updatestateDB.Duration {{BasicKind}} (to be completed)
       ID:
         format: uint64
         type: integer
@@ -1238,8 +1219,7 @@ responses:
           insertion for basic fields declaration
           Declation for basic field updatestateDB.Name {{BasicKind}} (to be completed)
       Period_Data:
-        description: Declation for basic field updatestateDB.Period {{BasicKind}}
-          (to be completed)
+        description: Declation for basic field updatestateDB.Period {{BasicKind}} (to be completed)
       UpdatedAt:
         format: date-time
         type: string

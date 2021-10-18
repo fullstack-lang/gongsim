@@ -33,6 +33,7 @@ func (specificEngine *LadybugSimulation) Reset(engine *models.Engine)           
 func (specificEngine *LadybugSimulation) CommitAgents(engine *models.Engine)            {}
 func (specificEngine *LadybugSimulation) CheckoutAgents(engine *models.Engine)          {}
 func (specificEngine *LadybugSimulation) GetLastCommitNb() uint                         { return 0 }
+func (specificEngine *LadybugSimulation) GetLastCommitNbFromFront() uint                { return 0 }
 
 type Ladybug struct {
 	models.Agent
