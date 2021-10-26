@@ -62,6 +62,9 @@ export class GongsimCommandsTableComponent implements OnInit {
     // enable sorting on all fields (including pointers and reverse pointer)
     this.matTableDataSource.sortingDataAccessor = (gongsimcommandDB: GongsimCommandDB, property: string) => {
       switch (property) {
+        case 'ID':
+          return gongsimcommandDB.ID
+
         // insertion point for specific sorting accessor
         case 'Name':
           return gongsimcommandDB.Name;

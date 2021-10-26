@@ -62,6 +62,9 @@ export class EventsTableComponent implements OnInit {
     // enable sorting on all fields (including pointers and reverse pointer)
     this.matTableDataSource.sortingDataAccessor = (eventDB: EventDB, property: string) => {
       switch (property) {
+        case 'ID':
+          return eventDB.ID
+
         // insertion point for specific sorting accessor
         case 'Name':
           return eventDB.Name;

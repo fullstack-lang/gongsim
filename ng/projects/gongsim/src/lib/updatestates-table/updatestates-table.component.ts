@@ -62,6 +62,9 @@ export class UpdateStatesTableComponent implements OnInit {
     // enable sorting on all fields (including pointers and reverse pointer)
     this.matTableDataSource.sortingDataAccessor = (updatestateDB: UpdateStateDB, property: string) => {
       switch (property) {
+        case 'ID':
+          return updatestateDB.ID
+
         // insertion point for specific sorting accessor
         case 'Name':
           return updatestateDB.Name;

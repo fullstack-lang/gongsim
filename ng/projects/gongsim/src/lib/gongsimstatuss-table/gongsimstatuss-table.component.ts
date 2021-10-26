@@ -62,6 +62,9 @@ export class GongsimStatussTableComponent implements OnInit {
     // enable sorting on all fields (including pointers and reverse pointer)
     this.matTableDataSource.sortingDataAccessor = (gongsimstatusDB: GongsimStatusDB, property: string) => {
       switch (property) {
+        case 'ID':
+          return gongsimstatusDB.ID
+
         // insertion point for specific sorting accessor
         case 'Name':
           return gongsimstatusDB.Name;
