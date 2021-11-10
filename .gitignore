@@ -1,6 +1,6 @@
 __debug_bin
-gongsim
 go/controllers/gongsimapi.yml
 gongsim.exe
 go/.DS_Store
 .DS_Store
+go/cmd/gongsim/gongsim

@@ -18,6 +18,8 @@ import (
 	"github.com/fullstack-lang/gongsim/go/controllers"
 	"github.com/fullstack-lang/gongsim/go/models"
 	"github.com/fullstack-lang/gongsim/go/orm"
+
+	gongsim "github.com/fullstack-lang/gongsim"
 )
 
 var (
@@ -111,7 +113,7 @@ func main() {
 	models.Stage.Commit()
 
 	// provide the static route for the angular pages
-	r.Use(static.Serve("/", EmbedFolder(ng, "ng/dist/ng")))
+	r.Use(static.Serve("/", EmbedFolder(gongsim.NgDistNg, "ng/dist/ng")))
 	r.NoRoute(func(c *gin.Context) {
 		fmt.Println(c.Request.URL.Path, "doesn't exists, redirect on /")
 		c.Redirect(http.StatusMovedPermanently, "/")
@@ -122,9 +124,6 @@ func main() {
 
 	r.Run()
 }
-
-//go:embed ng/dist/ng
-var ng embed.FS
 
 type embedFileSystem struct {
 	http.FileSystem
