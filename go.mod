@@ -23,6 +23,8 @@ require (
 	gorm.io/gorm v1.21.16
 )
 
+require github.com/fullstack-lang/gong v0.0.0-20220213112320-b55a99af448b
+
 require (
 	github.com/frankban/quicktest v1.13.1 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect

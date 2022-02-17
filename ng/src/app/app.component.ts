@@ -13,7 +13,7 @@ import { Body } from './body';
 })
 export class AppComponent implements OnInit {
   @ViewChild('canvas', { static: true }) canvas?: ElementRef<HTMLCanvasElement>;
-  ctx: CanvasRenderingContext2D = new CanvasRenderingContext2D
+  // ctx: CanvasRenderingContext2D = new CanvasRenderingContext2D()
   requestId = 0
   interval = 0
   bodies: Body[] = [];
@@ -39,47 +39,47 @@ export class AppComponent implements OnInit {
   sin: number = 0
 
   constructor(
-    private engineService: gongsim.EngineService,
+    // private engineService: gongsim.EngineService,
     private ngZone: NgZone
   ) { }
 
   ngOnInit() {
 
-    this.ctx = this.canvas!.nativeElement.getContext('2d')!
-    this.ctx.fillStyle = 'red'
+    // this.ctx = this.canvas!.nativeElement.getContext('2d')!
+    // this.ctx.fillStyle = 'red'
 
-    var Sun: Body = new Body(this.ctx)
-    Sun.Radius = 696.342 * 1000 * 1000
-    this.bodies = this.bodies.concat(Sun)
-
-
-    this.Jupiter = new Body(this.ctx)
-    this.Jupiter.OrbitSemiMajoraxis = 778.57 * 1000 * 1000 * 1000 // 778 millions of km in meters 
-    this.Jupiter.OrbitalPeriod = 4432.59 * 24 * 3600 // 4432 days or 11 years in seconds
-    this.Jupiter.Radius = 69.911 * 1000 * 1000 // in meters
-    this.Jupiter.OrbitCenter = Sun
-    this.bodies = this.bodies.concat(this.Jupiter)
-
-    // Io is the jovian moon watched by romer
-    this.Io = new Body(this.ctx)
-    this.Io.OrbitalPeriod = 42.45930686 * 3600 // 42 hours in seconds
-    this.Io.OrbitSemiMajoraxis = 421.7 * 1000 * 1000 // 421700 km in meters
-    this.Io.Radius = 1821.6 * 1000.0 // 0.2 earth
-    this.Io.OrbitCenter = this.Jupiter
-    this.bodies = this.bodies.concat(this.Io)
-
-    this.Earth = new Body(this.ctx)
-    this.Earth.OrbitSemiMajoraxis = 149.598 * 1000 * 1000 * 1000 // 150 millions of km in meters 
-    this.Earth.OrbitalPeriod = 365.256 * 24 * 3600 // 365 days in seconds
-    this.Earth.Radius = 6 * 1000 * 1000 // in meters
-    this.Earth.OrbitCenter = Sun
-    this.bodies = this.bodies.concat(this.Earth)
+    // var Sun: Body = new Body(this.ctx)
+    // Sun.Radius = 696.342 * 1000 * 1000
+    // this.bodies = this.bodies.concat(Sun)
 
 
-    this.ngZone.runOutsideAngular(() => this.tick());
-    setInterval(() => {
-      this.tick();
-    }, 200);
+    // this.Jupiter = new Body(this.ctx)
+    // this.Jupiter.OrbitSemiMajoraxis = 778.57 * 1000 * 1000 * 1000 // 778 millions of km in meters 
+    // this.Jupiter.OrbitalPeriod = 4432.59 * 24 * 3600 // 4432 days or 11 years in seconds
+    // this.Jupiter.Radius = 69.911 * 1000 * 1000 // in meters
+    // this.Jupiter.OrbitCenter = Sun
+    // this.bodies = this.bodies.concat(this.Jupiter)
+
+    // // Io is the jovian moon watched by romer
+    // this.Io = new Body(this.ctx)
+    // this.Io.OrbitalPeriod = 42.45930686 * 3600 // 42 hours in seconds
+    // this.Io.OrbitSemiMajoraxis = 421.7 * 1000 * 1000 // 421700 km in meters
+    // this.Io.Radius = 1821.6 * 1000.0 // 0.2 earth
+    // this.Io.OrbitCenter = this.Jupiter
+    // this.bodies = this.bodies.concat(this.Io)
+
+    // this.Earth = new Body(this.ctx)
+    // this.Earth.OrbitSemiMajoraxis = 149.598 * 1000 * 1000 * 1000 // 150 millions of km in meters 
+    // this.Earth.OrbitalPeriod = 365.256 * 24 * 3600 // 365 days in seconds
+    // this.Earth.Radius = 6 * 1000 * 1000 // in meters
+    // this.Earth.OrbitCenter = Sun
+    // this.bodies = this.bodies.concat(this.Earth)
+
+
+    // this.ngZone.runOutsideAngular(() => this.tick());
+    // setInterval(() => {
+    //   this.tick();
+    // }, 200);
 
   }
 
@@ -88,45 +88,45 @@ export class AppComponent implements OnInit {
 
     if (updateDisplay) {
 
-      // fetch the time
-      this.engineService.getEngines().subscribe(
-        engines => {
-          // get the engine
-          if (engines.length == 1) {
-            // update position between two ticks
-            for (this.SecondsSinceStart; this.SecondsSinceStart < engines[0].SecondsSinceStart; this.SecondsSinceStart++) {
-              this.bodies.forEach((body: Body) => {
-                body.updatePosition(this.SecondsSinceStart, this.Earth!);
-              });
+      // // fetch the time
+      // this.engineService.getEngines().subscribe(
+      //   engines => {
+      //     // get the engine
+      //     if (engines.length == 1) {
+      //       // update position between two ticks
+      //       for (this.SecondsSinceStart; this.SecondsSinceStart < engines[0].SecondsSinceStart; this.SecondsSinceStart++) {
+      //         this.bodies.forEach((body: Body) => {
+      //           body.updatePosition(this.SecondsSinceStart, this.Earth!);
+      //         });
 
-              var ioIsOnTheLeftOfJupiter = this.isIoOnLeftOfJupiter(false)
-              if (this.ioWasOnTheLeftOfJupiterAtLastCalculation != ioIsOnTheLeftOfJupiter) {
-                if (ioIsOnTheLeftOfJupiter) {
-                  this.isIoOnLeftOfJupiter(true)
-                  this.deltaFromEclipseToEclipseSeconds =
-                    (this.SecondsSinceStart - this.timeEndOfEclipse) - this.durationBetweenEclipse
-                  this.durationBetweenEclipse = this.SecondsSinceStart - this.timeEndOfEclipse
+      //         var ioIsOnTheLeftOfJupiter = this.isIoOnLeftOfJupiter(false)
+      //         if (this.ioWasOnTheLeftOfJupiterAtLastCalculation != ioIsOnTheLeftOfJupiter) {
+      //           if (ioIsOnTheLeftOfJupiter) {
+      //             this.isIoOnLeftOfJupiter(true)
+      //             this.deltaFromEclipseToEclipseSeconds =
+      //               (this.SecondsSinceStart - this.timeEndOfEclipse) - this.durationBetweenEclipse
+      //             this.durationBetweenEclipse = this.SecondsSinceStart - this.timeEndOfEclipse
 
-                  this.timeEndOfEclipse = this.SecondsSinceStart
+      //             this.timeEndOfEclipse = this.SecondsSinceStart
 
-                  if (this.durationBetweenEclipse > this.maxDurationBetweenEclipse) {
-                    this.maxDurationBetweenEclipse = this.durationBetweenEclipse
-                    this.maxDurationBetweenEclipseSeconds = this.timeEndOfEclipse % this.Earth!.OrbitalPeriod
-                  }
-                  if (this.durationBetweenEclipse < this.minDurationBetweenEclipse) {
-                    if (this.durationBetweenEclipse > 3600 * 24) {
-                      this.minDurationBetweenEclipse = this.durationBetweenEclipse
-                      this.minDurationBetweenEclipseSeconds = this.timeEndOfEclipse % this.Earth!.OrbitalPeriod
-                    }
-                  }
-                }
-                this.ioWasOnTheLeftOfJupiterAtLastCalculation = ioIsOnTheLeftOfJupiter
-              }
-            }
-            this.SecondsSinceStart = engines[0].SecondsSinceStart
-          }
-        }
-      )
+      //             if (this.durationBetweenEclipse > this.maxDurationBetweenEclipse) {
+      //               this.maxDurationBetweenEclipse = this.durationBetweenEclipse
+      //               this.maxDurationBetweenEclipseSeconds = this.timeEndOfEclipse % this.Earth!.OrbitalPeriod
+      //             }
+      //             if (this.durationBetweenEclipse < this.minDurationBetweenEclipse) {
+      //               if (this.durationBetweenEclipse > 3600 * 24) {
+      //                 this.minDurationBetweenEclipse = this.durationBetweenEclipse
+      //                 this.minDurationBetweenEclipseSeconds = this.timeEndOfEclipse % this.Earth!.OrbitalPeriod
+      //               }
+      //             }
+      //           }
+      //           this.ioWasOnTheLeftOfJupiterAtLastCalculation = ioIsOnTheLeftOfJupiter
+      //         }
+      //       }
+      //       this.SecondsSinceStart = engines[0].SecondsSinceStart
+      //     }
+      //   }
+      // )
     }
   }
 
@@ -171,35 +171,35 @@ export class AppComponent implements OnInit {
   }
 
   tick() {
-    this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+    // this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
 
-    this.bodies.forEach((body: Body) => {
-      body.draw();
-    });
-    this.ctx.fillStyle = 'orange';
-    this.ctx.font = '18px Arial';
+    // this.bodies.forEach((body: Body) => {
+    //   body.draw();
+    // });
+    // this.ctx.fillStyle = 'orange';
+    // this.ctx.font = '18px Arial';
 
-    var left = "Io is on the left of Jupiter"
-    var rigth = "Io is on the rigth of Jupiter"
+    // var left = "Io is on the left of Jupiter"
+    // var rigth = "Io is on the rigth of Jupiter"
 
-    var text = "days since beginning " + (this.SecondsSinceStart / (3600 * 24)).toFixed(1)
-    this.ctx.fillText(text, 10, 50);
+    // var text = "days since beginning " + (this.SecondsSinceStart / (3600 * 24)).toFixed(1)
+    // this.ctx.fillText(text, 10, 50);
 
 
-    if (this.ioWasOnTheLeftOfJupiterAtLastCalculation) {
-      text = left
-    } else {
-      text = rigth
-    }
-    this.ctx.fillText(text, 10, 75);
-    this.ctx.fillText("Duration between Eclipse :", 10, 100);
-    this.ctx.fillText("Cur:\t" + this.displayDuration(this.durationBetweenEclipse) +
-      " delta " + this.deltaFromEclipseToEclipseSeconds, 10, 125);
+    // if (this.ioWasOnTheLeftOfJupiterAtLastCalculation) {
+    //   text = left
+    // } else {
+    //   text = rigth
+    // }
+    // this.ctx.fillText(text, 10, 75);
+    // this.ctx.fillText("Duration between Eclipse :", 10, 100);
+    // this.ctx.fillText("Cur:\t" + this.displayDuration(this.durationBetweenEclipse) +
+    //   " delta " + this.deltaFromEclipseToEclipseSeconds, 10, 125);
 
-    this.ctx.fillText("Max:\t" + this.displayDuration(this.maxDurationBetweenEclipse), 10, 150);
-    this.ctx.fillText("Max:\t" + this.displayDuration(this.maxDurationBetweenEclipseSeconds), 10, 175);
-    this.ctx.fillText("Min:\t" + this.displayDuration(this.minDurationBetweenEclipse), 10, 200);
-    this.ctx.fillText("Min:\t" + this.displayDuration(this.minDurationBetweenEclipseSeconds), 10, 225);
+    // this.ctx.fillText("Max:\t" + this.displayDuration(this.maxDurationBetweenEclipse), 10, 150);
+    // this.ctx.fillText("Max:\t" + this.displayDuration(this.maxDurationBetweenEclipseSeconds), 10, 175);
+    // this.ctx.fillText("Min:\t" + this.displayDuration(this.minDurationBetweenEclipse), 10, 200);
+    // this.ctx.fillText("Min:\t" + this.displayDuration(this.minDurationBetweenEclipseSeconds), 10, 225);
 
     this.requestId = requestAnimationFrame(() => this.tick);
 
