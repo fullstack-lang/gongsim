@@ -267,7 +267,7 @@ func (backRepoEvent *BackRepoEventStruct) CheckoutPhaseOne() (Error error) {
 
 	// list of instances to be removed
 	// start from the initial map on the stage and remove instances that have been checked out
-	eventInstancesToBeRemovedFromTheStage := make(map[*models.Event]struct{})
+	eventInstancesToBeRemovedFromTheStage := make(map[*models.Event]any)
 	for key, value := range models.Stage.Events {
 		eventInstancesToBeRemovedFromTheStage[key] = value
 	}

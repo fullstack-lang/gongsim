@@ -285,7 +285,7 @@ func (backRepoGongsimStatus *BackRepoGongsimStatusStruct) CheckoutPhaseOne() (Er
 
 	// list of instances to be removed
 	// start from the initial map on the stage and remove instances that have been checked out
-	gongsimstatusInstancesToBeRemovedFromTheStage := make(map[*models.GongsimStatus]struct{})
+	gongsimstatusInstancesToBeRemovedFromTheStage := make(map[*models.GongsimStatus]any)
 	for key, value := range models.Stage.GongsimStatuss {
 		gongsimstatusInstancesToBeRemovedFromTheStage[key] = value
 	}

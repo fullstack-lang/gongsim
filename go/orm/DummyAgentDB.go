@@ -280,7 +280,7 @@ func (backRepoDummyAgent *BackRepoDummyAgentStruct) CheckoutPhaseOne() (Error er
 
 	// list of instances to be removed
 	// start from the initial map on the stage and remove instances that have been checked out
-	dummyagentInstancesToBeRemovedFromTheStage := make(map[*models.DummyAgent]struct{})
+	dummyagentInstancesToBeRemovedFromTheStage := make(map[*models.DummyAgent]any)
 	for key, value := range models.Stage.DummyAgents {
 		dummyagentInstancesToBeRemovedFromTheStage[key] = value
 	}

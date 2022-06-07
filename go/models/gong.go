@@ -12,7 +12,7 @@ import (
 )
 
 // swagger:ignore
-type __void struct{}
+type __void any
 
 // needed for creating set of instances in the stage
 var __member __void
@@ -28,22 +28,22 @@ type GongStructInterface interface {
 // StageStruct enables storage of staged instances
 // swagger:ignore
 type StageStruct struct { // insertion point for definition of arrays registering instances
-	DummyAgents           map[*DummyAgent]struct{}
+	DummyAgents           map[*DummyAgent]any
 	DummyAgents_mapString map[string]*DummyAgent
 
-	Engines           map[*Engine]struct{}
+	Engines           map[*Engine]any
 	Engines_mapString map[string]*Engine
 
-	Events           map[*Event]struct{}
+	Events           map[*Event]any
 	Events_mapString map[string]*Event
 
-	GongsimCommands           map[*GongsimCommand]struct{}
+	GongsimCommands           map[*GongsimCommand]any
 	GongsimCommands_mapString map[string]*GongsimCommand
 
-	GongsimStatuss           map[*GongsimStatus]struct{}
+	GongsimStatuss           map[*GongsimStatus]any
 	GongsimStatuss_mapString map[string]*GongsimStatus
 
-	UpdateStates           map[*UpdateState]struct{}
+	UpdateStates           map[*UpdateState]any
 	UpdateStates_mapString map[string]*UpdateState
 
 	AllModelsStructCreateCallback AllModelsStructCreateInterface
@@ -91,22 +91,22 @@ type BackRepoInterface interface {
 
 // swagger:ignore instructs the gong compiler (gongc) to avoid this particular struct
 var Stage StageStruct = StageStruct{ // insertion point for array initiatialisation
-	DummyAgents:           make(map[*DummyAgent]struct{}),
+	DummyAgents:           make(map[*DummyAgent]any),
 	DummyAgents_mapString: make(map[string]*DummyAgent),
 
-	Engines:           make(map[*Engine]struct{}),
+	Engines:           make(map[*Engine]any),
 	Engines_mapString: make(map[string]*Engine),
 
-	Events:           make(map[*Event]struct{}),
+	Events:           make(map[*Event]any),
 	Events_mapString: make(map[string]*Event),
 
-	GongsimCommands:           make(map[*GongsimCommand]struct{}),
+	GongsimCommands:           make(map[*GongsimCommand]any),
 	GongsimCommands_mapString: make(map[string]*GongsimCommand),
 
-	GongsimStatuss:           make(map[*GongsimStatus]struct{}),
+	GongsimStatuss:           make(map[*GongsimStatus]any),
 	GongsimStatuss_mapString: make(map[string]*GongsimStatus),
 
-	UpdateStates:           make(map[*UpdateState]struct{}),
+	UpdateStates:           make(map[*UpdateState]any),
 	UpdateStates_mapString: make(map[string]*UpdateState),
 
 	// end of insertion point
@@ -957,22 +957,22 @@ type AllModelsStructDeleteInterface interface { // insertion point for Callbacks
 }
 
 func (stage *StageStruct) Reset() { // insertion point for array reset
-	stage.DummyAgents = make(map[*DummyAgent]struct{})
+	stage.DummyAgents = make(map[*DummyAgent]any)
 	stage.DummyAgents_mapString = make(map[string]*DummyAgent)
 
-	stage.Engines = make(map[*Engine]struct{})
+	stage.Engines = make(map[*Engine]any)
 	stage.Engines_mapString = make(map[string]*Engine)
 
-	stage.Events = make(map[*Event]struct{})
+	stage.Events = make(map[*Event]any)
 	stage.Events_mapString = make(map[string]*Event)
 
-	stage.GongsimCommands = make(map[*GongsimCommand]struct{})
+	stage.GongsimCommands = make(map[*GongsimCommand]any)
 	stage.GongsimCommands_mapString = make(map[string]*GongsimCommand)
 
-	stage.GongsimStatuss = make(map[*GongsimStatus]struct{})
+	stage.GongsimStatuss = make(map[*GongsimStatus]any)
 	stage.GongsimStatuss_mapString = make(map[string]*GongsimStatus)
 
-	stage.UpdateStates = make(map[*UpdateState]struct{})
+	stage.UpdateStates = make(map[*UpdateState]any)
 	stage.UpdateStates_mapString = make(map[string]*UpdateState)
 
 }
@@ -1483,6 +1483,7 @@ func generatesIdentifier(gongStructName string, idx int, instanceName string) (i
 }
 
 // insertion point of functions that provide maps for reverse associations
+
 // generate function for reverse association maps of DummyAgent
 func (stageStruct *StageStruct) CreateReverseMap_DummyAgent_Engine() (res map[*Engine][]*DummyAgent) {
 	res = make(map[*Engine][]*DummyAgent)
@@ -1506,10 +1507,86 @@ func (stageStruct *StageStruct) CreateReverseMap_DummyAgent_Engine() (res map[*E
 }
 
 // generate function for reverse association maps of Engine
+
 // generate function for reverse association maps of Event
+
 // generate function for reverse association maps of GongsimCommand
+
 // generate function for reverse association maps of GongsimStatus
+
 // generate function for reverse association maps of UpdateState
+
+type GongstructSet interface {
+	map[any]any |
+		// insertion point for generic types
+		map[*DummyAgent]any |
+		map[*Engine]any |
+		map[*Event]any |
+		map[*GongsimCommand]any |
+		map[*GongsimStatus]any |
+		map[*UpdateState]any |
+		map[*any]any // because go does not support an extra "|" at the end of type specifications
+}
+
+type GongstructMapString interface {
+	map[any]any |
+		// insertion point for generic types
+		map[string]*DummyAgent |
+		map[string]*Engine |
+		map[string]*Event |
+		map[string]*GongsimCommand |
+		map[string]*GongsimStatus |
+		map[string]*UpdateState |
+		map[*any]any // because go does not support an extra "|" at the end of type specifications
+}
+
+// GongGetSet returns the set staged GongstructType instances
+// it is usefull because it allows refactoring of gong struct identifier
+func GongGetSet[Type GongstructSet]() *Type {
+	var ret Type
+
+	switch any(ret).(type) {
+	// insertion point for generic get functions
+	case map[*DummyAgent]any:
+		return any(&Stage.DummyAgents).(*Type)
+	case map[*Engine]any:
+		return any(&Stage.Engines).(*Type)
+	case map[*Event]any:
+		return any(&Stage.Events).(*Type)
+	case map[*GongsimCommand]any:
+		return any(&Stage.GongsimCommands).(*Type)
+	case map[*GongsimStatus]any:
+		return any(&Stage.GongsimStatuss).(*Type)
+	case map[*UpdateState]any:
+		return any(&Stage.UpdateStates).(*Type)
+	default:
+		return nil
+	}
+}
+
+// GongGetMap returns the map of staged GongstructType instances
+// it is usefull because it allows refactoring of gong struct identifier
+func GongGetMap[Type GongstructMapString]() *Type {
+	var ret Type
+
+	switch any(ret).(type) {
+	// insertion point for generic get functions
+	case map[string]*DummyAgent:
+		return any(&Stage.DummyAgents_mapString).(*Type)
+	case map[string]*Engine:
+		return any(&Stage.Engines_mapString).(*Type)
+	case map[string]*Event:
+		return any(&Stage.Events_mapString).(*Type)
+	case map[string]*GongsimCommand:
+		return any(&Stage.GongsimCommands_mapString).(*Type)
+	case map[string]*GongsimStatus:
+		return any(&Stage.GongsimStatuss_mapString).(*Type)
+	case map[string]*UpdateState:
+		return any(&Stage.UpdateStates_mapString).(*Type)
+	default:
+		return nil
+	}
+}
 
 // insertion point of enum utility functions
 // Utility function for ControlMode
