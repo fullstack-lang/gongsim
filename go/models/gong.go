@@ -270,27 +270,6 @@ func (dummyagent *DummyAgent) GetName() (res string) {
 	return dummyagent.Name
 }
 
-func (dummyagent *DummyAgent) GetFields() (res []string) {
-	// list of fields
-	res = []string{"TechName", "Engine", "Name"}
-	return
-}
-
-func (dummyagent *DummyAgent) GetFieldStringValue(fieldName string) (res string) {
-	switch fieldName {
-	// string value of fields
-	case "TechName":
-		res = dummyagent.TechName
-	case "Engine":
-		if dummyagent.Engine != nil {
-			res = dummyagent.Engine.Name
-		}
-	case "Name":
-		res = dummyagent.Name
-	}
-	return
-}
-
 func (stage *StageStruct) getEngineOrderedStructWithNameField() []*Engine {
 	// have alphabetical order generation
 	engineOrdered := []*Engine{}
@@ -396,35 +375,6 @@ func DeleteORMEngine(engine *Engine) {
 // for satisfaction of GongStruct interface
 func (engine *Engine) GetName() (res string) {
 	return engine.Name
-}
-
-func (engine *Engine) GetFields() (res []string) {
-	// list of fields
-	res = []string{"Name", "EndTime", "CurrentTime", "SecondsSinceStart", "Fired", "ControlMode", "State", "Speed"}
-	return
-}
-
-func (engine *Engine) GetFieldStringValue(fieldName string) (res string) {
-	switch fieldName {
-	// string value of fields
-	case "Name":
-		res = engine.Name
-	case "EndTime":
-		res = engine.EndTime
-	case "CurrentTime":
-		res = engine.CurrentTime
-	case "SecondsSinceStart":
-		res = fmt.Sprintf("%f", engine.SecondsSinceStart)
-	case "Fired":
-		res = fmt.Sprintf("%d", engine.Fired)
-	case "ControlMode":
-		res = engine.ControlMode.ToCodeString()
-	case "State":
-		res = engine.State.ToCodeString()
-	case "Speed":
-		res = fmt.Sprintf("%f", engine.Speed)
-	}
-	return
 }
 
 func (stage *StageStruct) getEventOrderedStructWithNameField() []*Event {
@@ -534,23 +484,6 @@ func (event *Event) GetName() (res string) {
 	return event.Name
 }
 
-func (event *Event) GetFields() (res []string) {
-	// list of fields
-	res = []string{"Name", "Duration"}
-	return
-}
-
-func (event *Event) GetFieldStringValue(fieldName string) (res string) {
-	switch fieldName {
-	// string value of fields
-	case "Name":
-		res = event.Name
-	case "Duration":
-		res = fmt.Sprintf("%d", event.Duration)
-	}
-	return
-}
-
 func (stage *StageStruct) getGongsimCommandOrderedStructWithNameField() []*GongsimCommand {
 	// have alphabetical order generation
 	gongsimcommandOrdered := []*GongsimCommand{}
@@ -656,29 +589,6 @@ func DeleteORMGongsimCommand(gongsimcommand *GongsimCommand) {
 // for satisfaction of GongStruct interface
 func (gongsimcommand *GongsimCommand) GetName() (res string) {
 	return gongsimcommand.Name
-}
-
-func (gongsimcommand *GongsimCommand) GetFields() (res []string) {
-	// list of fields
-	res = []string{"Name", "Command", "CommandDate", "SpeedCommandType", "DateSpeedCommand"}
-	return
-}
-
-func (gongsimcommand *GongsimCommand) GetFieldStringValue(fieldName string) (res string) {
-	switch fieldName {
-	// string value of fields
-	case "Name":
-		res = gongsimcommand.Name
-	case "Command":
-		res = gongsimcommand.Command.ToCodeString()
-	case "CommandDate":
-		res = gongsimcommand.CommandDate
-	case "SpeedCommandType":
-		res = gongsimcommand.SpeedCommandType.ToCodeString()
-	case "DateSpeedCommand":
-		res = gongsimcommand.DateSpeedCommand
-	}
-	return
 }
 
 func (stage *StageStruct) getGongsimStatusOrderedStructWithNameField() []*GongsimStatus {
@@ -788,29 +698,6 @@ func (gongsimstatus *GongsimStatus) GetName() (res string) {
 	return gongsimstatus.Name
 }
 
-func (gongsimstatus *GongsimStatus) GetFields() (res []string) {
-	// list of fields
-	res = []string{"Name", "CurrentCommand", "CompletionDate", "CurrentSpeedCommand", "SpeedCommandCompletionDate"}
-	return
-}
-
-func (gongsimstatus *GongsimStatus) GetFieldStringValue(fieldName string) (res string) {
-	switch fieldName {
-	// string value of fields
-	case "Name":
-		res = gongsimstatus.Name
-	case "CurrentCommand":
-		res = gongsimstatus.CurrentCommand.ToCodeString()
-	case "CompletionDate":
-		res = gongsimstatus.CompletionDate
-	case "CurrentSpeedCommand":
-		res = gongsimstatus.CurrentSpeedCommand.ToCodeString()
-	case "SpeedCommandCompletionDate":
-		res = gongsimstatus.SpeedCommandCompletionDate
-	}
-	return
-}
-
 func (stage *StageStruct) getUpdateStateOrderedStructWithNameField() []*UpdateState {
 	// have alphabetical order generation
 	updatestateOrdered := []*UpdateState{}
@@ -916,25 +803,6 @@ func DeleteORMUpdateState(updatestate *UpdateState) {
 // for satisfaction of GongStruct interface
 func (updatestate *UpdateState) GetName() (res string) {
 	return updatestate.Name
-}
-
-func (updatestate *UpdateState) GetFields() (res []string) {
-	// list of fields
-	res = []string{"Name", "Duration", "Period"}
-	return
-}
-
-func (updatestate *UpdateState) GetFieldStringValue(fieldName string) (res string) {
-	switch fieldName {
-	// string value of fields
-	case "Name":
-		res = updatestate.Name
-	case "Duration":
-		res = fmt.Sprintf("%d", updatestate.Duration)
-	case "Period":
-		res = fmt.Sprintf("%d", updatestate.Period)
-	}
-	return
 }
 
 // swagger:ignore
@@ -1082,7 +950,7 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 	sort.Slice(dummyagentOrdered[:], func(i, j int) bool {
 		return dummyagentOrdered[i].Name < dummyagentOrdered[j].Name
 	})
-	identifiersDecl += fmt.Sprintf("\n\n	// Declarations of staged instances of DummyAgent")
+	identifiersDecl += "\n\n	// Declarations of staged instances of DummyAgent"
 	for idx, dummyagent := range dummyagentOrdered {
 
 		id = generatesIdentifier("DummyAgent", idx, dummyagent.Name)
@@ -1120,7 +988,7 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 	sort.Slice(engineOrdered[:], func(i, j int) bool {
 		return engineOrdered[i].Name < engineOrdered[j].Name
 	})
-	identifiersDecl += fmt.Sprintf("\n\n	// Declarations of staged instances of Engine")
+	identifiersDecl += "\n\n	// Declarations of staged instances of Engine"
 	for idx, engine := range engineOrdered {
 
 		id = generatesIdentifier("Engine", idx, engine.Name)
@@ -1198,7 +1066,7 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 	sort.Slice(eventOrdered[:], func(i, j int) bool {
 		return eventOrdered[i].Name < eventOrdered[j].Name
 	})
-	identifiersDecl += fmt.Sprintf("\n\n	// Declarations of staged instances of Event")
+	identifiersDecl += "\n\n	// Declarations of staged instances of Event"
 	for idx, event := range eventOrdered {
 
 		id = generatesIdentifier("Event", idx, event.Name)
@@ -1236,7 +1104,7 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 	sort.Slice(gongsimcommandOrdered[:], func(i, j int) bool {
 		return gongsimcommandOrdered[i].Name < gongsimcommandOrdered[j].Name
 	})
-	identifiersDecl += fmt.Sprintf("\n\n	// Declarations of staged instances of GongsimCommand")
+	identifiersDecl += "\n\n	// Declarations of staged instances of GongsimCommand"
 	for idx, gongsimcommand := range gongsimcommandOrdered {
 
 		id = generatesIdentifier("GongsimCommand", idx, gongsimcommand.Name)
@@ -1296,7 +1164,7 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 	sort.Slice(gongsimstatusOrdered[:], func(i, j int) bool {
 		return gongsimstatusOrdered[i].Name < gongsimstatusOrdered[j].Name
 	})
-	identifiersDecl += fmt.Sprintf("\n\n	// Declarations of staged instances of GongsimStatus")
+	identifiersDecl += "\n\n	// Declarations of staged instances of GongsimStatus"
 	for idx, gongsimstatus := range gongsimstatusOrdered {
 
 		id = generatesIdentifier("GongsimStatus", idx, gongsimstatus.Name)
@@ -1356,7 +1224,7 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 	sort.Slice(updatestateOrdered[:], func(i, j int) bool {
 		return updatestateOrdered[i].Name < updatestateOrdered[j].Name
 	})
-	identifiersDecl += fmt.Sprintf("\n\n	// Declarations of staged instances of UpdateState")
+	identifiersDecl += "\n\n	// Declarations of staged instances of UpdateState"
 	for idx, updatestate := range updatestateOrdered {
 
 		id = generatesIdentifier("UpdateState", idx, updatestate.Name)
@@ -1516,7 +1384,7 @@ func (stageStruct *StageStruct) CreateReverseMap_DummyAgent_Engine() (res map[*E
 
 // generate function for reverse association maps of UpdateState
 
-// Gongstruct is the type paramter for generated generic function that allows 
+// Gongstruct is the type paramter for generated generic function that allows
 // - access to staged instances
 // - navigation between staged instances by going backward association links between gongstruct
 // - full refactoring of Gongstruct identifiers / fields
@@ -1657,8 +1525,10 @@ func GetAssociationName[Type Gongstruct]() *Type {
 	case DummyAgent:
 		return any(&DummyAgent{
 			// Initialisation of associations
-			// field is initialized with an instance of Engine with the name of the field
-			Engine: &Engine{Name: "Engine"},
+			// field is initialized with an instance of Engine (Agent as it is a composite) with the name of the field
+			Agent: Agent{
+				Engine: &Engine{Name: "Engine"},
+			},
 		}).(*Type)
 	case Engine:
 		return any(&Engine{
@@ -1793,6 +1663,145 @@ func GetSliceOfPointersReverseMap[Start, End Gongstruct](fieldname string) map[*
 	return nil
 }
 
+// GetGongstructName returns the name of the Gongstruct
+// this can be usefull if one want program robust to refactoring
+func GetGongstructName[Type Gongstruct]() (res string) {
+
+	var ret Type
+
+	switch any(ret).(type) {
+	// insertion point for generic get gongstruct name
+	case DummyAgent:
+		res = "DummyAgent"
+	case Engine:
+		res = "Engine"
+	case Event:
+		res = "Event"
+	case GongsimCommand:
+		res = "GongsimCommand"
+	case GongsimStatus:
+		res = "GongsimStatus"
+	case UpdateState:
+		res = "UpdateState"
+	}
+	return res
+}
+
+// GetFields return the array of the fields
+func GetFields[Type Gongstruct]() (res []string) {
+
+	var ret Type
+
+	switch any(ret).(type) {
+	// insertion point for generic get gongstruct name
+	case DummyAgent:
+		res = []string{"TechName", "Engine", "Name"}
+	case Engine:
+		res = []string{"Name", "EndTime", "CurrentTime", "SecondsSinceStart", "Fired", "ControlMode", "State", "Speed"}
+	case Event:
+		res = []string{"Name", "Duration"}
+	case GongsimCommand:
+		res = []string{"Name", "Command", "CommandDate", "SpeedCommandType", "DateSpeedCommand"}
+	case GongsimStatus:
+		res = []string{"Name", "CurrentCommand", "CompletionDate", "CurrentSpeedCommand", "SpeedCommandCompletionDate"}
+	case UpdateState:
+		res = []string{"Name", "Duration", "Period"}
+	}
+	return
+}
+
+func GetFieldStringValue[Type Gongstruct](instance Type, fieldName string) (res string) {
+	var ret Type
+
+	switch any(ret).(type) {
+	// insertion point for generic get gongstruct field value
+	case DummyAgent:
+		switch fieldName {
+		// string value of fields
+		case "TechName":
+			res = any(instance).(DummyAgent).TechName
+		case "Engine":
+			if any(instance).(DummyAgent).Engine != nil {
+				res = any(instance).(DummyAgent).Engine.Name
+			}
+		case "Name":
+			res = any(instance).(DummyAgent).Name
+		}
+	case Engine:
+		switch fieldName {
+		// string value of fields
+		case "Name":
+			res = any(instance).(Engine).Name
+		case "EndTime":
+			res = any(instance).(Engine).EndTime
+		case "CurrentTime":
+			res = any(instance).(Engine).CurrentTime
+		case "SecondsSinceStart":
+			res = fmt.Sprintf("%f", any(instance).(Engine).SecondsSinceStart)
+		case "Fired":
+			res = fmt.Sprintf("%d", any(instance).(Engine).Fired)
+		case "ControlMode":
+			enum := any(instance).(Engine).ControlMode
+			res = enum.ToCodeString()
+		case "State":
+			enum := any(instance).(Engine).State
+			res = enum.ToCodeString()
+		case "Speed":
+			res = fmt.Sprintf("%f", any(instance).(Engine).Speed)
+		}
+	case Event:
+		switch fieldName {
+		// string value of fields
+		case "Name":
+			res = any(instance).(Event).Name
+		case "Duration":
+			res = fmt.Sprintf("%d", any(instance).(Event).Duration)
+		}
+	case GongsimCommand:
+		switch fieldName {
+		// string value of fields
+		case "Name":
+			res = any(instance).(GongsimCommand).Name
+		case "Command":
+			enum := any(instance).(GongsimCommand).Command
+			res = enum.ToCodeString()
+		case "CommandDate":
+			res = any(instance).(GongsimCommand).CommandDate
+		case "SpeedCommandType":
+			enum := any(instance).(GongsimCommand).SpeedCommandType
+			res = enum.ToCodeString()
+		case "DateSpeedCommand":
+			res = any(instance).(GongsimCommand).DateSpeedCommand
+		}
+	case GongsimStatus:
+		switch fieldName {
+		// string value of fields
+		case "Name":
+			res = any(instance).(GongsimStatus).Name
+		case "CurrentCommand":
+			enum := any(instance).(GongsimStatus).CurrentCommand
+			res = enum.ToCodeString()
+		case "CompletionDate":
+			res = any(instance).(GongsimStatus).CompletionDate
+		case "CurrentSpeedCommand":
+			enum := any(instance).(GongsimStatus).CurrentSpeedCommand
+			res = enum.ToCodeString()
+		case "SpeedCommandCompletionDate":
+			res = any(instance).(GongsimStatus).SpeedCommandCompletionDate
+		}
+	case UpdateState:
+		switch fieldName {
+		// string value of fields
+		case "Name":
+			res = any(instance).(UpdateState).Name
+		case "Duration":
+			res = fmt.Sprintf("%d", any(instance).(UpdateState).Duration)
+		case "Period":
+			res = fmt.Sprintf("%d", any(instance).(UpdateState).Period)
+		}
+	}
+	return
+}
 
 // insertion point of enum utility functions
 // Utility function for ControlMode
