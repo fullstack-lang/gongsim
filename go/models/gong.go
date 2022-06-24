@@ -43,9 +43,6 @@ type StageStruct struct { // insertion point for definition of arrays registerin
 	GongsimStatuss           map[*GongsimStatus]any
 	GongsimStatuss_mapString map[string]*GongsimStatus
 
-	UpdateStates           map[*UpdateState]any
-	UpdateStates_mapString map[string]*UpdateState
-
 	AllModelsStructCreateCallback AllModelsStructCreateInterface
 
 	AllModelsStructDeleteCallback AllModelsStructDeleteInterface
@@ -83,8 +80,6 @@ type BackRepoInterface interface {
 	CheckoutGongsimCommand(gongsimcommand *GongsimCommand)
 	CommitGongsimStatus(gongsimstatus *GongsimStatus)
 	CheckoutGongsimStatus(gongsimstatus *GongsimStatus)
-	CommitUpdateState(updatestate *UpdateState)
-	CheckoutUpdateState(updatestate *UpdateState)
 	GetLastCommitFromBackNb() uint
 	GetLastPushFromFrontNb() uint
 }
@@ -106,9 +101,6 @@ var Stage StageStruct = StageStruct{ // insertion point for array initiatialisat
 	GongsimStatuss:           make(map[*GongsimStatus]any),
 	GongsimStatuss_mapString: make(map[string]*GongsimStatus),
 
-	UpdateStates:           make(map[*UpdateState]any),
-	UpdateStates_mapString: make(map[string]*UpdateState),
-
 	// end of insertion point
 	Map_GongStructName_InstancesNb: make(map[string]int),
 }
@@ -124,7 +116,6 @@ func (stage *StageStruct) Commit() {
 	stage.Map_GongStructName_InstancesNb["Event"] = len(stage.Events)
 	stage.Map_GongStructName_InstancesNb["GongsimCommand"] = len(stage.GongsimCommands)
 	stage.Map_GongStructName_InstancesNb["GongsimStatus"] = len(stage.GongsimStatuss)
-	stage.Map_GongStructName_InstancesNb["UpdateState"] = len(stage.UpdateStates)
 
 }
 
@@ -698,113 +689,6 @@ func (gongsimstatus *GongsimStatus) GetName() (res string) {
 	return gongsimstatus.Name
 }
 
-func (stage *StageStruct) getUpdateStateOrderedStructWithNameField() []*UpdateState {
-	// have alphabetical order generation
-	updatestateOrdered := []*UpdateState{}
-	for updatestate := range stage.UpdateStates {
-		updatestateOrdered = append(updatestateOrdered, updatestate)
-	}
-	sort.Slice(updatestateOrdered[:], func(i, j int) bool {
-		return updatestateOrdered[i].Name < updatestateOrdered[j].Name
-	})
-	return updatestateOrdered
-}
-
-// Stage puts updatestate to the model stage
-func (updatestate *UpdateState) Stage() *UpdateState {
-	Stage.UpdateStates[updatestate] = __member
-	Stage.UpdateStates_mapString[updatestate.Name] = updatestate
-
-	return updatestate
-}
-
-// Unstage removes updatestate off the model stage
-func (updatestate *UpdateState) Unstage() *UpdateState {
-	delete(Stage.UpdateStates, updatestate)
-	delete(Stage.UpdateStates_mapString, updatestate.Name)
-	return updatestate
-}
-
-// commit updatestate to the back repo (if it is already staged)
-func (updatestate *UpdateState) Commit() *UpdateState {
-	if _, ok := Stage.UpdateStates[updatestate]; ok {
-		if Stage.BackRepo != nil {
-			Stage.BackRepo.CommitUpdateState(updatestate)
-		}
-	}
-	return updatestate
-}
-
-// Checkout updatestate to the back repo (if it is already staged)
-func (updatestate *UpdateState) Checkout() *UpdateState {
-	if _, ok := Stage.UpdateStates[updatestate]; ok {
-		if Stage.BackRepo != nil {
-			Stage.BackRepo.CheckoutUpdateState(updatestate)
-		}
-	}
-	return updatestate
-}
-
-//
-// Legacy, to be deleted
-//
-
-// StageCopy appends a copy of updatestate to the model stage
-func (updatestate *UpdateState) StageCopy() *UpdateState {
-	_updatestate := new(UpdateState)
-	*_updatestate = *updatestate
-	_updatestate.Stage()
-	return _updatestate
-}
-
-// StageAndCommit appends updatestate to the model stage and commit to the orm repo
-func (updatestate *UpdateState) StageAndCommit() *UpdateState {
-	updatestate.Stage()
-	if Stage.AllModelsStructCreateCallback != nil {
-		Stage.AllModelsStructCreateCallback.CreateORMUpdateState(updatestate)
-	}
-	return updatestate
-}
-
-// DeleteStageAndCommit appends updatestate to the model stage and commit to the orm repo
-func (updatestate *UpdateState) DeleteStageAndCommit() *UpdateState {
-	updatestate.Unstage()
-	DeleteORMUpdateState(updatestate)
-	return updatestate
-}
-
-// StageCopyAndCommit appends a copy of updatestate to the model stage and commit to the orm repo
-func (updatestate *UpdateState) StageCopyAndCommit() *UpdateState {
-	_updatestate := new(UpdateState)
-	*_updatestate = *updatestate
-	_updatestate.Stage()
-	if Stage.AllModelsStructCreateCallback != nil {
-		Stage.AllModelsStructCreateCallback.CreateORMUpdateState(updatestate)
-	}
-	return _updatestate
-}
-
-// CreateORMUpdateState enables dynamic staging of a UpdateState instance
-func CreateORMUpdateState(updatestate *UpdateState) {
-	updatestate.Stage()
-	if Stage.AllModelsStructCreateCallback != nil {
-		Stage.AllModelsStructCreateCallback.CreateORMUpdateState(updatestate)
-	}
-}
-
-// DeleteORMUpdateState enables dynamic staging of a UpdateState instance
-func DeleteORMUpdateState(updatestate *UpdateState) {
-	updatestate.Unstage()
-	if Stage.AllModelsStructDeleteCallback != nil {
-		Stage.AllModelsStructDeleteCallback.DeleteORMUpdateState(updatestate)
-	}
-}
-
-// for satisfaction of GongStruct interface
-func (updatestate *UpdateState) GetName() (res string) {
-	return updatestate.Name
-}
-
 // swagger:ignore
 type AllModelsStructCreateInterface interface { // insertion point for Callbacks on creation
 	CreateORMDummyAgent(DummyAgent *DummyAgent)
@@ -812,7 +696,6 @@ type AllModelsStructCreateInterface interface { // insertion point for Callbacks
 	CreateORMEvent(Event *Event)
 	CreateORMGongsimCommand(GongsimCommand *GongsimCommand)
 	CreateORMGongsimStatus(GongsimStatus *GongsimStatus)
-	CreateORMUpdateState(UpdateState *UpdateState)
 }
 
 type AllModelsStructDeleteInterface interface { // insertion point for Callbacks on deletion
@@ -821,7 +704,6 @@ type AllModelsStructDeleteInterface interface { // insertion point for Callbacks
 	DeleteORMEvent(Event *Event)
 	DeleteORMGongsimCommand(GongsimCommand *GongsimCommand)
 	DeleteORMGongsimStatus(GongsimStatus *GongsimStatus)
-	DeleteORMUpdateState(UpdateState *UpdateState)
 }
 
 func (stage *StageStruct) Reset() { // insertion point for array reset
@@ -840,9 +722,6 @@ func (stage *StageStruct) Reset() { // insertion point for array reset
 	stage.GongsimStatuss = make(map[*GongsimStatus]any)
 	stage.GongsimStatuss_mapString = make(map[string]*GongsimStatus)
 
-	stage.UpdateStates = make(map[*UpdateState]any)
-	stage.UpdateStates_mapString = make(map[string]*UpdateState)
-
 }
 
 func (stage *StageStruct) Nil() { // insertion point for array nil
@@ -860,9 +739,6 @@ func (stage *StageStruct) Nil() { // insertion point for array nil
 
 	stage.GongsimStatuss = nil
 	stage.GongsimStatuss_mapString = nil
-
-	stage.UpdateStates = nil
-	stage.UpdateStates_mapString = nil
 
 }
 
@@ -1214,50 +1090,6 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 
 	}
 
-	map_UpdateState_Identifiers := make(map[*UpdateState]string)
-	_ = map_UpdateState_Identifiers
-
-	updatestateOrdered := []*UpdateState{}
-	for updatestate := range stage.UpdateStates {
-		updatestateOrdered = append(updatestateOrdered, updatestate)
-	}
-	sort.Slice(updatestateOrdered[:], func(i, j int) bool {
-		return updatestateOrdered[i].Name < updatestateOrdered[j].Name
-	})
-	identifiersDecl += "\n\n	// Declarations of staged instances of UpdateState"
-	for idx, updatestate := range updatestateOrdered {
-
-		id = generatesIdentifier("UpdateState", idx, updatestate.Name)
-		map_UpdateState_Identifiers[updatestate] = id
-
-		decl = IdentifiersDecls
-		decl = strings.ReplaceAll(decl, "{{Identifier}}", id)
-		decl = strings.ReplaceAll(decl, "{{GeneratedStructName}}", "UpdateState")
-		decl = strings.ReplaceAll(decl, "{{GeneratedFieldNameValue}}", updatestate.Name)
-		identifiersDecl += decl
-
-		initializerStatements += fmt.Sprintf("\n\n	// UpdateState %s values setup", updatestate.Name)
-		// Initialisation of values
-		setValueField = StringInitStatement
-		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
-		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "Name")
-		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", string(updatestate.Name))
-		initializerStatements += setValueField
-
-		setValueField = NumberInitStatement
-		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
-		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "Duration")
-		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", fmt.Sprintf("%d", updatestate.Duration))
-		initializerStatements += setValueField
-
-		setValueField = NumberInitStatement
-		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
-		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "Period")
-		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", fmt.Sprintf("%d", updatestate.Period))
-		initializerStatements += setValueField
-
-	}
-
 	// insertion initialization of objects to stage
 	for idx, dummyagent := range dummyagentOrdered {
 		var setPointerField string
@@ -1267,14 +1099,6 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 		map_DummyAgent_Identifiers[dummyagent] = id
 
 		// Initialisation of values
-		if dummyagent.Engine != nil {
-			setPointerField = PointerFieldInitStatement
-			setPointerField = strings.ReplaceAll(setPointerField, "{{Identifier}}", id)
-			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldName}}", "Engine")
-			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldNameValue}}", map_Engine_Identifiers[dummyagent.Engine])
-			pointersInitializesStatements += setPointerField
-		}
-
 	}
 
 	for idx, engine := range engineOrdered {
@@ -1317,16 +1141,6 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 		// Initialisation of values
 	}
 
-	for idx, updatestate := range updatestateOrdered {
-		var setPointerField string
-		_ = setPointerField
-
-		id = generatesIdentifier("UpdateState", idx, updatestate.Name)
-		map_UpdateState_Identifiers[updatestate] = id
-
-		// Initialisation of values
-	}
-
 	res = strings.ReplaceAll(res, "{{Identifiers}}", identifiersDecl)
 	res = strings.ReplaceAll(res, "{{ValueInitializers}}", initializerStatements)
 	res = strings.ReplaceAll(res, "{{PointersInitializers}}", pointersInitializesStatements)
@@ -1353,26 +1167,6 @@ func generatesIdentifier(gongStructName string, idx int, instanceName string) (i
 // insertion point of functions that provide maps for reverse associations
 
 // generate function for reverse association maps of DummyAgent
-func (stageStruct *StageStruct) CreateReverseMap_DummyAgent_Engine() (res map[*Engine][]*DummyAgent) {
-	res = make(map[*Engine][]*DummyAgent)
-
-	for dummyagent := range stageStruct.DummyAgents {
-		if dummyagent.Engine != nil {
-			engine_ := dummyagent.Engine
-			var dummyagents []*DummyAgent
-			_, ok := res[engine_]
-			if ok {
-				dummyagents = res[engine_]
-			} else {
-				dummyagents = make([]*DummyAgent, 0)
-			}
-			dummyagents = append(dummyagents, dummyagent)
-			res[engine_] = dummyagents
-		}
-	}
-
-	return
-}
 
 // generate function for reverse association maps of Engine
 
@@ -1382,15 +1176,13 @@ func (stageStruct *StageStruct) CreateReverseMap_DummyAgent_Engine() (res map[*E
 
 // generate function for reverse association maps of GongsimStatus
 
-// generate function for reverse association maps of UpdateState
-
 // Gongstruct is the type paramter for generated generic function that allows
 // - access to staged instances
 // - navigation between staged instances by going backward association links between gongstruct
 // - full refactoring of Gongstruct identifiers / fields
 type Gongstruct interface {
 	// insertion point for generic types
-	DummyAgent | Engine | Event | GongsimCommand | GongsimStatus | UpdateState
+	DummyAgent | Engine | Event | GongsimCommand | GongsimStatus
 }
 
 type GongstructSet interface {
@@ -1401,7 +1193,6 @@ type GongstructSet interface {
 		map[*Event]any |
 		map[*GongsimCommand]any |
 		map[*GongsimStatus]any |
-		map[*UpdateState]any |
 		map[*any]any // because go does not support an extra "|" at the end of type specifications
 }
 
@@ -1413,7 +1204,6 @@ type GongstructMapString interface {
 		map[string]*Event |
 		map[string]*GongsimCommand |
 		map[string]*GongsimStatus |
-		map[string]*UpdateState |
 		map[*any]any // because go does not support an extra "|" at the end of type specifications
 }
 
@@ -1434,8 +1224,6 @@ func GongGetSet[Type GongstructSet]() *Type {
 		return any(&Stage.GongsimCommands).(*Type)
 	case map[*GongsimStatus]any:
 		return any(&Stage.GongsimStatuss).(*Type)
-	case map[*UpdateState]any:
-		return any(&Stage.UpdateStates).(*Type)
 	default:
 		return nil
 	}
@@ -1458,8 +1246,6 @@ func GongGetMap[Type GongstructMapString]() *Type {
 		return any(&Stage.GongsimCommands_mapString).(*Type)
 	case map[string]*GongsimStatus:
 		return any(&Stage.GongsimStatuss_mapString).(*Type)
-	case map[string]*UpdateState:
-		return any(&Stage.UpdateStates_mapString).(*Type)
 	default:
 		return nil
 	}
@@ -1482,8 +1268,6 @@ func GetGongstructInstancesSet[Type Gongstruct]() *map[*Type]any {
 		return any(&Stage.GongsimCommands).(*map[*Type]any)
 	case GongsimStatus:
 		return any(&Stage.GongsimStatuss).(*map[*Type]any)
-	case UpdateState:
-		return any(&Stage.UpdateStates).(*map[*Type]any)
 	default:
 		return nil
 	}
@@ -1506,8 +1290,6 @@ func GetGongstructInstancesMap[Type Gongstruct]() *map[string]*Type {
 		return any(&Stage.GongsimCommands_mapString).(*map[string]*Type)
 	case GongsimStatus:
 		return any(&Stage.GongsimStatuss_mapString).(*map[string]*Type)
-	case UpdateState:
-		return any(&Stage.UpdateStates_mapString).(*map[string]*Type)
 	default:
 		return nil
 	}
@@ -1525,10 +1307,6 @@ func GetAssociationName[Type Gongstruct]() *Type {
 	case DummyAgent:
 		return any(&DummyAgent{
 			// Initialisation of associations
-			// field is initialized with an instance of Engine (Agent as it is a composite) with the name of the field
-			Agent: Agent{
-				Engine: &Engine{Name: "Engine"},
-			},
 		}).(*Type)
 	case Engine:
 		return any(&Engine{
@@ -1544,10 +1322,6 @@ func GetAssociationName[Type Gongstruct]() *Type {
 		}).(*Type)
 	case GongsimStatus:
 		return any(&GongsimStatus{
-			// Initialisation of associations
-		}).(*Type)
-	case UpdateState:
-		return any(&UpdateState{
 			// Initialisation of associations
 		}).(*Type)
 	default:
@@ -1571,23 +1345,6 @@ func GetPointerReverseMap[Start, End Gongstruct](fieldname string) map[*End][]*S
 	case DummyAgent:
 		switch fieldname {
 		// insertion point for per direct association field
-		case "Engine":
-			res := make(map[*Engine][]*DummyAgent)
-			for dummyagent := range Stage.DummyAgents {
-				if dummyagent.Engine != nil {
-					engine_ := dummyagent.Engine
-					var dummyagents []*DummyAgent
-					_, ok := res[engine_]
-					if ok {
-						dummyagents = res[engine_]
-					} else {
-						dummyagents = make([]*DummyAgent, 0)
-					}
-					dummyagents = append(dummyagents, dummyagent)
-					res[engine_] = dummyagents
-				}
-			}
-			return any(res).(map[*End][]*Start)
 		}
 	// reverse maps of direct associations of Engine
 	case Engine:
@@ -1606,11 +1363,6 @@ func GetPointerReverseMap[Start, End Gongstruct](fieldname string) map[*End][]*S
 		}
 	// reverse maps of direct associations of GongsimStatus
 	case GongsimStatus:
-		switch fieldname {
-		// insertion point for per direct association field
-		}
-	// reverse maps of direct associations of UpdateState
-	case UpdateState:
 		switch fieldname {
 		// insertion point for per direct association field
 		}
@@ -1654,11 +1406,6 @@ func GetSliceOfPointersReverseMap[Start, End Gongstruct](fieldname string) map[*
 		switch fieldname {
 		// insertion point for per direct association field
 		}
-	// reverse maps of direct associations of UpdateState
-	case UpdateState:
-		switch fieldname {
-		// insertion point for per direct association field
-		}
 	}
 	return nil
 }
@@ -1681,8 +1428,6 @@ func GetGongstructName[Type Gongstruct]() (res string) {
 		res = "GongsimCommand"
 	case GongsimStatus:
 		res = "GongsimStatus"
-	case UpdateState:
-		res = "UpdateState"
 	}
 	return res
 }
@@ -1695,7 +1440,7 @@ func GetFields[Type Gongstruct]() (res []string) {
 	switch any(ret).(type) {
 	// insertion point for generic get gongstruct name
 	case DummyAgent:
-		res = []string{"TechName", "Engine", "Name"}
+		res = []string{"TechName", "Name"}
 	case Engine:
 		res = []string{"Name", "EndTime", "CurrentTime", "SecondsSinceStart", "Fired", "ControlMode", "State", "Speed"}
 	case Event:
@@ -1704,8 +1449,6 @@ func GetFields[Type Gongstruct]() (res []string) {
 		res = []string{"Name", "Command", "CommandDate", "SpeedCommandType", "DateSpeedCommand"}
 	case GongsimStatus:
 		res = []string{"Name", "CurrentCommand", "CompletionDate", "CurrentSpeedCommand", "SpeedCommandCompletionDate"}
-	case UpdateState:
-		res = []string{"Name", "Duration", "Period"}
 	}
 	return
 }
@@ -1720,10 +1463,6 @@ func GetFieldStringValue[Type Gongstruct](instance Type, fieldName string) (res 
 		// string value of fields
 		case "TechName":
 			res = any(instance).(DummyAgent).TechName
-		case "Engine":
-			if any(instance).(DummyAgent).Engine != nil {
-				res = any(instance).(DummyAgent).Engine.Name
-			}
 		case "Name":
 			res = any(instance).(DummyAgent).Name
 		}
@@ -1789,16 +1528,6 @@ func GetFieldStringValue[Type Gongstruct](instance Type, fieldName string) (res 
 		case "SpeedCommandCompletionDate":
 			res = any(instance).(GongsimStatus).SpeedCommandCompletionDate
 		}
-	case UpdateState:
-		switch fieldName {
-		// string value of fields
-		case "Name":
-			res = any(instance).(UpdateState).Name
-		case "Duration":
-			res = fmt.Sprintf("%d", any(instance).(UpdateState).Duration)
-		case "Period":
-			res = fmt.Sprintf("%d", any(instance).(UpdateState).Period)
-		}
 	}
 	return
 }
@@ -1851,16 +1580,16 @@ func (enginedriverstate EngineDriverState) ToInt() (res int) {
 	// migration of former implementation of enum
 	switch enginedriverstate {
 	// insertion code per enum code
-	case CHECKOUT_AGENT_STATES:
-		res = 1
 	case COMMIT_AGENT_STATES:
 		res = 0
+	case CHECKOUT_AGENT_STATES:
+		res = 1
 	case FIRE_ONE_EVENT:
 		res = 2
-	case RESET_SIMULATION:
-		res = 4
 	case SLEEP_100_MS:
 		res = 3
+	case RESET_SIMULATION:
+		res = 4
 	case UNKOWN:
 		res = 5
 	}
@@ -1871,16 +1600,16 @@ func (enginedriverstate *EngineDriverState) FromInt(input int) {
 
 	switch input {
 	// insertion code per enum code
-	case 1:
-		*enginedriverstate = CHECKOUT_AGENT_STATES
 	case 0:
 		*enginedriverstate = COMMIT_AGENT_STATES
+	case 1:
+		*enginedriverstate = CHECKOUT_AGENT_STATES
 	case 2:
 		*enginedriverstate = FIRE_ONE_EVENT
-	case 4:
-		*enginedriverstate = RESET_SIMULATION
 	case 3:
 		*enginedriverstate = SLEEP_100_MS
+	case 4:
+		*enginedriverstate = RESET_SIMULATION
 	case 5:
 		*enginedriverstate = UNKOWN
 	}
@@ -1890,16 +1619,16 @@ func (enginedriverstate *EngineDriverState) ToCodeString() (res string) {
 
 	switch *enginedriverstate {
 	// insertion code per enum code
-	case CHECKOUT_AGENT_STATES:
-		res = "CHECKOUT_AGENT_STATES"
 	case COMMIT_AGENT_STATES:
 		res = "COMMIT_AGENT_STATES"
+	case CHECKOUT_AGENT_STATES:
+		res = "CHECKOUT_AGENT_STATES"
 	case FIRE_ONE_EVENT:
 		res = "FIRE_ONE_EVENT"
-	case RESET_SIMULATION:
-		res = "RESET_SIMULATION"
 	case SLEEP_100_MS:
 		res = "SLEEP_100_MS"
+	case RESET_SIMULATION:
+		res = "RESET_SIMULATION"
 	case UNKOWN:
 		res = "UNKOWN"
 	}
@@ -1914,10 +1643,10 @@ func (enginerunmode EngineRunMode) ToInt() (res int) {
 	// migration of former implementation of enum
 	switch enginerunmode {
 	// insertion code per enum code
-	case FULL_SPEED:
-		res = 1
 	case RELATIVE_SPEED:
 		res = 0
+	case FULL_SPEED:
+		res = 1
 	}
 	return
 }
@@ -1926,10 +1655,10 @@ func (enginerunmode *EngineRunMode) FromInt(input int) {
 
 	switch input {
 	// insertion code per enum code
-	case 1:
-		*enginerunmode = FULL_SPEED
 	case 0:
 		*enginerunmode = RELATIVE_SPEED
+	case 1:
+		*enginerunmode = FULL_SPEED
 	}
 }
 
@@ -1937,10 +1666,10 @@ func (enginerunmode *EngineRunMode) ToCodeString() (res string) {
 
 	switch *enginerunmode {
 	// insertion code per enum code
-	case FULL_SPEED:
-		res = "FULL_SPEED"
 	case RELATIVE_SPEED:
 		res = "RELATIVE_SPEED"
+	case FULL_SPEED:
+		res = "FULL_SPEED"
 	}
 	return
 }
@@ -1953,12 +1682,12 @@ func (enginestate EngineState) ToString() (res string) {
 	// migration of former implementation of enum
 	switch enginestate {
 	// insertion code per enum code
-	case OVER:
-		res = "OVER"
-	case PAUSED:
-		res = "PAUSED"
 	case RUNNING:
 		res = "RUNNING"
+	case PAUSED:
+		res = "PAUSED"
+	case OVER:
+		res = "OVER"
 	}
 	return
 }
@@ -1967,12 +1696,12 @@ func (enginestate *EngineState) FromString(input string) {
 
 	switch input {
 	// insertion code per enum code
-	case "OVER":
-		*enginestate = OVER
-	case "PAUSED":
-		*enginestate = PAUSED
 	case "RUNNING":
 		*enginestate = RUNNING
+	case "PAUSED":
+		*enginestate = PAUSED
+	case "OVER":
+		*enginestate = OVER
 	}
 }
 
@@ -1980,12 +1709,12 @@ func (enginestate *EngineState) ToCodeString() (res string) {
 
 	switch *enginestate {
 	// insertion code per enum code
-	case OVER:
-		res = "OVER"
-	case PAUSED:
-		res = "PAUSED"
 	case RUNNING:
 		res = "RUNNING"
+	case PAUSED:
+		res = "PAUSED"
+	case OVER:
+		res = "OVER"
 	}
 	return
 }
@@ -1998,10 +1727,10 @@ func (enginestopmode EngineStopMode) ToInt() (res int) {
 	// migration of former implementation of enum
 	switch enginestopmode {
 	// insertion code per enum code
-	case STATE_CHANGED:
-		res = 1
 	case TEN_MINUTES:
 		res = 0
+	case STATE_CHANGED:
+		res = 1
 	}
 	return
 }
@@ -2010,10 +1739,10 @@ func (enginestopmode *EngineStopMode) FromInt(input int) {
 
 	switch input {
 	// insertion code per enum code
-	case 1:
-		*enginestopmode = STATE_CHANGED
 	case 0:
 		*enginestopmode = TEN_MINUTES
+	case 1:
+		*enginestopmode = STATE_CHANGED
 	}
 }
 
@@ -2021,10 +1750,10 @@ func (enginestopmode *EngineStopMode) ToCodeString() (res string) {
 
 	switch *enginestopmode {
 	// insertion code per enum code
-	case STATE_CHANGED:
-		res = "STATE_CHANGED"
 	case TEN_MINUTES:
 		res = "TEN_MINUTES"
+	case STATE_CHANGED:
+		res = "STATE_CHANGED"
 	}
 	return
 }
@@ -2037,18 +1766,18 @@ func (gongsimcommandtype GongsimCommandType) ToString() (res string) {
 	// migration of former implementation of enum
 	switch gongsimcommandtype {
 	// insertion code per enum code
-	case COMMAND_ADVANCE_10_MIN:
-		res = "ADVANCE_10_MIN"
-	case COMMAND_FIRE_EVENT_TILL_STATES_CHANGE:
-		res = "FIRE_EVENT_TILL_STATES_CHANGE"
-	case COMMAND_FIRE_NEXT_EVENT:
-		res = "FIRE_NEXT_EVENT"
-	case COMMAND_PAUSE:
-		res = "PAUSE"
 	case COMMAND_PLAY:
 		res = "PLAY"
+	case COMMAND_PAUSE:
+		res = "PAUSE"
+	case COMMAND_FIRE_NEXT_EVENT:
+		res = "FIRE_NEXT_EVENT"
+	case COMMAND_FIRE_EVENT_TILL_STATES_CHANGE:
+		res = "FIRE_EVENT_TILL_STATES_CHANGE"
 	case COMMAND_RESET:
 		res = "RESET"
+	case COMMAND_ADVANCE_10_MIN:
+		res = "ADVANCE_10_MIN"
 	}
 	return
 }
@@ -2057,18 +1786,18 @@ func (gongsimcommandtype *GongsimCommandType) FromString(input string) {
 
 	switch input {
 	// insertion code per enum code
-	case "ADVANCE_10_MIN":
-		*gongsimcommandtype = COMMAND_ADVANCE_10_MIN
-	case "FIRE_EVENT_TILL_STATES_CHANGE":
-		*gongsimcommandtype = COMMAND_FIRE_EVENT_TILL_STATES_CHANGE
-	case "FIRE_NEXT_EVENT":
-		*gongsimcommandtype = COMMAND_FIRE_NEXT_EVENT
-	case "PAUSE":
-		*gongsimcommandtype = COMMAND_PAUSE
 	case "PLAY":
 		*gongsimcommandtype = COMMAND_PLAY
+	case "PAUSE":
+		*gongsimcommandtype = COMMAND_PAUSE
+	case "FIRE_NEXT_EVENT":
+		*gongsimcommandtype = COMMAND_FIRE_NEXT_EVENT
+	case "FIRE_EVENT_TILL_STATES_CHANGE":
+		*gongsimcommandtype = COMMAND_FIRE_EVENT_TILL_STATES_CHANGE
 	case "RESET":
 		*gongsimcommandtype = COMMAND_RESET
+	case "ADVANCE_10_MIN":
+		*gongsimcommandtype = COMMAND_ADVANCE_10_MIN
 	}
 }
 
@@ -2076,18 +1805,18 @@ func (gongsimcommandtype *GongsimCommandType) ToCodeString() (res string) {
 
 	switch *gongsimcommandtype {
 	// insertion code per enum code
-	case COMMAND_ADVANCE_10_MIN:
-		res = "COMMAND_ADVANCE_10_MIN"
-	case COMMAND_FIRE_EVENT_TILL_STATES_CHANGE:
-		res = "COMMAND_FIRE_EVENT_TILL_STATES_CHANGE"
-	case COMMAND_FIRE_NEXT_EVENT:
-		res = "COMMAND_FIRE_NEXT_EVENT"
-	case COMMAND_PAUSE:
-		res = "COMMAND_PAUSE"
 	case COMMAND_PLAY:
 		res = "COMMAND_PLAY"
+	case COMMAND_PAUSE:
+		res = "COMMAND_PAUSE"
+	case COMMAND_FIRE_NEXT_EVENT:
+		res = "COMMAND_FIRE_NEXT_EVENT"
+	case COMMAND_FIRE_EVENT_TILL_STATES_CHANGE:
+		res = "COMMAND_FIRE_EVENT_TILL_STATES_CHANGE"
 	case COMMAND_RESET:
 		res = "COMMAND_RESET"
+	case COMMAND_ADVANCE_10_MIN:
+		res = "COMMAND_ADVANCE_10_MIN"
 	}
 	return
 }
@@ -2100,10 +1829,10 @@ func (speedcommandtype SpeedCommandType) ToString() (res string) {
 	// migration of former implementation of enum
 	switch speedcommandtype {
 	// insertion code per enum code
-	case COMMAND_DECREASE_SPEED_50_PERCENTS:
-		res = "COMMAND_DECREASE_SPEED_50_PERCENTS "
 	case COMMAND_INCREASE_SPEED_100_PERCENTS:
 		res = "INCREASE_SPEED_100_PERCENTS"
+	case COMMAND_DECREASE_SPEED_50_PERCENTS:
+		res = "COMMAND_DECREASE_SPEED_50_PERCENTS "
 	case COMMAND_SPEED_STEADY:
 		res = "COMMAND_SPEED_STEADY"
 	}
@@ -2114,10 +1843,10 @@ func (speedcommandtype *SpeedCommandType) FromString(input string) {
 
 	switch input {
 	// insertion code per enum code
-	case "COMMAND_DECREASE_SPEED_50_PERCENTS ":
-		*speedcommandtype = COMMAND_DECREASE_SPEED_50_PERCENTS
 	case "INCREASE_SPEED_100_PERCENTS":
 		*speedcommandtype = COMMAND_INCREASE_SPEED_100_PERCENTS
+	case "COMMAND_DECREASE_SPEED_50_PERCENTS ":
+		*speedcommandtype = COMMAND_DECREASE_SPEED_50_PERCENTS
 	case "COMMAND_SPEED_STEADY":
 		*speedcommandtype = COMMAND_SPEED_STEADY
 	}
@@ -2127,10 +1856,10 @@ func (speedcommandtype *SpeedCommandType) ToCodeString() (res string) {
 
 	switch *speedcommandtype {
 	// insertion code per enum code
-	case COMMAND_DECREASE_SPEED_50_PERCENTS:
-		res = "COMMAND_DECREASE_SPEED_50_PERCENTS"
 	case COMMAND_INCREASE_SPEED_100_PERCENTS:
 		res = "COMMAND_INCREASE_SPEED_100_PERCENTS"
+	case COMMAND_DECREASE_SPEED_50_PERCENTS:
+		res = "COMMAND_DECREASE_SPEED_50_PERCENTS"
 	case COMMAND_SPEED_STEADY:
 		res = "COMMAND_SPEED_STEADY"
 	}

@@ -58,10 +58,10 @@ type EventDB struct {
 
 	// insertion for basic fields declaration
 
-	// Declation for basic field eventDB.Name {{BasicKind}} (to be completed)
+	// Declation for basic field eventDB.Name
 	Name_Data sql.NullString
 
-	// Declation for basic field eventDB.Duration {{BasicKind}} (to be completed)
+	// Declation for basic field eventDB.Duration
 	Duration_Data sql.NullInt64
 	// encoding of pointers
 	EventPointersEnconding

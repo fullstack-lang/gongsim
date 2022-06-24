@@ -58,19 +58,19 @@ type GongsimCommandDB struct {
 
 	// insertion for basic fields declaration
 
-	// Declation for basic field gongsimcommandDB.Name {{BasicKind}} (to be completed)
+	// Declation for basic field gongsimcommandDB.Name
 	Name_Data sql.NullString
 
-	// Declation for basic field gongsimcommandDB.Command {{BasicKind}} (to be completed)
+	// Declation for basic field gongsimcommandDB.Command
 	Command_Data sql.NullString
 
-	// Declation for basic field gongsimcommandDB.CommandDate {{BasicKind}} (to be completed)
+	// Declation for basic field gongsimcommandDB.CommandDate
 	CommandDate_Data sql.NullString
 
-	// Declation for basic field gongsimcommandDB.SpeedCommandType {{BasicKind}} (to be completed)
+	// Declation for basic field gongsimcommandDB.SpeedCommandType
 	SpeedCommandType_Data sql.NullString
 
-	// Declation for basic field gongsimcommandDB.DateSpeedCommand {{BasicKind}} (to be completed)
+	// Declation for basic field gongsimcommandDB.DateSpeedCommand
 	DateSpeedCommand_Data sql.NullString
 	// encoding of pointers
 	GongsimCommandPointersEnconding
