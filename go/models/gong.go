@@ -123,6 +123,14 @@ func (stage *StageStruct) Checkout() {
 	if stage.BackRepo != nil {
 		stage.BackRepo.Checkout(stage)
 	}
+
+	// insertion point for computing the map of number of instances per gongstruct
+	stage.Map_GongStructName_InstancesNb["DummyAgent"] = len(stage.DummyAgents)
+	stage.Map_GongStructName_InstancesNb["Engine"] = len(stage.Engines)
+	stage.Map_GongStructName_InstancesNb["Event"] = len(stage.Events)
+	stage.Map_GongStructName_InstancesNb["GongsimCommand"] = len(stage.GongsimCommands)
+	stage.Map_GongStructName_InstancesNb["GongsimStatus"] = len(stage.GongsimStatuss)
+
 }
 
 // backup generates backup files in the dirPath
