@@ -34,6 +34,18 @@
 			"group": "build"
 		},
 		{
+			"label": "00 - update gong dependencies",
+			"type": "shell",
+			"command": "go",
+			"args": [
+				"get",
+				"-d",
+				"github.com/fullstack-lang/gong@HEAD",
+				"github.com/fullstack-lang/gongdoc@HEAD",
+			],
+			"group": "build"
+		},
+		{
 			"label": "01 - gongc & run",
 			"type": "shell",
 			"options": {
