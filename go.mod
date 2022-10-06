@@ -24,6 +24,7 @@ require github.com/glebarez/sqlite v1.3.5
 
 require (
 	github.com/frankban/quicktest v1.13.1 // indirect
+	github.com/fullstack-lang/gongdoc v0.0.0-20221006192736-652f930a70fc // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/glebarez/go-sqlite v1.14.7 // indirect
 	github.com/go-playground/locales v0.14.0 // indirect
