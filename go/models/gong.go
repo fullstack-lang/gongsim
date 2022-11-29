@@ -40,7 +40,6 @@ type StageStruct struct { // insertion point for definition of arrays registerin
 	OnAfterDummyAgentDeleteCallback OnAfterDeleteInterface[DummyAgent]
 	OnAfterDummyAgentReadCallback   OnAfterReadInterface[DummyAgent]
 
-
 	Engines           map[*Engine]any
 	Engines_mapString map[string]*Engine
 
@@ -48,7 +47,6 @@ type StageStruct struct { // insertion point for definition of arrays registerin
 	OnAfterEngineUpdateCallback OnAfterUpdateInterface[Engine]
 	OnAfterEngineDeleteCallback OnAfterDeleteInterface[Engine]
 	OnAfterEngineReadCallback   OnAfterReadInterface[Engine]
-
 
 	Events           map[*Event]any
 	Events_mapString map[string]*Event
@@ -58,7 +56,6 @@ type StageStruct struct { // insertion point for definition of arrays registerin
 	OnAfterEventDeleteCallback OnAfterDeleteInterface[Event]
 	OnAfterEventReadCallback   OnAfterReadInterface[Event]
 
-
 	GongsimCommands           map[*GongsimCommand]any
 	GongsimCommands_mapString map[string]*GongsimCommand
 
@@ -67,7 +64,6 @@ type StageStruct struct { // insertion point for definition of arrays registerin
 	OnAfterGongsimCommandDeleteCallback OnAfterDeleteInterface[GongsimCommand]
 	OnAfterGongsimCommandReadCallback   OnAfterReadInterface[GongsimCommand]
 
-
 	GongsimStatuss           map[*GongsimStatus]any
 	GongsimStatuss_mapString map[string]*GongsimStatus
 
@@ -75,7 +71,6 @@ type StageStruct struct { // insertion point for definition of arrays registerin
 	OnAfterGongsimStatusUpdateCallback OnAfterUpdateInterface[GongsimStatus]
 	OnAfterGongsimStatusDeleteCallback OnAfterDeleteInterface[GongsimStatus]
 	OnAfterGongsimStatusReadCallback   OnAfterReadInterface[GongsimStatus]
-
 
 	AllModelsStructCreateCallback AllModelsStructCreateInterface
 
@@ -755,6 +750,10 @@ import (
 	"{{ModelsPackageName}}"
 )
 
+// generated in order to avoid error in the package import
+// if there are no elements in the stage to marshall
+var ___dummy__Stage models.StageStruct
+
 func init() {
 	var __Dummy_time_variable time.Time
 	_ = __Dummy_time_variable
@@ -774,7 +773,7 @@ func {{databaseName}}Injection() {
 `
 
 const IdentifiersDecls = `
-	{{Identifier}} := (&models.{{GeneratedStructName}}{Name: "{{GeneratedFieldNameValue}}"}).Stage()`
+	{{Identifier}} := (&models.{{GeneratedStructName}}{Name: ` + "`" + `{{GeneratedFieldNameValue}}` + "`" + `}).Stage()`
 
 const StringInitStatement = `
 	{{Identifier}}.{{GeneratedFieldName}} = ` + "`" + `{{GeneratedFieldNameValue}}` + "`"
@@ -843,7 +842,7 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 		decl = strings.ReplaceAll(decl, "{{GeneratedFieldNameValue}}", dummyagent.Name)
 		identifiersDecl += decl
 
-		initializerStatements += fmt.Sprintf("\n\n	// DummyAgent %s values setup", dummyagent.Name)
+		initializerStatements += "\n\n	// DummyAgent values setup"
 		// Initialisation of values
 		setValueField = StringInitStatement
 		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
@@ -881,7 +880,7 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 		decl = strings.ReplaceAll(decl, "{{GeneratedFieldNameValue}}", engine.Name)
 		identifiersDecl += decl
 
-		initializerStatements += fmt.Sprintf("\n\n	// Engine %s values setup", engine.Name)
+		initializerStatements += "\n\n	// Engine values setup"
 		// Initialisation of values
 		setValueField = StringInitStatement
 		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
@@ -959,7 +958,7 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 		decl = strings.ReplaceAll(decl, "{{GeneratedFieldNameValue}}", event.Name)
 		identifiersDecl += decl
 
-		initializerStatements += fmt.Sprintf("\n\n	// Event %s values setup", event.Name)
+		initializerStatements += "\n\n	// Event values setup"
 		// Initialisation of values
 		setValueField = StringInitStatement
 		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
@@ -997,7 +996,7 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 		decl = strings.ReplaceAll(decl, "{{GeneratedFieldNameValue}}", gongsimcommand.Name)
 		identifiersDecl += decl
 
-		initializerStatements += fmt.Sprintf("\n\n	// GongsimCommand %s values setup", gongsimcommand.Name)
+		initializerStatements += "\n\n	// GongsimCommand values setup"
 		// Initialisation of values
 		setValueField = StringInitStatement
 		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
@@ -1057,7 +1056,7 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 		decl = strings.ReplaceAll(decl, "{{GeneratedFieldNameValue}}", gongsimstatus.Name)
 		identifiersDecl += decl
 
-		initializerStatements += fmt.Sprintf("\n\n	// GongsimStatus %s values setup", gongsimstatus.Name)
+		initializerStatements += "\n\n	// GongsimStatus values setup"
 		// Initialisation of values
 		setValueField = StringInitStatement
 		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
@@ -1578,6 +1577,20 @@ func (controlmode *ControlMode) FromString(input string) (err error) {
 	return
 }
 
+func (controlmode *ControlMode) FromCodeString(input string) (err error) {
+
+	switch input {
+	// insertion code per enum code
+	case "AUTONOMOUS":
+		*controlmode = AUTONOMOUS
+	case "CLIENT_CONTROL":
+		*controlmode = CLIENT_CONTROL
+	default:
+		return errUnkownEnum
+	}
+	return
+}
+
 func (controlmode *ControlMode) ToCodeString() (res string) {
 
 	switch *controlmode {
@@ -1636,6 +1649,28 @@ func (enginedriverstate *EngineDriverState) FromInt(input int) (err error) {
 	return
 }
 
+func (enginedriverstate *EngineDriverState) FromCodeString(input string) (err error) {
+
+	switch input {
+	// insertion code per enum code
+	case "COMMIT_AGENT_STATES":
+		*enginedriverstate = COMMIT_AGENT_STATES
+	case "CHECKOUT_AGENT_STATES":
+		*enginedriverstate = CHECKOUT_AGENT_STATES
+	case "FIRE_ONE_EVENT":
+		*enginedriverstate = FIRE_ONE_EVENT
+	case "SLEEP_100_MS":
+		*enginedriverstate = SLEEP_100_MS
+	case "RESET_SIMULATION":
+		*enginedriverstate = RESET_SIMULATION
+	case "UNKOWN":
+		*enginedriverstate = UNKOWN
+	default:
+		return errUnkownEnum
+	}
+	return
+}
+
 func (enginedriverstate *EngineDriverState) ToCodeString() (res string) {
 
 	switch *enginedriverstate {
@@ -1679,6 +1714,20 @@ func (enginerunmode *EngineRunMode) FromInt(input int) (err error) {
 	case 0:
 		*enginerunmode = RELATIVE_SPEED
 	case 1:
+		*enginerunmode = FULL_SPEED
+	default:
+		return errUnkownEnum
+	}
+	return
+}
+
+func (enginerunmode *EngineRunMode) FromCodeString(input string) (err error) {
+
+	switch input {
+	// insertion code per enum code
+	case "RELATIVE_SPEED":
+		*enginerunmode = RELATIVE_SPEED
+	case "FULL_SPEED":
 		*enginerunmode = FULL_SPEED
 	default:
 		return errUnkownEnum
@@ -1732,6 +1781,22 @@ func (enginestate *EngineState) FromString(input string) (err error) {
 	return
 }
 
+func (enginestate *EngineState) FromCodeString(input string) (err error) {
+
+	switch input {
+	// insertion code per enum code
+	case "RUNNING":
+		*enginestate = RUNNING
+	case "PAUSED":
+		*enginestate = PAUSED
+	case "OVER":
+		*enginestate = OVER
+	default:
+		return errUnkownEnum
+	}
+	return
+}
+
 func (enginestate *EngineState) ToCodeString() (res string) {
 
 	switch *enginestate {
@@ -1769,6 +1834,20 @@ func (enginestopmode *EngineStopMode) FromInt(input int) (err error) {
 	case 0:
 		*enginestopmode = TEN_MINUTES
 	case 1:
+		*enginestopmode = STATE_CHANGED
+	default:
+		return errUnkownEnum
+	}
+	return
+}
+
+func (enginestopmode *EngineStopMode) FromCodeString(input string) (err error) {
+
+	switch input {
+	// insertion code per enum code
+	case "TEN_MINUTES":
+		*enginestopmode = TEN_MINUTES
+	case "STATE_CHANGED":
 		*enginestopmode = STATE_CHANGED
 	default:
 		return errUnkownEnum
@@ -1834,6 +1913,28 @@ func (gongsimcommandtype *GongsimCommandType) FromString(input string) (err erro
 	return
 }
 
+func (gongsimcommandtype *GongsimCommandType) FromCodeString(input string) (err error) {
+
+	switch input {
+	// insertion code per enum code
+	case "COMMAND_PLAY":
+		*gongsimcommandtype = COMMAND_PLAY
+	case "COMMAND_PAUSE":
+		*gongsimcommandtype = COMMAND_PAUSE
+	case "COMMAND_FIRE_NEXT_EVENT":
+		*gongsimcommandtype = COMMAND_FIRE_NEXT_EVENT
+	case "COMMAND_FIRE_EVENT_TILL_STATES_CHANGE":
+		*gongsimcommandtype = COMMAND_FIRE_EVENT_TILL_STATES_CHANGE
+	case "COMMAND_RESET":
+		*gongsimcommandtype = COMMAND_RESET
+	case "COMMAND_ADVANCE_10_MIN":
+		*gongsimcommandtype = COMMAND_ADVANCE_10_MIN
+	default:
+		return errUnkownEnum
+	}
+	return
+}
+
 func (gongsimcommandtype *GongsimCommandType) ToCodeString() (res string) {
 
 	switch *gongsimcommandtype {
@@ -1879,6 +1980,22 @@ func (speedcommandtype *SpeedCommandType) FromString(input string) (err error) {
 	case "INCREASE_SPEED_100_PERCENTS":
 		*speedcommandtype = COMMAND_INCREASE_SPEED_100_PERCENTS
 	case "COMMAND_DECREASE_SPEED_50_PERCENTS ":
+		*speedcommandtype = COMMAND_DECREASE_SPEED_50_PERCENTS
+	case "COMMAND_SPEED_STEADY":
+		*speedcommandtype = COMMAND_SPEED_STEADY
+	default:
+		return errUnkownEnum
+	}
+	return
+}
+
+func (speedcommandtype *SpeedCommandType) FromCodeString(input string) (err error) {
+
+	switch input {
+	// insertion code per enum code
+	case "COMMAND_INCREASE_SPEED_100_PERCENTS":
+		*speedcommandtype = COMMAND_INCREASE_SPEED_100_PERCENTS
+	case "COMMAND_DECREASE_SPEED_50_PERCENTS":
 		*speedcommandtype = COMMAND_DECREASE_SPEED_50_PERCENTS
 	case "COMMAND_SPEED_STEADY":
 		*speedcommandtype = COMMAND_SPEED_STEADY
