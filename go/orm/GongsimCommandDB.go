@@ -273,8 +273,7 @@ func (backRepoGongsimCommand *BackRepoGongsimCommandStruct) CommitPhaseTwoInstan
 // BackRepoGongsimCommand.CheckoutPhaseOne Checkouts all BackRepo instances to the Stage
 //
 // Phase One will result in having instances on the stage aligned with the back repo
-// pointers are not initialized yet (this is for pahse two)
-//
+// pointers are not initialized yet (this is for phase two)
 func (backRepoGongsimCommand *BackRepoGongsimCommandStruct) CheckoutPhaseOne() (Error error) {
 
 	gongsimcommandDBArray := make([]GongsimCommandDB, 0)
@@ -332,6 +331,9 @@ func (backRepoGongsimCommand *BackRepoGongsimCommandStruct) CheckoutPhaseOneInst
 		gongsimcommand.Stage()
 	}
 	gongsimcommandDB.CopyBasicFieldsToGongsimCommand(gongsimcommand)
+
+	// in some cases, the instance might have been unstaged. It is necessary to stage it again
+	gongsimcommand.Stage()
 
 	// preserve pointer to gongsimcommandDB. Otherwise, pointer will is recycled and the map of pointers
 	// Map_GongsimCommandDBID_GongsimCommandDB)[gongsimcommandDB hold variable pointers

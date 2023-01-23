@@ -255,8 +255,7 @@ func (backRepoEvent *BackRepoEventStruct) CommitPhaseTwoInstance(backRepo *BackR
 // BackRepoEvent.CheckoutPhaseOne Checkouts all BackRepo instances to the Stage
 //
 // Phase One will result in having instances on the stage aligned with the back repo
-// pointers are not initialized yet (this is for pahse two)
-//
+// pointers are not initialized yet (this is for phase two)
 func (backRepoEvent *BackRepoEventStruct) CheckoutPhaseOne() (Error error) {
 
 	eventDBArray := make([]EventDB, 0)
@@ -314,6 +313,9 @@ func (backRepoEvent *BackRepoEventStruct) CheckoutPhaseOneInstance(eventDB *Even
 		event.Stage()
 	}
 	eventDB.CopyBasicFieldsToEvent(event)
+
+	// in some cases, the instance might have been unstaged. It is necessary to stage it again
+	event.Stage()
 
 	// preserve pointer to eventDB. Otherwise, pointer will is recycled and the map of pointers
 	// Map_EventDBID_EventDB)[eventDB hold variable pointers

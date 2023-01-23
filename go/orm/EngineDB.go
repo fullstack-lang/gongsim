@@ -291,8 +291,7 @@ func (backRepoEngine *BackRepoEngineStruct) CommitPhaseTwoInstance(backRepo *Bac
 // BackRepoEngine.CheckoutPhaseOne Checkouts all BackRepo instances to the Stage
 //
 // Phase One will result in having instances on the stage aligned with the back repo
-// pointers are not initialized yet (this is for pahse two)
-//
+// pointers are not initialized yet (this is for phase two)
 func (backRepoEngine *BackRepoEngineStruct) CheckoutPhaseOne() (Error error) {
 
 	engineDBArray := make([]EngineDB, 0)
@@ -350,6 +349,9 @@ func (backRepoEngine *BackRepoEngineStruct) CheckoutPhaseOneInstance(engineDB *E
 		engine.Stage()
 	}
 	engineDB.CopyBasicFieldsToEngine(engine)
+
+	// in some cases, the instance might have been unstaged. It is necessary to stage it again
+	engine.Stage()
 
 	// preserve pointer to engineDB. Otherwise, pointer will is recycled and the map of pointers
 	// Map_EngineDBID_EngineDB)[engineDB hold variable pointers
