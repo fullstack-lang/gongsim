@@ -24,7 +24,7 @@
         "./projects/gongsimcontrol/src/public-api.ts"
       ]
     }
-  },
+  ,"skipLibCheck":true},
   "angularCompilerOptions": {
     "fullTemplateTypeCheck": true,
     "strictInjectionParameters": true
