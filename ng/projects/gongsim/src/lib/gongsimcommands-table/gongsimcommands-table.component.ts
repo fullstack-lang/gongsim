@@ -151,7 +151,7 @@ export class GongsimCommandsTableComponent implements OnInit {
       }
     )
     if (this.mode == TableComponentMode.DISPLAY_MODE) {
-      this.displayedColumns = ['ID', 'Edit', 'Delete', // insertion point for columns to display
+      this.displayedColumns = ['ID', 'Delete', // insertion point for columns to display
         "Name",
         "Command",
         "CommandDate",
@@ -248,15 +248,6 @@ export class GongsimCommandsTableComponent implements OnInit {
     this.router.navigate([{
       outlets: {
         github_com_fullstack_lang_gongsim_go_editor: ["github_com_fullstack_lang_gongsim_go-" + "gongsimcommand-detail", gongsimcommandID]
-      }
-    }]);
-  }
-
-  // set presentation outlet
-  setPresentationRouterOutlet(gongsimcommandID: number) {
-    this.router.navigate([{
-      outlets: {
-        github_com_fullstack_lang_gongsim_go_presentation: ["github_com_fullstack_lang_gongsim_go-" + "gongsimcommand-presentation", gongsimcommandID]
       }
     }]);
   }
