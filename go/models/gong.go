@@ -827,21 +827,28 @@ type GongstructMapString interface {
 
 // GongGetSet returns the set staged GongstructType instances
 // it is usefull because it allows refactoring of gong struct identifier
-func GongGetSet[Type GongstructSet]() *Type {
+func GongGetSet[Type GongstructSet](stages ...*StageStruct) *Type {
 	var ret Type
+
+	var stage *StageStruct
+	if len(stages) > 0 {
+		stage = stages[0]
+	} else {
+		stage = &Stage
+	}
 
 	switch any(ret).(type) {
 	// insertion point for generic get functions
 	case map[*DummyAgent]any:
-		return any(&Stage.DummyAgents).(*Type)
+		return any(&stage.DummyAgents).(*Type)
 	case map[*Engine]any:
-		return any(&Stage.Engines).(*Type)
+		return any(&stage.Engines).(*Type)
 	case map[*Event]any:
-		return any(&Stage.Events).(*Type)
+		return any(&stage.Events).(*Type)
 	case map[*GongsimCommand]any:
-		return any(&Stage.GongsimCommands).(*Type)
+		return any(&stage.GongsimCommands).(*Type)
 	case map[*GongsimStatus]any:
-		return any(&Stage.GongsimStatuss).(*Type)
+		return any(&stage.GongsimStatuss).(*Type)
 	default:
 		return nil
 	}
@@ -849,21 +856,28 @@ func GongGetSet[Type GongstructSet]() *Type {
 
 // GongGetMap returns the map of staged GongstructType instances
 // it is usefull because it allows refactoring of gong struct identifier
-func GongGetMap[Type GongstructMapString]() *Type {
+func GongGetMap[Type GongstructMapString](stages ...*StageStruct) *Type {
 	var ret Type
+
+	var stage *StageStruct
+	if len(stages) > 0 {
+		stage = stages[0]
+	} else {
+		stage = &Stage
+	}
 
 	switch any(ret).(type) {
 	// insertion point for generic get functions
 	case map[string]*DummyAgent:
-		return any(&Stage.DummyAgents_mapString).(*Type)
+		return any(&stage.DummyAgents_mapString).(*Type)
 	case map[string]*Engine:
-		return any(&Stage.Engines_mapString).(*Type)
+		return any(&stage.Engines_mapString).(*Type)
 	case map[string]*Event:
-		return any(&Stage.Events_mapString).(*Type)
+		return any(&stage.Events_mapString).(*Type)
 	case map[string]*GongsimCommand:
-		return any(&Stage.GongsimCommands_mapString).(*Type)
+		return any(&stage.GongsimCommands_mapString).(*Type)
 	case map[string]*GongsimStatus:
-		return any(&Stage.GongsimStatuss_mapString).(*Type)
+		return any(&stage.GongsimStatuss_mapString).(*Type)
 	default:
 		return nil
 	}
@@ -871,21 +885,28 @@ func GongGetMap[Type GongstructMapString]() *Type {
 
 // GetGongstructInstancesSet returns the set staged GongstructType instances
 // it is usefull because it allows refactoring of gongstruct identifier
-func GetGongstructInstancesSet[Type Gongstruct]() *map[*Type]any {
+func GetGongstructInstancesSet[Type Gongstruct](stages ...*StageStruct) *map[*Type]any {
 	var ret Type
+
+	var stage *StageStruct
+	if len(stages) > 0 {
+		stage = stages[0]
+	} else {
+		stage = &Stage
+	}
 
 	switch any(ret).(type) {
 	// insertion point for generic get functions
 	case DummyAgent:
-		return any(&Stage.DummyAgents).(*map[*Type]any)
+		return any(&stage.DummyAgents).(*map[*Type]any)
 	case Engine:
-		return any(&Stage.Engines).(*map[*Type]any)
+		return any(&stage.Engines).(*map[*Type]any)
 	case Event:
-		return any(&Stage.Events).(*map[*Type]any)
+		return any(&stage.Events).(*map[*Type]any)
 	case GongsimCommand:
-		return any(&Stage.GongsimCommands).(*map[*Type]any)
+		return any(&stage.GongsimCommands).(*map[*Type]any)
 	case GongsimStatus:
-		return any(&Stage.GongsimStatuss).(*map[*Type]any)
+		return any(&stage.GongsimStatuss).(*map[*Type]any)
 	default:
 		return nil
 	}
@@ -893,21 +914,28 @@ func GetGongstructInstancesSet[Type Gongstruct]() *map[*Type]any {
 
 // GetGongstructInstancesMap returns the map of staged GongstructType instances
 // it is usefull because it allows refactoring of gong struct identifier
-func GetGongstructInstancesMap[Type Gongstruct]() *map[string]*Type {
+func GetGongstructInstancesMap[Type Gongstruct](stages ...*StageStruct) *map[string]*Type {
 	var ret Type
+
+	var stage *StageStruct
+	if len(stages) > 0 {
+		stage = stages[0]
+	} else {
+		stage = &Stage
+	}
 
 	switch any(ret).(type) {
 	// insertion point for generic get functions
 	case DummyAgent:
-		return any(&Stage.DummyAgents_mapString).(*map[string]*Type)
+		return any(&stage.DummyAgents_mapString).(*map[string]*Type)
 	case Engine:
-		return any(&Stage.Engines_mapString).(*map[string]*Type)
+		return any(&stage.Engines_mapString).(*map[string]*Type)
 	case Event:
-		return any(&Stage.Events_mapString).(*map[string]*Type)
+		return any(&stage.Events_mapString).(*map[string]*Type)
 	case GongsimCommand:
-		return any(&Stage.GongsimCommands_mapString).(*map[string]*Type)
+		return any(&stage.GongsimCommands_mapString).(*map[string]*Type)
 	case GongsimStatus:
-		return any(&Stage.GongsimStatuss_mapString).(*map[string]*Type)
+		return any(&stage.GongsimStatuss_mapString).(*map[string]*Type)
 	default:
 		return nil
 	}

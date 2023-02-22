@@ -19,30 +19,30 @@ import { GongsimStatusDetailComponent } from './gongsimstatus-detail/gongsimstat
 
 
 const routes: Routes = [ // insertion point for routes declarations
-	{ path: 'github_com_fullstack_lang_gongsim_go-dummyagents', component: DummyAgentsTableComponent, outlet: 'github_com_fullstack_lang_gongsim_go_table' },
-	{ path: 'github_com_fullstack_lang_gongsim_go-dummyagent-adder', component: DummyAgentDetailComponent, outlet: 'github_com_fullstack_lang_gongsim_go_editor' },
-	{ path: 'github_com_fullstack_lang_gongsim_go-dummyagent-adder/:id/:originStruct/:originStructFieldName', component: DummyAgentDetailComponent, outlet: 'github_com_fullstack_lang_gongsim_go_editor' },
-	{ path: 'github_com_fullstack_lang_gongsim_go-dummyagent-detail/:id', component: DummyAgentDetailComponent, outlet: 'github_com_fullstack_lang_gongsim_go_editor' },
+	{ path: 'github_com_fullstack_lang_gongsim_go-dummyagents/:GONG__StackPath', component: DummyAgentsTableComponent, outlet: 'github_com_fullstack_lang_gongsim_go_table' },
+	{ path: 'github_com_fullstack_lang_gongsim_go-dummyagent-adder/:GONG__StackPath', component: DummyAgentDetailComponent, outlet: 'github_com_fullstack_lang_gongsim_go_editor' },
+	{ path: 'github_com_fullstack_lang_gongsim_go-dummyagent-adder/:id/:originStruct/:originStructFieldName/:GONG__StackPath', component: DummyAgentDetailComponent, outlet: 'github_com_fullstack_lang_gongsim_go_editor' },
+	{ path: 'github_com_fullstack_lang_gongsim_go-dummyagent-detail/:id/:GONG__StackPath', component: DummyAgentDetailComponent, outlet: 'github_com_fullstack_lang_gongsim_go_editor' },
 
-	{ path: 'github_com_fullstack_lang_gongsim_go-engines', component: EnginesTableComponent, outlet: 'github_com_fullstack_lang_gongsim_go_table' },
-	{ path: 'github_com_fullstack_lang_gongsim_go-engine-adder', component: EngineDetailComponent, outlet: 'github_com_fullstack_lang_gongsim_go_editor' },
-	{ path: 'github_com_fullstack_lang_gongsim_go-engine-adder/:id/:originStruct/:originStructFieldName', component: EngineDetailComponent, outlet: 'github_com_fullstack_lang_gongsim_go_editor' },
-	{ path: 'github_com_fullstack_lang_gongsim_go-engine-detail/:id', component: EngineDetailComponent, outlet: 'github_com_fullstack_lang_gongsim_go_editor' },
+	{ path: 'github_com_fullstack_lang_gongsim_go-engines/:GONG__StackPath', component: EnginesTableComponent, outlet: 'github_com_fullstack_lang_gongsim_go_table' },
+	{ path: 'github_com_fullstack_lang_gongsim_go-engine-adder/:GONG__StackPath', component: EngineDetailComponent, outlet: 'github_com_fullstack_lang_gongsim_go_editor' },
+	{ path: 'github_com_fullstack_lang_gongsim_go-engine-adder/:id/:originStruct/:originStructFieldName/:GONG__StackPath', component: EngineDetailComponent, outlet: 'github_com_fullstack_lang_gongsim_go_editor' },
+	{ path: 'github_com_fullstack_lang_gongsim_go-engine-detail/:id/:GONG__StackPath', component: EngineDetailComponent, outlet: 'github_com_fullstack_lang_gongsim_go_editor' },
 
-	{ path: 'github_com_fullstack_lang_gongsim_go-events', component: EventsTableComponent, outlet: 'github_com_fullstack_lang_gongsim_go_table' },
-	{ path: 'github_com_fullstack_lang_gongsim_go-event-adder', component: EventDetailComponent, outlet: 'github_com_fullstack_lang_gongsim_go_editor' },
-	{ path: 'github_com_fullstack_lang_gongsim_go-event-adder/:id/:originStruct/:originStructFieldName', component: EventDetailComponent, outlet: 'github_com_fullstack_lang_gongsim_go_editor' },
-	{ path: 'github_com_fullstack_lang_gongsim_go-event-detail/:id', component: EventDetailComponent, outlet: 'github_com_fullstack_lang_gongsim_go_editor' },
+	{ path: 'github_com_fullstack_lang_gongsim_go-events/:GONG__StackPath', component: EventsTableComponent, outlet: 'github_com_fullstack_lang_gongsim_go_table' },
+	{ path: 'github_com_fullstack_lang_gongsim_go-event-adder/:GONG__StackPath', component: EventDetailComponent, outlet: 'github_com_fullstack_lang_gongsim_go_editor' },
+	{ path: 'github_com_fullstack_lang_gongsim_go-event-adder/:id/:originStruct/:originStructFieldName/:GONG__StackPath', component: EventDetailComponent, outlet: 'github_com_fullstack_lang_gongsim_go_editor' },
+	{ path: 'github_com_fullstack_lang_gongsim_go-event-detail/:id/:GONG__StackPath', component: EventDetailComponent, outlet: 'github_com_fullstack_lang_gongsim_go_editor' },
 
-	{ path: 'github_com_fullstack_lang_gongsim_go-gongsimcommands', component: GongsimCommandsTableComponent, outlet: 'github_com_fullstack_lang_gongsim_go_table' },
-	{ path: 'github_com_fullstack_lang_gongsim_go-gongsimcommand-adder', component: GongsimCommandDetailComponent, outlet: 'github_com_fullstack_lang_gongsim_go_editor' },
-	{ path: 'github_com_fullstack_lang_gongsim_go-gongsimcommand-adder/:id/:originStruct/:originStructFieldName', component: GongsimCommandDetailComponent, outlet: 'github_com_fullstack_lang_gongsim_go_editor' },
-	{ path: 'github_com_fullstack_lang_gongsim_go-gongsimcommand-detail/:id', component: GongsimCommandDetailComponent, outlet: 'github_com_fullstack_lang_gongsim_go_editor' },
+	{ path: 'github_com_fullstack_lang_gongsim_go-gongsimcommands/:GONG__StackPath', component: GongsimCommandsTableComponent, outlet: 'github_com_fullstack_lang_gongsim_go_table' },
+	{ path: 'github_com_fullstack_lang_gongsim_go-gongsimcommand-adder/:GONG__StackPath', component: GongsimCommandDetailComponent, outlet: 'github_com_fullstack_lang_gongsim_go_editor' },
+	{ path: 'github_com_fullstack_lang_gongsim_go-gongsimcommand-adder/:id/:originStruct/:originStructFieldName/:GONG__StackPath', component: GongsimCommandDetailComponent, outlet: 'github_com_fullstack_lang_gongsim_go_editor' },
+	{ path: 'github_com_fullstack_lang_gongsim_go-gongsimcommand-detail/:id/:GONG__StackPath', component: GongsimCommandDetailComponent, outlet: 'github_com_fullstack_lang_gongsim_go_editor' },
 
-	{ path: 'github_com_fullstack_lang_gongsim_go-gongsimstatuss', component: GongsimStatussTableComponent, outlet: 'github_com_fullstack_lang_gongsim_go_table' },
-	{ path: 'github_com_fullstack_lang_gongsim_go-gongsimstatus-adder', component: GongsimStatusDetailComponent, outlet: 'github_com_fullstack_lang_gongsim_go_editor' },
-	{ path: 'github_com_fullstack_lang_gongsim_go-gongsimstatus-adder/:id/:originStruct/:originStructFieldName', component: GongsimStatusDetailComponent, outlet: 'github_com_fullstack_lang_gongsim_go_editor' },
-	{ path: 'github_com_fullstack_lang_gongsim_go-gongsimstatus-detail/:id', component: GongsimStatusDetailComponent, outlet: 'github_com_fullstack_lang_gongsim_go_editor' },
+	{ path: 'github_com_fullstack_lang_gongsim_go-gongsimstatuss/:GONG__StackPath', component: GongsimStatussTableComponent, outlet: 'github_com_fullstack_lang_gongsim_go_table' },
+	{ path: 'github_com_fullstack_lang_gongsim_go-gongsimstatus-adder/:GONG__StackPath', component: GongsimStatusDetailComponent, outlet: 'github_com_fullstack_lang_gongsim_go_editor' },
+	{ path: 'github_com_fullstack_lang_gongsim_go-gongsimstatus-adder/:id/:originStruct/:originStructFieldName/:GONG__StackPath', component: GongsimStatusDetailComponent, outlet: 'github_com_fullstack_lang_gongsim_go_editor' },
+	{ path: 'github_com_fullstack_lang_gongsim_go-gongsimstatus-detail/:id/:GONG__StackPath', component: GongsimStatusDetailComponent, outlet: 'github_com_fullstack_lang_gongsim_go_editor' },
 
 ];
 

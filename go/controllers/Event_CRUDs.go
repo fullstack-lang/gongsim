@@ -52,6 +52,19 @@ func GetEvents(c *gin.Context) {
 
 	// source slice
 	var eventDBs []orm.EventDB
+
+	// type Values map[string][]string
+	values := c.Request.URL.Query()
+	if len(values) == 1 {
+		value := values["GONG__StackPath"]
+		if len(value) == 1 {
+			// we have a single parameter
+			// we assume it is the stack
+			stackParam := value[0]
+			log.Println("GONG__StackPath", stackParam)
+		}
+	}
+
 	query := db.Find(&eventDBs)
 	if query.Error != nil {
 		var returnError GenericError
@@ -96,7 +109,6 @@ func GetEvents(c *gin.Context) {
 //	Responses:
 //	  200: nodeDBResponse
 func PostEvent(c *gin.Context) {
-	db := orm.BackRepo.BackRepoEvent.GetDB()
 
 	// Validate input
 	var input orm.EventAPI
@@ -116,6 +128,7 @@ func PostEvent(c *gin.Context) {
 	eventDB.EventPointersEnconding = input.EventPointersEnconding
 	eventDB.CopyBasicFieldsFromEvent(&input.Event)
 
+	db := orm.BackRepo.BackRepoEvent.GetDB()
 	query := db.Create(&eventDB)
 	if query.Error != nil {
 		var returnError GenericError
@@ -152,6 +165,19 @@ func PostEvent(c *gin.Context) {
 //
 //	200: eventDBResponse
 func GetEvent(c *gin.Context) {
+
+	// type Values map[string][]string
+	values := c.Request.URL.Query()
+	if len(values) == 1 {
+		value := values["stack"]
+		if len(value) == 1 {
+			// we have a single parameter
+			// we assume it is the stack
+			stackParam := value[0]
+			log.Println("GET params", stackParam)
+		}
+	}
+
 	db := orm.BackRepo.BackRepoEvent.GetDB()
 
 	// Get eventDB in DB
@@ -184,6 +210,15 @@ func GetEvent(c *gin.Context) {
 //
 //	200: eventDBResponse
 func UpdateEvent(c *gin.Context) {
+
+	// Validate input
+	var input orm.EventAPI
+	if err := c.ShouldBindJSON(&input); err != nil {
+		log.Println(err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
 	db := orm.BackRepo.BackRepoEvent.GetDB()
 
 	// Get model if exist
@@ -198,14 +233,6 @@ func UpdateEvent(c *gin.Context) {
 		returnError.Body.Message = query.Error.Error()
 		log.Println(query.Error.Error())
 		c.JSON(http.StatusBadRequest, returnError.Body)
-		return
-	}
-
-	// Validate input
-	var input orm.EventAPI
-	if err := c.ShouldBindJSON(&input); err != nil {
-		log.Println(err.Error())
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 

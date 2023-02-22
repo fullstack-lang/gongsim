@@ -52,6 +52,19 @@ func GetDummyAgents(c *gin.Context) {
 
 	// source slice
 	var dummyagentDBs []orm.DummyAgentDB
+
+	// type Values map[string][]string
+	values := c.Request.URL.Query()
+	if len(values) == 1 {
+		value := values["GONG__StackPath"]
+		if len(value) == 1 {
+			// we have a single parameter
+			// we assume it is the stack
+			stackParam := value[0]
+			log.Println("GONG__StackPath", stackParam)
+		}
+	}
+
 	query := db.Find(&dummyagentDBs)
 	if query.Error != nil {
 		var returnError GenericError
@@ -96,7 +109,6 @@ func GetDummyAgents(c *gin.Context) {
 //	Responses:
 //	  200: nodeDBResponse
 func PostDummyAgent(c *gin.Context) {
-	db := orm.BackRepo.BackRepoDummyAgent.GetDB()
 
 	// Validate input
 	var input orm.DummyAgentAPI
@@ -116,6 +128,7 @@ func PostDummyAgent(c *gin.Context) {
 	dummyagentDB.DummyAgentPointersEnconding = input.DummyAgentPointersEnconding
 	dummyagentDB.CopyBasicFieldsFromDummyAgent(&input.DummyAgent)
 
+	db := orm.BackRepo.BackRepoDummyAgent.GetDB()
 	query := db.Create(&dummyagentDB)
 	if query.Error != nil {
 		var returnError GenericError
@@ -152,6 +165,19 @@ func PostDummyAgent(c *gin.Context) {
 //
 //	200: dummyagentDBResponse
 func GetDummyAgent(c *gin.Context) {
+
+	// type Values map[string][]string
+	values := c.Request.URL.Query()
+	if len(values) == 1 {
+		value := values["stack"]
+		if len(value) == 1 {
+			// we have a single parameter
+			// we assume it is the stack
+			stackParam := value[0]
+			log.Println("GET params", stackParam)
+		}
+	}
+
 	db := orm.BackRepo.BackRepoDummyAgent.GetDB()
 
 	// Get dummyagentDB in DB
@@ -184,6 +210,15 @@ func GetDummyAgent(c *gin.Context) {
 //
 //	200: dummyagentDBResponse
 func UpdateDummyAgent(c *gin.Context) {
+
+	// Validate input
+	var input orm.DummyAgentAPI
+	if err := c.ShouldBindJSON(&input); err != nil {
+		log.Println(err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
 	db := orm.BackRepo.BackRepoDummyAgent.GetDB()
 
 	// Get model if exist
@@ -198,14 +233,6 @@ func UpdateDummyAgent(c *gin.Context) {
 		returnError.Body.Message = query.Error.Error()
 		log.Println(query.Error.Error())
 		c.JSON(http.StatusBadRequest, returnError.Body)
-		return
-	}
-
-	// Validate input
-	var input orm.DummyAgentAPI
-	if err := c.ShouldBindJSON(&input); err != nil {
-		log.Println(err.Error())
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
