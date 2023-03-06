@@ -158,13 +158,13 @@ export class GongsimCommandDetailComponent implements OnInit {
 
 		switch (this.state) {
 			case GongsimCommandDetailComponentState.UPDATE_INSTANCE:
-				this.gongsimcommandService.updateGongsimCommand(this.gongsimcommand)
+				this.gongsimcommandService.updateGongsimCommand(this.gongsimcommand, this.GONG__StackPath)
 					.subscribe(gongsimcommand => {
 						this.gongsimcommandService.GongsimCommandServiceChanged.next("update")
 					});
 				break;
 			default:
-				this.gongsimcommandService.postGongsimCommand(this.gongsimcommand).subscribe(gongsimcommand => {
+				this.gongsimcommandService.postGongsimCommand(this.gongsimcommand, this.GONG__StackPath).subscribe(gongsimcommand => {
 					this.gongsimcommandService.GongsimCommandServiceChanged.next("post")
 					this.gongsimcommand = new (GongsimCommandDB) // reset fields
 				});

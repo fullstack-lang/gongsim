@@ -100,7 +100,7 @@ export class EventSortingComponent implements OnInit {
 
     this.associatedEvents.forEach(
       event => {
-        this.eventService.updateEvent(event)
+        this.eventService.updateEvent(event, this.dialogData.GONG__StackPath)
           .subscribe(event => {
             this.eventService.EventServiceChanged.next("update")
           });

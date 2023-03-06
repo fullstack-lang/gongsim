@@ -152,13 +152,13 @@ export class DummyAgentDetailComponent implements OnInit {
 
 		switch (this.state) {
 			case DummyAgentDetailComponentState.UPDATE_INSTANCE:
-				this.dummyagentService.updateDummyAgent(this.dummyagent)
+				this.dummyagentService.updateDummyAgent(this.dummyagent, this.GONG__StackPath)
 					.subscribe(dummyagent => {
 						this.dummyagentService.DummyAgentServiceChanged.next("update")
 					});
 				break;
 			default:
-				this.dummyagentService.postDummyAgent(this.dummyagent).subscribe(dummyagent => {
+				this.dummyagentService.postDummyAgent(this.dummyagent, this.GONG__StackPath).subscribe(dummyagent => {
 					this.dummyagentService.DummyAgentServiceChanged.next("post")
 					this.dummyagent = new (DummyAgentDB) // reset fields
 				});

@@ -20,10 +20,6 @@ import { DummyAgentDB } from './dummyagent-db';
 })
 export class DummyAgentService {
 
-  httpOptions = {
-    headers: new HttpHeaders({ 'Content-Type': 'application/json' })
-  };
-
   // Kamar Raïmo: Adding a way to communicate between components that share information
   // so that they are notified of a change.
   DummyAgentServiceChanged: BehaviorSubject<string> = new BehaviorSubject("");
@@ -32,7 +28,6 @@ export class DummyAgentService {
 
   constructor(
     private http: HttpClient,
-    private location: Location,
     @Inject(DOCUMENT) private document: Document
   ) {
     // path to the service share the same origin with the path to the document
@@ -67,14 +62,18 @@ export class DummyAgentService {
     );
   }
 
-  //////// Save methods //////////
-
   /** POST: add a new dummyagent to the server */
-  postDummyAgent(dummyagentdb: DummyAgentDB): Observable<DummyAgentDB> {
+  postDummyAgent(dummyagentdb: DummyAgentDB, GONG__StackPath: string): Observable<DummyAgentDB> {
 
     // insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
 
-    return this.http.post<DummyAgentDB>(this.dummyagentsUrl, dummyagentdb, this.httpOptions).pipe(
+    let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
+    let httpOptions = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+      params: params
+    }
+
+	return this.http.post<DummyAgentDB>(this.dummyagentsUrl, dummyagentdb, httpOptions).pipe(
       tap(_ => {
         // insertion point for restoration of reverse pointers
         this.log(`posted dummyagentdb id=${dummyagentdb.ID}`)
@@ -84,24 +83,36 @@ export class DummyAgentService {
   }
 
   /** DELETE: delete the dummyagentdb from the server */
-  deleteDummyAgent(dummyagentdb: DummyAgentDB | number): Observable<DummyAgentDB> {
+  deleteDummyAgent(dummyagentdb: DummyAgentDB | number, GONG__StackPath: string): Observable<DummyAgentDB> {
     const id = typeof dummyagentdb === 'number' ? dummyagentdb : dummyagentdb.ID;
     const url = `${this.dummyagentsUrl}/${id}`;
 
-    return this.http.delete<DummyAgentDB>(url, this.httpOptions).pipe(
+    let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
+    let httpOptions = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+      params: params
+    };
+
+    return this.http.delete<DummyAgentDB>(url, httpOptions).pipe(
       tap(_ => this.log(`deleted dummyagentdb id=${id}`)),
       catchError(this.handleError<DummyAgentDB>('deleteDummyAgent'))
     );
   }
 
   /** PUT: update the dummyagentdb on the server */
-  updateDummyAgent(dummyagentdb: DummyAgentDB): Observable<DummyAgentDB> {
+  updateDummyAgent(dummyagentdb: DummyAgentDB, GONG__StackPath: string): Observable<DummyAgentDB> {
     const id = typeof dummyagentdb === 'number' ? dummyagentdb : dummyagentdb.ID;
     const url = `${this.dummyagentsUrl}/${id}`;
 
     // insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
 
-    return this.http.put<DummyAgentDB>(url, dummyagentdb, this.httpOptions).pipe(
+    let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
+    let httpOptions = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+      params: params
+    };
+
+    return this.http.put<DummyAgentDB>(url, dummyagentdb, httpOptions).pipe(
       tap(_ => {
         // insertion point for restoration of reverse pointers
         this.log(`updated dummyagentdb id=${dummyagentdb.ID}`)

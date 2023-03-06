@@ -20,10 +20,6 @@ import { EventDB } from './event-db';
 })
 export class EventService {
 
-  httpOptions = {
-    headers: new HttpHeaders({ 'Content-Type': 'application/json' })
-  };
-
   // Kamar Raïmo: Adding a way to communicate between components that share information
   // so that they are notified of a change.
   EventServiceChanged: BehaviorSubject<string> = new BehaviorSubject("");
@@ -32,7 +28,6 @@ export class EventService {
 
   constructor(
     private http: HttpClient,
-    private location: Location,
     @Inject(DOCUMENT) private document: Document
   ) {
     // path to the service share the same origin with the path to the document
@@ -67,14 +62,18 @@ export class EventService {
     );
   }
 
-  //////// Save methods //////////
-
   /** POST: add a new event to the server */
-  postEvent(eventdb: EventDB): Observable<EventDB> {
+  postEvent(eventdb: EventDB, GONG__StackPath: string): Observable<EventDB> {
 
     // insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
 
-    return this.http.post<EventDB>(this.eventsUrl, eventdb, this.httpOptions).pipe(
+    let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
+    let httpOptions = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+      params: params
+    }
+
+	return this.http.post<EventDB>(this.eventsUrl, eventdb, httpOptions).pipe(
       tap(_ => {
         // insertion point for restoration of reverse pointers
         this.log(`posted eventdb id=${eventdb.ID}`)
@@ -84,24 +83,36 @@ export class EventService {
   }
 
   /** DELETE: delete the eventdb from the server */
-  deleteEvent(eventdb: EventDB | number): Observable<EventDB> {
+  deleteEvent(eventdb: EventDB | number, GONG__StackPath: string): Observable<EventDB> {
     const id = typeof eventdb === 'number' ? eventdb : eventdb.ID;
     const url = `${this.eventsUrl}/${id}`;
 
-    return this.http.delete<EventDB>(url, this.httpOptions).pipe(
+    let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
+    let httpOptions = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+      params: params
+    };
+
+    return this.http.delete<EventDB>(url, httpOptions).pipe(
       tap(_ => this.log(`deleted eventdb id=${id}`)),
       catchError(this.handleError<EventDB>('deleteEvent'))
     );
   }
 
   /** PUT: update the eventdb on the server */
-  updateEvent(eventdb: EventDB): Observable<EventDB> {
+  updateEvent(eventdb: EventDB, GONG__StackPath: string): Observable<EventDB> {
     const id = typeof eventdb === 'number' ? eventdb : eventdb.ID;
     const url = `${this.eventsUrl}/${id}`;
 
     // insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
 
-    return this.http.put<EventDB>(url, eventdb, this.httpOptions).pipe(
+    let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
+    let httpOptions = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+      params: params
+    };
+
+    return this.http.put<EventDB>(url, eventdb, httpOptions).pipe(
       tap(_ => {
         // insertion point for restoration of reverse pointers
         this.log(`updated eventdb id=${eventdb.ID}`)

@@ -158,13 +158,13 @@ export class EngineDetailComponent implements OnInit {
 
 		switch (this.state) {
 			case EngineDetailComponentState.UPDATE_INSTANCE:
-				this.engineService.updateEngine(this.engine)
+				this.engineService.updateEngine(this.engine, this.GONG__StackPath)
 					.subscribe(engine => {
 						this.engineService.EngineServiceChanged.next("update")
 					});
 				break;
 			default:
-				this.engineService.postEngine(this.engine).subscribe(engine => {
+				this.engineService.postEngine(this.engine, this.GONG__StackPath).subscribe(engine => {
 					this.engineService.EngineServiceChanged.next("post")
 					this.engine = new (EngineDB) // reset fields
 				});

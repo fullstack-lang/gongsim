@@ -177,7 +177,7 @@ export class GongsimCommandsTableComponent implements OnInit {
 
   ngOnInit(): void {
     let stackPath = this.activatedRoute.snapshot.paramMap.get('GONG__StackPath')
-    if ( stackPath != undefined) {
+    if (stackPath != undefined) {
       this.GONG__StackPath = stackPath
     }
 
@@ -213,10 +213,14 @@ export class GongsimCommandsTableComponent implements OnInit {
           let mapOfSourceInstances = this.frontRepo[this.dialogData.SourceStruct + "s" as keyof FrontRepo] as Map<number, GongsimCommandDB>
           let sourceInstance = mapOfSourceInstances.get(this.dialogData.ID)!
 
-          let sourceField = sourceInstance[this.dialogData.SourceField as keyof typeof sourceInstance]! as unknown as GongsimCommandDB[]
-          for (let associationInstance of sourceField) {
-            let gongsimcommand = associationInstance[this.dialogData.IntermediateStructField as keyof typeof associationInstance] as unknown as GongsimCommandDB
-            this.initialSelection.push(gongsimcommand)
+          // we associates on sourceInstance of type SourceStruct with a MANY MANY associations to GongsimCommandDB
+          // the field name is sourceField
+          let sourceFieldArray = sourceInstance[this.dialogData.SourceField as keyof typeof sourceInstance]! as unknown as GongsimCommandDB[]
+          if (sourceFieldArray != null) {
+            for (let associationInstance of sourceFieldArray) {
+              let gongsimcommand = associationInstance[this.dialogData.IntermediateStructField as keyof typeof associationInstance] as unknown as GongsimCommandDB
+              this.initialSelection.push(gongsimcommand)
+            }
           }
 
           this.selection = new SelectionModel<GongsimCommandDB>(allowMultiSelect, this.initialSelection);
@@ -237,7 +241,7 @@ export class GongsimCommandsTableComponent implements OnInit {
     // list of gongsimcommands is truncated of gongsimcommand before the delete
     this.gongsimcommands = this.gongsimcommands.filter(h => h !== gongsimcommand);
 
-    this.gongsimcommandService.deleteGongsimCommand(gongsimcommandID).subscribe(
+    this.gongsimcommandService.deleteGongsimCommand(gongsimcommandID, this.GONG__StackPath).subscribe(
       gongsimcommand => {
         this.gongsimcommandService.GongsimCommandServiceChanged.next("delete")
       }
@@ -303,7 +307,7 @@ export class GongsimCommandsTableComponent implements OnInit {
 
       // update all gongsimcommand (only update selection & initial selection)
       for (let gongsimcommand of toUpdate) {
-        this.gongsimcommandService.updateGongsimCommand(gongsimcommand)
+        this.gongsimcommandService.updateGongsimCommand(gongsimcommand, this.GONG__StackPath)
           .subscribe(gongsimcommand => {
             this.gongsimcommandService.GongsimCommandServiceChanged.next("update")
           });

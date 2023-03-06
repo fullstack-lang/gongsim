@@ -177,7 +177,7 @@ export class GongsimStatussTableComponent implements OnInit {
 
   ngOnInit(): void {
     let stackPath = this.activatedRoute.snapshot.paramMap.get('GONG__StackPath')
-    if ( stackPath != undefined) {
+    if (stackPath != undefined) {
       this.GONG__StackPath = stackPath
     }
 
@@ -213,10 +213,14 @@ export class GongsimStatussTableComponent implements OnInit {
           let mapOfSourceInstances = this.frontRepo[this.dialogData.SourceStruct + "s" as keyof FrontRepo] as Map<number, GongsimStatusDB>
           let sourceInstance = mapOfSourceInstances.get(this.dialogData.ID)!
 
-          let sourceField = sourceInstance[this.dialogData.SourceField as keyof typeof sourceInstance]! as unknown as GongsimStatusDB[]
-          for (let associationInstance of sourceField) {
-            let gongsimstatus = associationInstance[this.dialogData.IntermediateStructField as keyof typeof associationInstance] as unknown as GongsimStatusDB
-            this.initialSelection.push(gongsimstatus)
+          // we associates on sourceInstance of type SourceStruct with a MANY MANY associations to GongsimStatusDB
+          // the field name is sourceField
+          let sourceFieldArray = sourceInstance[this.dialogData.SourceField as keyof typeof sourceInstance]! as unknown as GongsimStatusDB[]
+          if (sourceFieldArray != null) {
+            for (let associationInstance of sourceFieldArray) {
+              let gongsimstatus = associationInstance[this.dialogData.IntermediateStructField as keyof typeof associationInstance] as unknown as GongsimStatusDB
+              this.initialSelection.push(gongsimstatus)
+            }
           }
 
           this.selection = new SelectionModel<GongsimStatusDB>(allowMultiSelect, this.initialSelection);
@@ -237,7 +241,7 @@ export class GongsimStatussTableComponent implements OnInit {
     // list of gongsimstatuss is truncated of gongsimstatus before the delete
     this.gongsimstatuss = this.gongsimstatuss.filter(h => h !== gongsimstatus);
 
-    this.gongsimstatusService.deleteGongsimStatus(gongsimstatusID).subscribe(
+    this.gongsimstatusService.deleteGongsimStatus(gongsimstatusID, this.GONG__StackPath).subscribe(
       gongsimstatus => {
         this.gongsimstatusService.GongsimStatusServiceChanged.next("delete")
       }
@@ -303,7 +307,7 @@ export class GongsimStatussTableComponent implements OnInit {
 
       // update all gongsimstatus (only update selection & initial selection)
       for (let gongsimstatus of toUpdate) {
-        this.gongsimstatusService.updateGongsimStatus(gongsimstatus)
+        this.gongsimstatusService.updateGongsimStatus(gongsimstatus, this.GONG__StackPath)
           .subscribe(gongsimstatus => {
             this.gongsimstatusService.GongsimStatusServiceChanged.next("update")
           });

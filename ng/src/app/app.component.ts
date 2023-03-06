@@ -12,6 +12,17 @@ import { Body } from './body';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
+
+  view = 'Default view'
+  default = 'Default view'
+  diagrams = 'Diagrams view'
+  meta = 'Meta view'
+  sim = "Sim view"
+
+  views: string[] = [this.sim, this.default, this.diagrams, this.meta];
+
+
+
   @ViewChild('canvas', { static: true }) canvas?: ElementRef<HTMLCanvasElement>;
   // ctx: CanvasRenderingContext2D = new CanvasRenderingContext2D()
   requestId = 0

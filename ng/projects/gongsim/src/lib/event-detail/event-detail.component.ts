@@ -163,13 +163,13 @@ export class EventDetailComponent implements OnInit {
 
 		switch (this.state) {
 			case EventDetailComponentState.UPDATE_INSTANCE:
-				this.eventService.updateEvent(this.event)
+				this.eventService.updateEvent(this.event, this.GONG__StackPath)
 					.subscribe(event => {
 						this.eventService.EventServiceChanged.next("update")
 					});
 				break;
 			default:
-				this.eventService.postEvent(this.event).subscribe(event => {
+				this.eventService.postEvent(this.event, this.GONG__StackPath).subscribe(event => {
 					this.eventService.EventServiceChanged.next("post")
 					this.event = new (EventDB) // reset fields
 				});

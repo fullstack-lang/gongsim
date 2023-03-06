@@ -47,23 +47,22 @@ type GongsimCommandInput struct {
 // default: genericError
 //
 //	200: gongsimcommandDBResponse
-func GetGongsimCommands(c *gin.Context) {
-	db := orm.BackRepo.BackRepoGongsimCommand.GetDB()
+func (controller *Controller) GetGongsimCommands(c *gin.Context) {
 
 	// source slice
 	var gongsimcommandDBs []orm.GongsimCommandDB
 
-	// type Values map[string][]string
 	values := c.Request.URL.Query()
+	stackPath := ""
 	if len(values) == 1 {
 		value := values["GONG__StackPath"]
 		if len(value) == 1 {
-			// we have a single parameter
-			// we assume it is the stack
-			stackParam := value[0]
-			log.Println("GONG__StackPath", stackParam)
+			stackPath = value[0]
+			log.Println("GetGongsimCommands", "GONG__StackPath", stackPath)
 		}
 	}
+	backRepo := controller.Map_BackRepos[stackPath]
+	db := backRepo.BackRepoGongsimCommand.GetDB()
 
 	query := db.Find(&gongsimcommandDBs)
 	if query.Error != nil {
@@ -108,7 +107,19 @@ func GetGongsimCommands(c *gin.Context) {
 //
 //	Responses:
 //	  200: nodeDBResponse
-func PostGongsimCommand(c *gin.Context) {
+func (controller *Controller) PostGongsimCommand(c *gin.Context) {
+
+	values := c.Request.URL.Query()
+	stackPath := ""
+	if len(values) == 1 {
+		value := values["GONG__StackPath"]
+		if len(value) == 1 {
+			stackPath = value[0]
+			log.Println("PostGongsimCommands", "GONG__StackPath", stackPath)
+		}
+	}
+	backRepo := controller.Map_BackRepos[stackPath]
+	db := backRepo.BackRepoGongsimCommand.GetDB()
 
 	// Validate input
 	var input orm.GongsimCommandAPI
@@ -128,7 +139,6 @@ func PostGongsimCommand(c *gin.Context) {
 	gongsimcommandDB.GongsimCommandPointersEnconding = input.GongsimCommandPointersEnconding
 	gongsimcommandDB.CopyBasicFieldsFromGongsimCommand(&input.GongsimCommand)
 
-	db := orm.BackRepo.BackRepoGongsimCommand.GetDB()
 	query := db.Create(&gongsimcommandDB)
 	if query.Error != nil {
 		var returnError GenericError
@@ -140,16 +150,16 @@ func PostGongsimCommand(c *gin.Context) {
 	}
 
 	// get an instance (not staged) from DB instance, and call callback function
-	orm.BackRepo.BackRepoGongsimCommand.CheckoutPhaseOneInstance(&gongsimcommandDB)
-	gongsimcommand := (*orm.BackRepo.BackRepoGongsimCommand.Map_GongsimCommandDBID_GongsimCommandPtr)[gongsimcommandDB.ID]
+	backRepo.BackRepoGongsimCommand.CheckoutPhaseOneInstance(&gongsimcommandDB)
+	gongsimcommand := (*backRepo.BackRepoGongsimCommand.Map_GongsimCommandDBID_GongsimCommandPtr)[gongsimcommandDB.ID]
 
 	if gongsimcommand != nil {
-		models.AfterCreateFromFront(&models.Stage, gongsimcommand)
+		models.AfterCreateFromFront(backRepo.GetStage(), gongsimcommand)
 	}
 
 	// a POST is equivalent to a back repo commit increase
 	// (this will be improved with implementation of unit of work design pattern)
-	orm.BackRepo.IncrementPushFromFrontNb()
+	backRepo.IncrementPushFromFrontNb()
 
 	c.JSON(http.StatusOK, gongsimcommandDB)
 }
@@ -164,21 +174,19 @@ func PostGongsimCommand(c *gin.Context) {
 // default: genericError
 //
 //	200: gongsimcommandDBResponse
-func GetGongsimCommand(c *gin.Context) {
+func (controller *Controller) GetGongsimCommand(c *gin.Context) {
 
-	// type Values map[string][]string
 	values := c.Request.URL.Query()
+	stackPath := ""
 	if len(values) == 1 {
-		value := values["stack"]
+		value := values["GONG__StackPath"]
 		if len(value) == 1 {
-			// we have a single parameter
-			// we assume it is the stack
-			stackParam := value[0]
-			log.Println("GET params", stackParam)
+			stackPath = value[0]
+			log.Println("GetGongsimCommand", "GONG__StackPath", stackPath)
 		}
 	}
-
-	db := orm.BackRepo.BackRepoGongsimCommand.GetDB()
+	backRepo := controller.Map_BackRepos[stackPath]
+	db := backRepo.BackRepoGongsimCommand.GetDB()
 
 	// Get gongsimcommandDB in DB
 	var gongsimcommandDB orm.GongsimCommandDB
@@ -209,7 +217,19 @@ func GetGongsimCommand(c *gin.Context) {
 // default: genericError
 //
 //	200: gongsimcommandDBResponse
-func UpdateGongsimCommand(c *gin.Context) {
+func (controller *Controller) UpdateGongsimCommand(c *gin.Context) {
+
+	values := c.Request.URL.Query()
+	stackPath := ""
+	if len(values) == 1 {
+		value := values["GONG__StackPath"]
+		if len(value) == 1 {
+			stackPath = value[0]
+			log.Println("UpdateGongsimCommand", "GONG__StackPath", stackPath)
+		}
+	}
+	backRepo := controller.Map_BackRepos[stackPath]
+	db := backRepo.BackRepoGongsimCommand.GetDB()
 
 	// Validate input
 	var input orm.GongsimCommandAPI
@@ -218,8 +238,6 @@ func UpdateGongsimCommand(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
-	db := orm.BackRepo.BackRepoGongsimCommand.GetDB()
 
 	// Get model if exist
 	var gongsimcommandDB orm.GongsimCommandDB
@@ -255,16 +273,16 @@ func UpdateGongsimCommand(c *gin.Context) {
 	gongsimcommandDB.CopyBasicFieldsToGongsimCommand(gongsimcommandNew)
 
 	// get stage instance from DB instance, and call callback function
-	gongsimcommandOld := (*orm.BackRepo.BackRepoGongsimCommand.Map_GongsimCommandDBID_GongsimCommandPtr)[gongsimcommandDB.ID]
+	gongsimcommandOld := (*backRepo.BackRepoGongsimCommand.Map_GongsimCommandDBID_GongsimCommandPtr)[gongsimcommandDB.ID]
 	if gongsimcommandOld != nil {
-		models.AfterUpdateFromFront(&models.Stage, gongsimcommandOld, gongsimcommandNew)
+		models.AfterUpdateFromFront(backRepo.GetStage(), gongsimcommandOld, gongsimcommandNew)
 	}
 
 	// an UPDATE generates a back repo commit increase
 	// (this will be improved with implementation of unit of work design pattern)
 	// in some cases, with the marshalling of the stage, this operation might
 	// generates a checkout
-	orm.BackRepo.IncrementPushFromFrontNb()
+	backRepo.IncrementPushFromFrontNb()
 
 	// return status OK with the marshalling of the the gongsimcommandDB
 	c.JSON(http.StatusOK, gongsimcommandDB)
@@ -279,8 +297,19 @@ func UpdateGongsimCommand(c *gin.Context) {
 // default: genericError
 //
 //	200: gongsimcommandDBResponse
-func DeleteGongsimCommand(c *gin.Context) {
-	db := orm.BackRepo.BackRepoGongsimCommand.GetDB()
+func (controller *Controller) DeleteGongsimCommand(c *gin.Context) {
+
+	values := c.Request.URL.Query()
+	stackPath := ""
+	if len(values) == 1 {
+		value := values["GONG__StackPath"]
+		if len(value) == 1 {
+			stackPath = value[0]
+			log.Println("DeleteGongsimCommand", "GONG__StackPath", stackPath)
+		}
+	}
+	backRepo := controller.Map_BackRepos[stackPath]
+	db := backRepo.BackRepoGongsimCommand.GetDB()
 
 	// Get model if exist
 	var gongsimcommandDB orm.GongsimCommandDB
@@ -301,14 +330,14 @@ func DeleteGongsimCommand(c *gin.Context) {
 	gongsimcommandDB.CopyBasicFieldsToGongsimCommand(gongsimcommandDeleted)
 
 	// get stage instance from DB instance, and call callback function
-	gongsimcommandStaged := (*orm.BackRepo.BackRepoGongsimCommand.Map_GongsimCommandDBID_GongsimCommandPtr)[gongsimcommandDB.ID]
+	gongsimcommandStaged := (*backRepo.BackRepoGongsimCommand.Map_GongsimCommandDBID_GongsimCommandPtr)[gongsimcommandDB.ID]
 	if gongsimcommandStaged != nil {
-		models.AfterDeleteFromFront(&models.Stage, gongsimcommandStaged, gongsimcommandDeleted)
+		models.AfterDeleteFromFront(backRepo.GetStage(), gongsimcommandStaged, gongsimcommandDeleted)
 	}
 
 	// a DELETE generates a back repo commit increase
 	// (this will be improved with implementation of unit of work design pattern)
-	orm.BackRepo.IncrementPushFromFrontNb()
+	backRepo.IncrementPushFromFrontNb()
 
 	c.JSON(http.StatusOK, gin.H{"data": true})
 }

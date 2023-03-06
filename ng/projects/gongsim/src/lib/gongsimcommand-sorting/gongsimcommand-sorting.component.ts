@@ -100,7 +100,7 @@ export class GongsimCommandSortingComponent implements OnInit {
 
     this.associatedGongsimCommands.forEach(
       gongsimcommand => {
-        this.gongsimcommandService.updateGongsimCommand(gongsimcommand)
+        this.gongsimcommandService.updateGongsimCommand(gongsimcommand, this.dialogData.GONG__StackPath)
           .subscribe(gongsimcommand => {
             this.gongsimcommandService.GongsimCommandServiceChanged.next("update")
           });

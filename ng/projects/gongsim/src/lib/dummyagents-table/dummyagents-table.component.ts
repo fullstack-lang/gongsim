@@ -159,7 +159,7 @@ export class DummyAgentsTableComponent implements OnInit {
 
   ngOnInit(): void {
     let stackPath = this.activatedRoute.snapshot.paramMap.get('GONG__StackPath')
-    if ( stackPath != undefined) {
+    if (stackPath != undefined) {
       this.GONG__StackPath = stackPath
     }
 
@@ -195,10 +195,14 @@ export class DummyAgentsTableComponent implements OnInit {
           let mapOfSourceInstances = this.frontRepo[this.dialogData.SourceStruct + "s" as keyof FrontRepo] as Map<number, DummyAgentDB>
           let sourceInstance = mapOfSourceInstances.get(this.dialogData.ID)!
 
-          let sourceField = sourceInstance[this.dialogData.SourceField as keyof typeof sourceInstance]! as unknown as DummyAgentDB[]
-          for (let associationInstance of sourceField) {
-            let dummyagent = associationInstance[this.dialogData.IntermediateStructField as keyof typeof associationInstance] as unknown as DummyAgentDB
-            this.initialSelection.push(dummyagent)
+          // we associates on sourceInstance of type SourceStruct with a MANY MANY associations to DummyAgentDB
+          // the field name is sourceField
+          let sourceFieldArray = sourceInstance[this.dialogData.SourceField as keyof typeof sourceInstance]! as unknown as DummyAgentDB[]
+          if (sourceFieldArray != null) {
+            for (let associationInstance of sourceFieldArray) {
+              let dummyagent = associationInstance[this.dialogData.IntermediateStructField as keyof typeof associationInstance] as unknown as DummyAgentDB
+              this.initialSelection.push(dummyagent)
+            }
           }
 
           this.selection = new SelectionModel<DummyAgentDB>(allowMultiSelect, this.initialSelection);
@@ -219,7 +223,7 @@ export class DummyAgentsTableComponent implements OnInit {
     // list of dummyagents is truncated of dummyagent before the delete
     this.dummyagents = this.dummyagents.filter(h => h !== dummyagent);
 
-    this.dummyagentService.deleteDummyAgent(dummyagentID).subscribe(
+    this.dummyagentService.deleteDummyAgent(dummyagentID, this.GONG__StackPath).subscribe(
       dummyagent => {
         this.dummyagentService.DummyAgentServiceChanged.next("delete")
       }
@@ -285,7 +289,7 @@ export class DummyAgentsTableComponent implements OnInit {
 
       // update all dummyagent (only update selection & initial selection)
       for (let dummyagent of toUpdate) {
-        this.dummyagentService.updateDummyAgent(dummyagent)
+        this.dummyagentService.updateDummyAgent(dummyagent, this.GONG__StackPath)
           .subscribe(dummyagent => {
             this.dummyagentService.DummyAgentServiceChanged.next("update")
           });

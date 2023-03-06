@@ -20,6 +20,8 @@ func IsStaged[Type Gongstruct](stage *StageStruct, instance *Type) (ok bool) {
 	case *GongsimStatus:
 		ok = stage.IsStagedGongsimStatus(target)
 
+	default:
+		_ = target
 	}
 	return
 }
@@ -84,6 +86,8 @@ func StageBranch[Type Gongstruct](stage *StageStruct, instance *Type) {
 	case *GongsimStatus:
 		stage.StageBranchGongsimStatus(target)
 
+	default:
+		_ = target
 	}
 }
 
@@ -95,7 +99,7 @@ func (stage *StageStruct) StageBranchDummyAgent(dummyagent *DummyAgent) {
 		return
 	}
 
-	dummyagent.Stage()
+	dummyagent.Stage(stage)
 
 	//insertion point for the staging of instances referenced by pointers
 
@@ -110,7 +114,7 @@ func (stage *StageStruct) StageBranchEngine(engine *Engine) {
 		return
 	}
 
-	engine.Stage()
+	engine.Stage(stage)
 
 	//insertion point for the staging of instances referenced by pointers
 
@@ -125,7 +129,7 @@ func (stage *StageStruct) StageBranchEvent(event *Event) {
 		return
 	}
 
-	event.Stage()
+	event.Stage(stage)
 
 	//insertion point for the staging of instances referenced by pointers
 
@@ -140,7 +144,7 @@ func (stage *StageStruct) StageBranchGongsimCommand(gongsimcommand *GongsimComma
 		return
 	}
 
-	gongsimcommand.Stage()
+	gongsimcommand.Stage(stage)
 
 	//insertion point for the staging of instances referenced by pointers
 
@@ -155,7 +159,7 @@ func (stage *StageStruct) StageBranchGongsimStatus(gongsimstatus *GongsimStatus)
 		return
 	}
 
-	gongsimstatus.Stage()
+	gongsimstatus.Stage(stage)
 
 	//insertion point for the staging of instances referenced by pointers
 
@@ -187,6 +191,8 @@ func UnstageBranch[Type Gongstruct](stage *StageStruct, instance *Type) {
 	case *GongsimStatus:
 		stage.UnstageBranchGongsimStatus(target)
 
+	default:
+		_ = target
 	}
 }
 
@@ -198,7 +204,7 @@ func (stage *StageStruct) UnstageBranchDummyAgent(dummyagent *DummyAgent) {
 		return
 	}
 
-	dummyagent.Unstage()
+	dummyagent.Unstage(stage)
 
 	//insertion point for the staging of instances referenced by pointers
 
@@ -213,7 +219,7 @@ func (stage *StageStruct) UnstageBranchEngine(engine *Engine) {
 		return
 	}
 
-	engine.Unstage()
+	engine.Unstage(stage)
 
 	//insertion point for the staging of instances referenced by pointers
 
@@ -228,7 +234,7 @@ func (stage *StageStruct) UnstageBranchEvent(event *Event) {
 		return
 	}
 
-	event.Unstage()
+	event.Unstage(stage)
 
 	//insertion point for the staging of instances referenced by pointers
 
@@ -243,7 +249,7 @@ func (stage *StageStruct) UnstageBranchGongsimCommand(gongsimcommand *GongsimCom
 		return
 	}
 
-	gongsimcommand.Unstage()
+	gongsimcommand.Unstage(stage)
 
 	//insertion point for the staging of instances referenced by pointers
 
@@ -258,7 +264,7 @@ func (stage *StageStruct) UnstageBranchGongsimStatus(gongsimstatus *GongsimStatu
 		return
 	}
 
-	gongsimstatus.Unstage()
+	gongsimstatus.Unstage(stage)
 
 	//insertion point for the staging of instances referenced by pointers
 

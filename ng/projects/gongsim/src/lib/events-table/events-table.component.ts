@@ -158,7 +158,7 @@ export class EventsTableComponent implements OnInit {
 
   ngOnInit(): void {
     let stackPath = this.activatedRoute.snapshot.paramMap.get('GONG__StackPath')
-    if ( stackPath != undefined) {
+    if (stackPath != undefined) {
       this.GONG__StackPath = stackPath
     }
 
@@ -201,10 +201,14 @@ export class EventsTableComponent implements OnInit {
           let mapOfSourceInstances = this.frontRepo[this.dialogData.SourceStruct + "s" as keyof FrontRepo] as Map<number, EventDB>
           let sourceInstance = mapOfSourceInstances.get(this.dialogData.ID)!
 
-          let sourceField = sourceInstance[this.dialogData.SourceField as keyof typeof sourceInstance]! as unknown as EventDB[]
-          for (let associationInstance of sourceField) {
-            let event = associationInstance[this.dialogData.IntermediateStructField as keyof typeof associationInstance] as unknown as EventDB
-            this.initialSelection.push(event)
+          // we associates on sourceInstance of type SourceStruct with a MANY MANY associations to EventDB
+          // the field name is sourceField
+          let sourceFieldArray = sourceInstance[this.dialogData.SourceField as keyof typeof sourceInstance]! as unknown as EventDB[]
+          if (sourceFieldArray != null) {
+            for (let associationInstance of sourceFieldArray) {
+              let event = associationInstance[this.dialogData.IntermediateStructField as keyof typeof associationInstance] as unknown as EventDB
+              this.initialSelection.push(event)
+            }
           }
 
           this.selection = new SelectionModel<EventDB>(allowMultiSelect, this.initialSelection);
@@ -225,7 +229,7 @@ export class EventsTableComponent implements OnInit {
     // list of events is truncated of event before the delete
     this.events = this.events.filter(h => h !== event);
 
-    this.eventService.deleteEvent(eventID).subscribe(
+    this.eventService.deleteEvent(eventID, this.GONG__StackPath).subscribe(
       event => {
         this.eventService.EventServiceChanged.next("delete")
       }
@@ -291,7 +295,7 @@ export class EventsTableComponent implements OnInit {
 
       // update all event (only update selection & initial selection)
       for (let event of toUpdate) {
-        this.eventService.updateEvent(event)
+        this.eventService.updateEvent(event, this.GONG__StackPath)
           .subscribe(event => {
             this.eventService.EventServiceChanged.next("update")
           });

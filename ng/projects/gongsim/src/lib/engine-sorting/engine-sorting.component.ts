@@ -100,7 +100,7 @@ export class EngineSortingComponent implements OnInit {
 
     this.associatedEngines.forEach(
       engine => {
-        this.engineService.updateEngine(engine)
+        this.engineService.updateEngine(engine, this.dialogData.GONG__StackPath)
           .subscribe(engine => {
             this.engineService.EngineServiceChanged.next("update")
           });

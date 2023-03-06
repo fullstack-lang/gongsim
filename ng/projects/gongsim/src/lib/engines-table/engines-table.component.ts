@@ -195,7 +195,7 @@ export class EnginesTableComponent implements OnInit {
 
   ngOnInit(): void {
     let stackPath = this.activatedRoute.snapshot.paramMap.get('GONG__StackPath')
-    if ( stackPath != undefined) {
+    if (stackPath != undefined) {
       this.GONG__StackPath = stackPath
     }
 
@@ -231,10 +231,14 @@ export class EnginesTableComponent implements OnInit {
           let mapOfSourceInstances = this.frontRepo[this.dialogData.SourceStruct + "s" as keyof FrontRepo] as Map<number, EngineDB>
           let sourceInstance = mapOfSourceInstances.get(this.dialogData.ID)!
 
-          let sourceField = sourceInstance[this.dialogData.SourceField as keyof typeof sourceInstance]! as unknown as EngineDB[]
-          for (let associationInstance of sourceField) {
-            let engine = associationInstance[this.dialogData.IntermediateStructField as keyof typeof associationInstance] as unknown as EngineDB
-            this.initialSelection.push(engine)
+          // we associates on sourceInstance of type SourceStruct with a MANY MANY associations to EngineDB
+          // the field name is sourceField
+          let sourceFieldArray = sourceInstance[this.dialogData.SourceField as keyof typeof sourceInstance]! as unknown as EngineDB[]
+          if (sourceFieldArray != null) {
+            for (let associationInstance of sourceFieldArray) {
+              let engine = associationInstance[this.dialogData.IntermediateStructField as keyof typeof associationInstance] as unknown as EngineDB
+              this.initialSelection.push(engine)
+            }
           }
 
           this.selection = new SelectionModel<EngineDB>(allowMultiSelect, this.initialSelection);
@@ -255,7 +259,7 @@ export class EnginesTableComponent implements OnInit {
     // list of engines is truncated of engine before the delete
     this.engines = this.engines.filter(h => h !== engine);
 
-    this.engineService.deleteEngine(engineID).subscribe(
+    this.engineService.deleteEngine(engineID, this.GONG__StackPath).subscribe(
       engine => {
         this.engineService.EngineServiceChanged.next("delete")
       }
@@ -321,7 +325,7 @@ export class EnginesTableComponent implements OnInit {
 
       // update all engine (only update selection & initial selection)
       for (let engine of toUpdate) {
-        this.engineService.updateEngine(engine)
+        this.engineService.updateEngine(engine, this.GONG__StackPath)
           .subscribe(engine => {
             this.engineService.EngineServiceChanged.next("update")
           });

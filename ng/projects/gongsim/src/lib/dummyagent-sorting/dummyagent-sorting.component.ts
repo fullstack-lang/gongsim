@@ -100,7 +100,7 @@ export class DummyAgentSortingComponent implements OnInit {
 
     this.associatedDummyAgents.forEach(
       dummyagent => {
-        this.dummyagentService.updateDummyAgent(dummyagent)
+        this.dummyagentService.updateDummyAgent(dummyagent, this.dialogData.GONG__StackPath)
           .subscribe(dummyagent => {
             this.dummyagentService.DummyAgentServiceChanged.next("update")
           });
