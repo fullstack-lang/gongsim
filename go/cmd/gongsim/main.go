@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"os"
 	"runtime/pprof"
-	"strings"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -28,10 +27,7 @@ var (
 	logDBFlag  = flag.Bool("logDB", false, "log mode for db")
 	logGINFlag = flag.Bool("logGIN", false, "log mode for gin")
 
-	marshallOnStartup  = flag.String("marshallOnStartup", "", "at startup, marshall staged data to a go file with the marshall name and '.go' (must be lowercased without spaces). If marshall arg is '', no marshalling")
-	unmarshallFromCode = flag.String("unmarshallFromCode", "", "unmarshall data from go file and '.go' (must be lowercased without spaces), If unmarshallFromCode arg is '', no unmarshalling")
-	unmarshall         = flag.String("unmarshall", "", "unmarshall data from marshall name and '.go' (must be lowercased without spaces), If unmarshall arg is '', no unmarshalling")
-	marshallOnCommit   = flag.String("marshallOnCommit", "", "on all commits, marshall staged data to a go file with the marshall name and '.go' (must be lowercased without spaces). If marshall arg is '', no marshalling")
+	marshallOnCommit = flag.String("marshallOnCommit", "", "on all commits, marshall staged data to a go file with the marshall name and '.go' (must be lowercased without spaces). If marshall arg is '', no marshalling")
 
 	diagrams         = flag.Bool("diagrams", true, "parse/analysis go/models and go/diagrams")
 	embeddedDiagrams = flag.Bool("embeddedDiagrams", false, "parse/analysis go/models and go/embeddedDiagrams")
@@ -99,59 +95,6 @@ func main() {
 		stage, _ = fullstack.NewStackInstance(r, "", "")
 	}
 
-	// generate injection code from the stage
-	if *marshallOnStartup != "" {
-
-		if strings.Contains(*marshallOnStartup, " ") {
-			log.Fatalln(*marshallOnStartup + " must not contains blank spaces")
-		}
-		if strings.ToLower(*marshallOnStartup) != *marshallOnStartup {
-			log.Fatalln(*marshallOnStartup + " must be lowercases")
-		}
-
-		file, err := os.Create(fmt.Sprintf("./%s.go", *marshallOnStartup))
-		if err != nil {
-			log.Fatal(err.Error())
-		}
-		defer file.Close()
-
-		stage.Checkout()
-		stage.Marshall(file, "github.com/fullstack-lang/gongsim/go/models", "main")
-		os.Exit(0)
-	}
-
-	// setup the stage by injecting the code from code database
-	if *unmarshall != "" {
-		stage.Checkout()
-		stage.Reset()
-		stage.Commit()
-		if InjectionGateway[*unmarshall] != nil {
-			InjectionGateway[*unmarshall]()
-		}
-		stage.Commit()
-	} else {
-		// in case the database is used, checkout the content to the stage
-		stage.Checkout()
-	}
-
-	if *unmarshallFromCode != "" {
-		stage.Checkout()
-		stage.Reset()
-		stage.Commit()
-		err := models.ParseAstFile(stage, *unmarshallFromCode)
-
-		// if the application is run with -unmarshallFromCode=xxx.go -marshallOnCommit
-		// xxx.go might be absent the first time. However, this shall not be a show stopper.
-		if err != nil {
-			log.Println("no file to read " + err.Error())
-		}
-
-		stage.Commit()
-	} else {
-		// in case the database is used, checkout the content to the stage
-		stage.Checkout()
-	}
-
 	// hook automatic marshall to go code at every commit
 	if *marshallOnCommit != "" {
 		hook := new(BeforeCommitImplementation)
@@ -203,7 +146,7 @@ func main() {
 	}
 
 	// commit simulation stage
-	models.Stage.Commit()
+	stage.Commit()
 
 	// provide the static route for the angular pages
 	r.Use(static.Serve("/", EmbedFolder(gongsim.NgDistNg, "ng/dist/ng")))
