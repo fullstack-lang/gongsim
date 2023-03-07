@@ -90,54 +90,54 @@ var map_DocLink_Identifier_NewDiagram map[string]any = map[string]any{
 // }
 
 // NewDiagramInjection will stage objects of database "NewDiagram"
-func NewDiagramInjection() {
+func NewDiagramInjection(stage *models.StageStruct) {
 
 	// Declaration of instances to stage
 
 	// Declarations of staged instances of Classdiagram
-	__Classdiagram__000000_NewDiagram := (&models.Classdiagram{Name: `NewDiagram`}).Stage()
+	__Classdiagram__000000_NewDiagram := (&models.Classdiagram{Name: `NewDiagram`}).Stage(stage)
 
 	// Declarations of staged instances of DiagramPackage
 
 	// Declarations of staged instances of Field
-	__Field__000000_Command := (&models.Field{Name: `Command`}).Stage()
-	__Field__000001_CommandDate := (&models.Field{Name: `CommandDate`}).Stage()
-	__Field__000002_CompletionDate := (&models.Field{Name: `CompletionDate`}).Stage()
-	__Field__000003_ControlMode := (&models.Field{Name: `ControlMode`}).Stage()
-	__Field__000004_CurrentCommand := (&models.Field{Name: `CurrentCommand`}).Stage()
-	__Field__000005_CurrentSpeedCommand := (&models.Field{Name: `CurrentSpeedCommand`}).Stage()
-	__Field__000006_CurrentTime := (&models.Field{Name: `CurrentTime`}).Stage()
-	__Field__000007_DateSpeedCommand := (&models.Field{Name: `DateSpeedCommand`}).Stage()
-	__Field__000008_Duration := (&models.Field{Name: `Duration`}).Stage()
-	__Field__000009_EndTime := (&models.Field{Name: `EndTime`}).Stage()
-	__Field__000010_Fired := (&models.Field{Name: `Fired`}).Stage()
-	__Field__000011_Name := (&models.Field{Name: `Name`}).Stage()
-	__Field__000012_Name := (&models.Field{Name: `Name`}).Stage()
-	__Field__000013_Name := (&models.Field{Name: `Name`}).Stage()
-	__Field__000014_Name := (&models.Field{Name: `Name`}).Stage()
-	__Field__000015_SecondsSinceStart := (&models.Field{Name: `SecondsSinceStart`}).Stage()
-	__Field__000016_Speed := (&models.Field{Name: `Speed`}).Stage()
-	__Field__000017_SpeedCommandCompletionDate := (&models.Field{Name: `SpeedCommandCompletionDate`}).Stage()
-	__Field__000018_SpeedCommandType := (&models.Field{Name: `SpeedCommandType`}).Stage()
-	__Field__000019_State := (&models.Field{Name: `State`}).Stage()
+	__Field__000000_Command := (&models.Field{Name: `Command`}).Stage(stage)
+	__Field__000001_CommandDate := (&models.Field{Name: `CommandDate`}).Stage(stage)
+	__Field__000002_CompletionDate := (&models.Field{Name: `CompletionDate`}).Stage(stage)
+	__Field__000003_ControlMode := (&models.Field{Name: `ControlMode`}).Stage(stage)
+	__Field__000004_CurrentCommand := (&models.Field{Name: `CurrentCommand`}).Stage(stage)
+	__Field__000005_CurrentSpeedCommand := (&models.Field{Name: `CurrentSpeedCommand`}).Stage(stage)
+	__Field__000006_CurrentTime := (&models.Field{Name: `CurrentTime`}).Stage(stage)
+	__Field__000007_DateSpeedCommand := (&models.Field{Name: `DateSpeedCommand`}).Stage(stage)
+	__Field__000008_Duration := (&models.Field{Name: `Duration`}).Stage(stage)
+	__Field__000009_EndTime := (&models.Field{Name: `EndTime`}).Stage(stage)
+	__Field__000010_Fired := (&models.Field{Name: `Fired`}).Stage(stage)
+	__Field__000011_Name := (&models.Field{Name: `Name`}).Stage(stage)
+	__Field__000012_Name := (&models.Field{Name: `Name`}).Stage(stage)
+	__Field__000013_Name := (&models.Field{Name: `Name`}).Stage(stage)
+	__Field__000014_Name := (&models.Field{Name: `Name`}).Stage(stage)
+	__Field__000015_SecondsSinceStart := (&models.Field{Name: `SecondsSinceStart`}).Stage(stage)
+	__Field__000016_Speed := (&models.Field{Name: `Speed`}).Stage(stage)
+	__Field__000017_SpeedCommandCompletionDate := (&models.Field{Name: `SpeedCommandCompletionDate`}).Stage(stage)
+	__Field__000018_SpeedCommandType := (&models.Field{Name: `SpeedCommandType`}).Stage(stage)
+	__Field__000019_State := (&models.Field{Name: `State`}).Stage(stage)
 
 	// Declarations of staged instances of GongEnumShape
-	__GongEnumShape__000000_NewDiagram_ControlMode := (&models.GongEnumShape{Name: `NewDiagram-ControlMode`}).Stage()
-	__GongEnumShape__000001_NewDiagram_EngineRunMode := (&models.GongEnumShape{Name: `NewDiagram-EngineRunMode`}).Stage()
-	__GongEnumShape__000002_NewDiagram_EngineState := (&models.GongEnumShape{Name: `NewDiagram-EngineState`}).Stage()
+	__GongEnumShape__000000_NewDiagram_ControlMode := (&models.GongEnumShape{Name: `NewDiagram-ControlMode`}).Stage(stage)
+	__GongEnumShape__000001_NewDiagram_EngineRunMode := (&models.GongEnumShape{Name: `NewDiagram-EngineRunMode`}).Stage(stage)
+	__GongEnumShape__000002_NewDiagram_EngineState := (&models.GongEnumShape{Name: `NewDiagram-EngineState`}).Stage(stage)
 
 	// Declarations of staged instances of GongEnumValueEntry
-	__GongEnumValueEntry__000000_AUTONOMOUS := (&models.GongEnumValueEntry{Name: `AUTONOMOUS`}).Stage()
-	__GongEnumValueEntry__000001_CLIENT_CONTROL := (&models.GongEnumValueEntry{Name: `CLIENT_CONTROL`}).Stage()
-	__GongEnumValueEntry__000002_OVER := (&models.GongEnumValueEntry{Name: `OVER`}).Stage()
-	__GongEnumValueEntry__000003_PAUSED := (&models.GongEnumValueEntry{Name: `PAUSED`}).Stage()
-	__GongEnumValueEntry__000004_RUNNING := (&models.GongEnumValueEntry{Name: `RUNNING`}).Stage()
+	__GongEnumValueEntry__000000_AUTONOMOUS := (&models.GongEnumValueEntry{Name: `AUTONOMOUS`}).Stage(stage)
+	__GongEnumValueEntry__000001_CLIENT_CONTROL := (&models.GongEnumValueEntry{Name: `CLIENT_CONTROL`}).Stage(stage)
+	__GongEnumValueEntry__000002_OVER := (&models.GongEnumValueEntry{Name: `OVER`}).Stage(stage)
+	__GongEnumValueEntry__000003_PAUSED := (&models.GongEnumValueEntry{Name: `PAUSED`}).Stage(stage)
+	__GongEnumValueEntry__000004_RUNNING := (&models.GongEnumValueEntry{Name: `RUNNING`}).Stage(stage)
 
 	// Declarations of staged instances of GongStructShape
-	__GongStructShape__000000_NewDiagram_Engine := (&models.GongStructShape{Name: `NewDiagram-Engine`}).Stage()
-	__GongStructShape__000001_NewDiagram_Event := (&models.GongStructShape{Name: `NewDiagram-Event`}).Stage()
-	__GongStructShape__000002_NewDiagram_GongsimCommand := (&models.GongStructShape{Name: `NewDiagram-GongsimCommand`}).Stage()
-	__GongStructShape__000003_NewDiagram_GongsimStatus := (&models.GongStructShape{Name: `NewDiagram-GongsimStatus`}).Stage()
+	__GongStructShape__000000_NewDiagram_Engine := (&models.GongStructShape{Name: `NewDiagram-Engine`}).Stage(stage)
+	__GongStructShape__000001_NewDiagram_Event := (&models.GongStructShape{Name: `NewDiagram-Event`}).Stage(stage)
+	__GongStructShape__000002_NewDiagram_GongsimCommand := (&models.GongStructShape{Name: `NewDiagram-GongsimCommand`}).Stage(stage)
+	__GongStructShape__000003_NewDiagram_GongsimStatus := (&models.GongStructShape{Name: `NewDiagram-GongsimStatus`}).Stage(stage)
 
 	// Declarations of staged instances of Link
 
@@ -148,13 +148,13 @@ func NewDiagramInjection() {
 	// Declarations of staged instances of NoteShapeLink
 
 	// Declarations of staged instances of Position
-	__Position__000000_Pos_NewDiagram_ControlMode := (&models.Position{Name: `Pos-NewDiagram-ControlMode`}).Stage()
-	__Position__000001_Pos_NewDiagram_Engine := (&models.Position{Name: `Pos-NewDiagram-Engine`}).Stage()
-	__Position__000002_Pos_NewDiagram_EngineRunMode := (&models.Position{Name: `Pos-NewDiagram-EngineRunMode`}).Stage()
-	__Position__000003_Pos_NewDiagram_EngineState := (&models.Position{Name: `Pos-NewDiagram-EngineState`}).Stage()
-	__Position__000004_Pos_NewDiagram_Event := (&models.Position{Name: `Pos-NewDiagram-Event`}).Stage()
-	__Position__000005_Pos_NewDiagram_GongsimCommand := (&models.Position{Name: `Pos-NewDiagram-GongsimCommand`}).Stage()
-	__Position__000006_Pos_NewDiagram_GongsimStatus := (&models.Position{Name: `Pos-NewDiagram-GongsimStatus`}).Stage()
+	__Position__000000_Pos_NewDiagram_ControlMode := (&models.Position{Name: `Pos-NewDiagram-ControlMode`}).Stage(stage)
+	__Position__000001_Pos_NewDiagram_Engine := (&models.Position{Name: `Pos-NewDiagram-Engine`}).Stage(stage)
+	__Position__000002_Pos_NewDiagram_EngineRunMode := (&models.Position{Name: `Pos-NewDiagram-EngineRunMode`}).Stage(stage)
+	__Position__000003_Pos_NewDiagram_EngineState := (&models.Position{Name: `Pos-NewDiagram-EngineState`}).Stage(stage)
+	__Position__000004_Pos_NewDiagram_Event := (&models.Position{Name: `Pos-NewDiagram-Event`}).Stage(stage)
+	__Position__000005_Pos_NewDiagram_GongsimCommand := (&models.Position{Name: `Pos-NewDiagram-GongsimCommand`}).Stage(stage)
+	__Position__000006_Pos_NewDiagram_GongsimStatus := (&models.Position{Name: `Pos-NewDiagram-GongsimStatus`}).Stage(stage)
 
 	// Declarations of staged instances of Tree
 
@@ -172,7 +172,7 @@ func NewDiagramInjection() {
 
 	// Field values setup
 	__Field__000000_Command.Name = `Command`
-	
+
 	// comment added to overcome the problem with the comment map association
 
 	//gong:ident [ref_models.GongsimCommand.Command]
@@ -183,7 +183,7 @@ func NewDiagramInjection() {
 
 	// Field values setup
 	__Field__000001_CommandDate.Name = `CommandDate`
-	
+
 	// comment added to overcome the problem with the comment map association
 
 	//gong:ident [ref_models.GongsimCommand.CommandDate]
@@ -194,7 +194,7 @@ func NewDiagramInjection() {
 
 	// Field values setup
 	__Field__000002_CompletionDate.Name = `CompletionDate`
-	
+
 	// comment added to overcome the problem with the comment map association
 
 	//gong:ident [ref_models.GongsimStatus.CompletionDate]
@@ -205,7 +205,7 @@ func NewDiagramInjection() {
 
 	// Field values setup
 	__Field__000003_ControlMode.Name = `ControlMode`
-	
+
 	// comment added to overcome the problem with the comment map association
 
 	//gong:ident [ref_models.Engine.ControlMode]
@@ -216,7 +216,7 @@ func NewDiagramInjection() {
 
 	// Field values setup
 	__Field__000004_CurrentCommand.Name = `CurrentCommand`
-	
+
 	// comment added to overcome the problem with the comment map association
 
 	//gong:ident [ref_models.GongsimStatus.CurrentCommand]
@@ -227,7 +227,7 @@ func NewDiagramInjection() {
 
 	// Field values setup
 	__Field__000005_CurrentSpeedCommand.Name = `CurrentSpeedCommand`
-	
+
 	// comment added to overcome the problem with the comment map association
 
 	//gong:ident [ref_models.GongsimStatus.CurrentSpeedCommand]
@@ -238,7 +238,7 @@ func NewDiagramInjection() {
 
 	// Field values setup
 	__Field__000006_CurrentTime.Name = `CurrentTime`
-	
+
 	// comment added to overcome the problem with the comment map association
 
 	//gong:ident [ref_models.Engine.CurrentTime]
@@ -249,7 +249,7 @@ func NewDiagramInjection() {
 
 	// Field values setup
 	__Field__000007_DateSpeedCommand.Name = `DateSpeedCommand`
-	
+
 	// comment added to overcome the problem with the comment map association
 
 	//gong:ident [ref_models.GongsimCommand.DateSpeedCommand]
@@ -260,7 +260,7 @@ func NewDiagramInjection() {
 
 	// Field values setup
 	__Field__000008_Duration.Name = `Duration`
-	
+
 	// comment added to overcome the problem with the comment map association
 
 	//gong:ident [ref_models.Event.Duration]
@@ -271,7 +271,7 @@ func NewDiagramInjection() {
 
 	// Field values setup
 	__Field__000009_EndTime.Name = `EndTime`
-	
+
 	// comment added to overcome the problem with the comment map association
 
 	//gong:ident [ref_models.Engine.EndTime]
@@ -282,7 +282,7 @@ func NewDiagramInjection() {
 
 	// Field values setup
 	__Field__000010_Fired.Name = `Fired`
-	
+
 	// comment added to overcome the problem with the comment map association
 
 	//gong:ident [ref_models.Engine.Fired]
@@ -293,7 +293,7 @@ func NewDiagramInjection() {
 
 	// Field values setup
 	__Field__000011_Name.Name = `Name`
-	
+
 	// comment added to overcome the problem with the comment map association
 
 	//gong:ident [ref_models.GongsimCommand.Name]
@@ -304,7 +304,7 @@ func NewDiagramInjection() {
 
 	// Field values setup
 	__Field__000012_Name.Name = `Name`
-	
+
 	// comment added to overcome the problem with the comment map association
 
 	//gong:ident [ref_models.Event.Name]
@@ -315,7 +315,7 @@ func NewDiagramInjection() {
 
 	// Field values setup
 	__Field__000013_Name.Name = `Name`
-	
+
 	// comment added to overcome the problem with the comment map association
 
 	//gong:ident [ref_models.Engine.Name]
@@ -326,7 +326,7 @@ func NewDiagramInjection() {
 
 	// Field values setup
 	__Field__000014_Name.Name = `Name`
-	
+
 	// comment added to overcome the problem with the comment map association
 
 	//gong:ident [ref_models.GongsimStatus.Name]
@@ -337,7 +337,7 @@ func NewDiagramInjection() {
 
 	// Field values setup
 	__Field__000015_SecondsSinceStart.Name = `SecondsSinceStart`
-	
+
 	// comment added to overcome the problem with the comment map association
 
 	//gong:ident [ref_models.Engine.SecondsSinceStart]
@@ -348,7 +348,7 @@ func NewDiagramInjection() {
 
 	// Field values setup
 	__Field__000016_Speed.Name = `Speed`
-	
+
 	// comment added to overcome the problem with the comment map association
 
 	//gong:ident [ref_models.Engine.Speed]
@@ -359,7 +359,7 @@ func NewDiagramInjection() {
 
 	// Field values setup
 	__Field__000017_SpeedCommandCompletionDate.Name = `SpeedCommandCompletionDate`
-	
+
 	// comment added to overcome the problem with the comment map association
 
 	//gong:ident [ref_models.GongsimStatus.SpeedCommandCompletionDate]
@@ -370,7 +370,7 @@ func NewDiagramInjection() {
 
 	// Field values setup
 	__Field__000018_SpeedCommandType.Name = `SpeedCommandType`
-	
+
 	// comment added to overcome the problem with the comment map association
 
 	//gong:ident [ref_models.GongsimCommand.SpeedCommandType]
@@ -381,7 +381,7 @@ func NewDiagramInjection() {
 
 	// Field values setup
 	__Field__000019_State.Name = `State`
-	
+
 	// comment added to overcome the problem with the comment map association
 
 	//gong:ident [ref_models.Engine.State]
@@ -392,7 +392,7 @@ func NewDiagramInjection() {
 
 	// GongEnumShape values setup
 	__GongEnumShape__000000_NewDiagram_ControlMode.Name = `NewDiagram-ControlMode`
-	
+
 	// comment added to overcome the problem with the comment map association
 
 	//gong:ident [ref_models.ControlMode]
@@ -402,7 +402,7 @@ func NewDiagramInjection() {
 
 	// GongEnumShape values setup
 	__GongEnumShape__000001_NewDiagram_EngineRunMode.Name = `NewDiagram-EngineRunMode`
-	
+
 	// comment added to overcome the problem with the comment map association
 
 	//gong:ident [ref_models.EngineRunMode]
@@ -412,7 +412,7 @@ func NewDiagramInjection() {
 
 	// GongEnumShape values setup
 	__GongEnumShape__000002_NewDiagram_EngineState.Name = `NewDiagram-EngineState`
-	
+
 	// comment added to overcome the problem with the comment map association
 
 	//gong:ident [ref_models.EngineState]
@@ -422,7 +422,7 @@ func NewDiagramInjection() {
 
 	// GongEnumValueEntry values setup
 	__GongEnumValueEntry__000000_AUTONOMOUS.Name = `AUTONOMOUS`
-	
+
 	// comment added to overcome the problem with the comment map association
 
 	//gong:ident [ref_models.ControlMode.AUTONOMOUS]
@@ -430,7 +430,7 @@ func NewDiagramInjection() {
 
 	// GongEnumValueEntry values setup
 	__GongEnumValueEntry__000001_CLIENT_CONTROL.Name = `CLIENT_CONTROL`
-	
+
 	// comment added to overcome the problem with the comment map association
 
 	//gong:ident [ref_models.ControlMode.CLIENT_CONTROL]
@@ -438,7 +438,7 @@ func NewDiagramInjection() {
 
 	// GongEnumValueEntry values setup
 	__GongEnumValueEntry__000002_OVER.Name = `OVER`
-	
+
 	// comment added to overcome the problem with the comment map association
 
 	//gong:ident [ref_models.EngineState.OVER]
@@ -446,7 +446,7 @@ func NewDiagramInjection() {
 
 	// GongEnumValueEntry values setup
 	__GongEnumValueEntry__000003_PAUSED.Name = `PAUSED`
-	
+
 	// comment added to overcome the problem with the comment map association
 
 	//gong:ident [ref_models.EngineState.PAUSED]
@@ -454,7 +454,7 @@ func NewDiagramInjection() {
 
 	// GongEnumValueEntry values setup
 	__GongEnumValueEntry__000004_RUNNING.Name = `RUNNING`
-	
+
 	// comment added to overcome the problem with the comment map association
 
 	//gong:ident [ref_models.EngineState.RUNNING]
@@ -462,7 +462,7 @@ func NewDiagramInjection() {
 
 	// GongStructShape values setup
 	__GongStructShape__000000_NewDiagram_Engine.Name = `NewDiagram-Engine`
-	
+
 	// comment added to overcome the problem with the comment map association
 
 	//gong:ident [ref_models.Engine]
@@ -475,7 +475,7 @@ func NewDiagramInjection() {
 
 	// GongStructShape values setup
 	__GongStructShape__000001_NewDiagram_Event.Name = `NewDiagram-Event`
-	
+
 	// comment added to overcome the problem with the comment map association
 
 	//gong:ident [ref_models.Event]
@@ -488,7 +488,7 @@ func NewDiagramInjection() {
 
 	// GongStructShape values setup
 	__GongStructShape__000002_NewDiagram_GongsimCommand.Name = `NewDiagram-GongsimCommand`
-	
+
 	// comment added to overcome the problem with the comment map association
 
 	//gong:ident [ref_models.GongsimCommand]
@@ -501,7 +501,7 @@ func NewDiagramInjection() {
 
 	// GongStructShape values setup
 	__GongStructShape__000003_NewDiagram_GongsimStatus.Name = `NewDiagram-GongsimStatus`
-	
+
 	// comment added to overcome the problem with the comment map association
 
 	//gong:ident [ref_models.GongsimStatus]
@@ -588,5 +588,3 @@ func NewDiagramInjection() {
 	__GongStructShape__000003_NewDiagram_GongsimStatus.Fields = append(__GongStructShape__000003_NewDiagram_GongsimStatus.Fields, __Field__000005_CurrentSpeedCommand)
 	__GongStructShape__000003_NewDiagram_GongsimStatus.Fields = append(__GongStructShape__000003_NewDiagram_GongsimStatus.Fields, __Field__000017_SpeedCommandCompletionDate)
 }
-
-
