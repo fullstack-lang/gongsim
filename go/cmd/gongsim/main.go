@@ -8,7 +8,9 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"runtime/pprof"
 	"strings"
+	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/static"
@@ -33,6 +35,11 @@ var (
 
 	diagrams         = flag.Bool("diagrams", true, "parse/analysis go/models and go/diagrams")
 	embeddedDiagrams = flag.Bool("embeddedDiagrams", false, "parse/analysis go/models and go/embeddedDiagrams")
+
+	play         = flag.Bool("play", false, "start rigth away")
+	displayWatch = flag.Bool("displayWatch", false, "if true, print current status every 1/2 seconds")
+
+	cpuprofile = flag.String("cpuprofile", "", "write cpu profile to `file`")
 )
 
 // InjectionGateway is the singloton that stores all functions
@@ -63,6 +70,19 @@ func main() {
 	// parse program arguments
 	flag.Parse()
 
+	if *cpuprofile != "" {
+		models.CpuProfile = true
+		f, err := os.Create(*cpuprofile)
+		if err != nil {
+			log.Fatal("could not create CPU profile: ", err)
+		}
+		defer f.Close() // error handling omitted for example
+		if err := pprof.StartCPUProfile(f); err != nil {
+			log.Fatal("could not start CPU profile: ", err)
+		}
+		defer pprof.StopCPUProfile()
+	}
+
 	// setup controlers
 	if !*logGINFlag {
 		myfile, _ := os.Create("/tmp/server.log")
@@ -76,7 +96,7 @@ func main() {
 	if *marshallOnCommit != "" {
 		stage, _ = fullstack.NewStackInstance(r, "")
 	} else {
-		stage, _ = fullstack.NewStackInstance(r, "", "./test.db")
+		stage, _ = fullstack.NewStackInstance(r, "", "")
 	}
 
 	// generate injection code from the stage
@@ -146,7 +166,52 @@ func main() {
 		*embeddedDiagrams,
 		&stage.Map_GongStructName_InstancesNb)
 
-	// insertion point for serving the static file{{staticCodeServiceCode}}
+	models.EngineSingloton.ControlMode = models.CLIENT_CONTROL
+
+	// seven days of simulation
+	models.EngineSingloton.SetStartTime(time.Date(1676, time.January, 1, 0, 0, 0, 0, time.UTC))
+	models.EngineSingloton.SetCurrentTime(models.EngineSingloton.GetStartTime())
+	models.EngineSingloton.State = models.PAUSED
+	models.EngineSingloton.Speed = 0.5 * 24 * 3600.0 // days per second
+	log.Printf("Sim start \t\t\t%s\n", models.EngineSingloton.GetStartTime())
+
+	// Three years
+	models.EngineSingloton.SetEndTime(time.Date(1680, time.January, 1, 0, 0, 0, 0, time.UTC))
+	log.Printf("Sim end  \t\t\t%s\n", models.EngineSingloton.GetEndTime())
+
+	// PLUMBING n°1: callback for treating model specific action. In this case, see specific engine
+	var simulation models.Simulation
+	models.EngineSingloton.Simulation = &simulation
+
+	// append a dummy agent to feed the discrete event engine with at least an event
+	dummyAgent := new(models.DummyAgent)
+	dummyAgent.Name = "Dummy"
+
+	models.EngineSingloton.AppendAgent(dummyAgent)
+	var step models.UpdateState
+	step.SetFireTime(models.EngineSingloton.GetStartTime())
+	step.Period = 1 * time.Second //
+	step.Name = "update of planetary motion"
+	dummyAgent.QueueEvent(&step)
+
+	// start right away
+	if *play {
+		models.GongsimCommandSingloton.Command = models.COMMAND_PLAY
+	}
+	if *displayWatch {
+		models.DisplayWatch = true
+	}
+
+	// commit simulation stage
+	models.Stage.Commit()
+
+	// provide the static route for the angular pages
+	r.Use(static.Serve("/", EmbedFolder(gongsim.NgDistNg, "ng/dist/ng")))
+	r.NoRoute(func(c *gin.Context) {
+		fmt.Println(c.Request.URL.Path, "doesn't exists, redirect on /")
+		c.Redirect(http.StatusMovedPermanently, "/")
+		c.Abort()
+	})
 
 	log.Printf("Server ready serve on localhost:8080")
 	r.Run()
