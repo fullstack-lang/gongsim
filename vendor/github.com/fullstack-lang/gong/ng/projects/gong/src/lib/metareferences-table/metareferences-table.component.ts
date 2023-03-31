@@ -19,6 +19,8 @@ import { MetaReferenceService } from '../metareference.service'
 
 // insertion point for additional imports
 
+import { RouteService } from '../route-service';
+
 // TableComponent is initilizaed from different routes
 // TableComponentMode detail different cases 
 enum TableComponentMode {
@@ -123,6 +125,8 @@ export class MetaReferencesTableComponent implements OnInit {
 
     private router: Router,
     private activatedRoute: ActivatedRoute,
+
+    private routeService: RouteService,
   ) {
 
     // compute mode
@@ -166,7 +170,7 @@ export class MetaReferencesTableComponent implements OnInit {
 
   ngOnInit(): void {
     let stackPath = this.activatedRoute.snapshot.paramMap.get('GONG__StackPath')
-    if ( stackPath != undefined) {
+    if (stackPath != undefined) {
       this.GONG__StackPath = stackPath
     }
 
@@ -202,10 +206,14 @@ export class MetaReferencesTableComponent implements OnInit {
           let mapOfSourceInstances = this.frontRepo[this.dialogData.SourceStruct + "s" as keyof FrontRepo] as Map<number, MetaReferenceDB>
           let sourceInstance = mapOfSourceInstances.get(this.dialogData.ID)!
 
-          let sourceField = sourceInstance[this.dialogData.SourceField as keyof typeof sourceInstance]! as unknown as MetaReferenceDB[]
-          for (let associationInstance of sourceField) {
-            let metareference = associationInstance[this.dialogData.IntermediateStructField as keyof typeof associationInstance] as unknown as MetaReferenceDB
-            this.initialSelection.push(metareference)
+          // we associates on sourceInstance of type SourceStruct with a MANY MANY associations to MetaReferenceDB
+          // the field name is sourceField
+          let sourceFieldArray = sourceInstance[this.dialogData.SourceField as keyof typeof sourceInstance]! as unknown as MetaReferenceDB[]
+          if (sourceFieldArray != null) {
+            for (let associationInstance of sourceFieldArray) {
+              let metareference = associationInstance[this.dialogData.IntermediateStructField as keyof typeof associationInstance] as unknown as MetaReferenceDB
+              this.initialSelection.push(metareference)
+            }
           }
 
           this.selection = new SelectionModel<MetaReferenceDB>(allowMultiSelect, this.initialSelection);
@@ -226,7 +234,7 @@ export class MetaReferencesTableComponent implements OnInit {
     // list of metareferences is truncated of metareference before the delete
     this.metareferences = this.metareferences.filter(h => h !== metareference);
 
-    this.metareferenceService.deleteMetaReference(metareferenceID).subscribe(
+    this.metareferenceService.deleteMetaReference(metareferenceID, this.GONG__StackPath).subscribe(
       metareference => {
         this.metareferenceService.MetaReferenceServiceChanged.next("delete")
       }
@@ -237,18 +245,15 @@ export class MetaReferencesTableComponent implements OnInit {
 
   }
 
-  // display metareference in router
-  displayMetaReferenceInRouter(metareferenceID: number) {
-    this.router.navigate(["github_com_fullstack_lang_gong_go-" + "metareference-display", metareferenceID])
-  }
-
   // set editor outlet
   setEditorRouterOutlet(metareferenceID: number) {
-    this.router.navigate([{
-      outlets: {
-        github_com_fullstack_lang_gong_go_editor: ["github_com_fullstack_lang_gong_go-" + "metareference-detail", metareferenceID, this.GONG__StackPath]
-      }
-    }]);
+    let outletName = this.routeService.getEditorOutlet(this.GONG__StackPath)
+    let fullPath = this.routeService.getPathRoot() + "-" + "metareference" + "-detail"
+
+    let outletConf: any = {}
+    outletConf[outletName] = [fullPath, metareferenceID, this.GONG__StackPath]
+
+    this.router.navigate([{ outlets: outletConf }])
   }
 
   /** Whether the number of selected elements matches the total number of rows. */
@@ -292,7 +297,7 @@ export class MetaReferencesTableComponent implements OnInit {
 
       // update all metareference (only update selection & initial selection)
       for (let metareference of toUpdate) {
-        this.metareferenceService.updateMetaReference(metareference)
+        this.metareferenceService.updateMetaReference(metareference, this.GONG__StackPath)
           .subscribe(metareference => {
             this.metareferenceService.MetaReferenceServiceChanged.next("update")
           });

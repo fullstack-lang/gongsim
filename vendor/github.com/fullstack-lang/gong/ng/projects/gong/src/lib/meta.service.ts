@@ -20,10 +20,6 @@ import { MetaDB } from './meta-db';
 })
 export class MetaService {
 
-  httpOptions = {
-    headers: new HttpHeaders({ 'Content-Type': 'application/json' })
-  };
-
   // Kamar Raïmo: Adding a way to communicate between components that share information
   // so that they are notified of a change.
   MetaServiceChanged: BehaviorSubject<string> = new BehaviorSubject("");
@@ -32,7 +28,6 @@ export class MetaService {
 
   constructor(
     private http: HttpClient,
-    private location: Location,
     @Inject(DOCUMENT) private document: Document
   ) {
     // path to the service share the same origin with the path to the document
@@ -49,11 +44,12 @@ export class MetaService {
   /** GET metas from the server */
   getMetas(GONG__StackPath: string = ""): Observable<MetaDB[]> {
 
-	let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
+    let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
 
     return this.http.get<MetaDB[]>(this.metasUrl, { params: params })
       .pipe(
-        tap(_ => this.log('fetched metas')),
+        tap(),
+		// tap(_ => this.log('fetched metas')),
         catchError(this.handleError<MetaDB[]>('getMetas', []))
       );
   }
@@ -67,15 +63,19 @@ export class MetaService {
     );
   }
 
-  //////// Save methods //////////
-
   /** POST: add a new meta to the server */
-  postMeta(metadb: MetaDB): Observable<MetaDB> {
+  postMeta(metadb: MetaDB, GONG__StackPath: string): Observable<MetaDB> {
 
     // insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
     metadb.MetaReferences = []
 
-    return this.http.post<MetaDB>(this.metasUrl, metadb, this.httpOptions).pipe(
+    let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
+    let httpOptions = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+      params: params
+    }
+
+    return this.http.post<MetaDB>(this.metasUrl, metadb, httpOptions).pipe(
       tap(_ => {
         // insertion point for restoration of reverse pointers
         this.log(`posted metadb id=${metadb.ID}`)
@@ -85,25 +85,37 @@ export class MetaService {
   }
 
   /** DELETE: delete the metadb from the server */
-  deleteMeta(metadb: MetaDB | number): Observable<MetaDB> {
+  deleteMeta(metadb: MetaDB | number, GONG__StackPath: string): Observable<MetaDB> {
     const id = typeof metadb === 'number' ? metadb : metadb.ID;
     const url = `${this.metasUrl}/${id}`;
 
-    return this.http.delete<MetaDB>(url, this.httpOptions).pipe(
+    let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
+    let httpOptions = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+      params: params
+    };
+
+    return this.http.delete<MetaDB>(url, httpOptions).pipe(
       tap(_ => this.log(`deleted metadb id=${id}`)),
       catchError(this.handleError<MetaDB>('deleteMeta'))
     );
   }
 
   /** PUT: update the metadb on the server */
-  updateMeta(metadb: MetaDB): Observable<MetaDB> {
+  updateMeta(metadb: MetaDB, GONG__StackPath: string): Observable<MetaDB> {
     const id = typeof metadb === 'number' ? metadb : metadb.ID;
     const url = `${this.metasUrl}/${id}`;
 
     // insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
     metadb.MetaReferences = []
 
-    return this.http.put<MetaDB>(url, metadb, this.httpOptions).pipe(
+    let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
+    let httpOptions = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+      params: params
+    };
+
+    return this.http.put<MetaDB>(url, metadb, httpOptions).pipe(
       tap(_ => {
         // insertion point for restoration of reverse pointers
         this.log(`updated metadb id=${metadb.ID}`)
@@ -118,11 +130,11 @@ export class MetaService {
    * @param operation - name of the operation that failed
    * @param result - optional value to return as the observable result
    */
-  private handleError<T>(operation = 'operation', result?: T) {
+  private handleError<T>(operation = 'operation in MetaService', result?: T) {
     return (error: any): Observable<T> => {
 
       // TODO: send the error to remote logging infrastructure
-      console.error(error); // log to console instead
+      console.error("MetaService" + error); // log to console instead
 
       // TODO: better job of transforming error for user consumption
       this.log(`${operation} failed: ${error.message}`);
@@ -133,6 +145,6 @@ export class MetaService {
   }
 
   private log(message: string) {
-
+      console.log(message)
   }
 }

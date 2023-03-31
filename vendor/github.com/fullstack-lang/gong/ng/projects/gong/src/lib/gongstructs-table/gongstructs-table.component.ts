@@ -19,6 +19,8 @@ import { GongStructService } from '../gongstruct.service'
 
 // insertion point for additional imports
 
+import { RouteService } from '../route-service';
+
 // TableComponent is initilizaed from different routes
 // TableComponentMode detail different cases 
 enum TableComponentMode {
@@ -112,6 +114,8 @@ export class GongStructsTableComponent implements OnInit {
 
     private router: Router,
     private activatedRoute: ActivatedRoute,
+
+    private routeService: RouteService,
   ) {
 
     // compute mode
@@ -153,7 +157,7 @@ export class GongStructsTableComponent implements OnInit {
 
   ngOnInit(): void {
     let stackPath = this.activatedRoute.snapshot.paramMap.get('GONG__StackPath')
-    if ( stackPath != undefined) {
+    if (stackPath != undefined) {
       this.GONG__StackPath = stackPath
     }
 
@@ -189,10 +193,14 @@ export class GongStructsTableComponent implements OnInit {
           let mapOfSourceInstances = this.frontRepo[this.dialogData.SourceStruct + "s" as keyof FrontRepo] as Map<number, GongStructDB>
           let sourceInstance = mapOfSourceInstances.get(this.dialogData.ID)!
 
-          let sourceField = sourceInstance[this.dialogData.SourceField as keyof typeof sourceInstance]! as unknown as GongStructDB[]
-          for (let associationInstance of sourceField) {
-            let gongstruct = associationInstance[this.dialogData.IntermediateStructField as keyof typeof associationInstance] as unknown as GongStructDB
-            this.initialSelection.push(gongstruct)
+          // we associates on sourceInstance of type SourceStruct with a MANY MANY associations to GongStructDB
+          // the field name is sourceField
+          let sourceFieldArray = sourceInstance[this.dialogData.SourceField as keyof typeof sourceInstance]! as unknown as GongStructDB[]
+          if (sourceFieldArray != null) {
+            for (let associationInstance of sourceFieldArray) {
+              let gongstruct = associationInstance[this.dialogData.IntermediateStructField as keyof typeof associationInstance] as unknown as GongStructDB
+              this.initialSelection.push(gongstruct)
+            }
           }
 
           this.selection = new SelectionModel<GongStructDB>(allowMultiSelect, this.initialSelection);
@@ -213,7 +221,7 @@ export class GongStructsTableComponent implements OnInit {
     // list of gongstructs is truncated of gongstruct before the delete
     this.gongstructs = this.gongstructs.filter(h => h !== gongstruct);
 
-    this.gongstructService.deleteGongStruct(gongstructID).subscribe(
+    this.gongstructService.deleteGongStruct(gongstructID, this.GONG__StackPath).subscribe(
       gongstruct => {
         this.gongstructService.GongStructServiceChanged.next("delete")
       }
@@ -224,18 +232,15 @@ export class GongStructsTableComponent implements OnInit {
 
   }
 
-  // display gongstruct in router
-  displayGongStructInRouter(gongstructID: number) {
-    this.router.navigate(["github_com_fullstack_lang_gong_go-" + "gongstruct-display", gongstructID])
-  }
-
   // set editor outlet
   setEditorRouterOutlet(gongstructID: number) {
-    this.router.navigate([{
-      outlets: {
-        github_com_fullstack_lang_gong_go_editor: ["github_com_fullstack_lang_gong_go-" + "gongstruct-detail", gongstructID, this.GONG__StackPath]
-      }
-    }]);
+    let outletName = this.routeService.getEditorOutlet(this.GONG__StackPath)
+    let fullPath = this.routeService.getPathRoot() + "-" + "gongstruct" + "-detail"
+
+    let outletConf: any = {}
+    outletConf[outletName] = [fullPath, gongstructID, this.GONG__StackPath]
+
+    this.router.navigate([{ outlets: outletConf }])
   }
 
   /** Whether the number of selected elements matches the total number of rows. */
@@ -279,7 +284,7 @@ export class GongStructsTableComponent implements OnInit {
 
       // update all gongstruct (only update selection & initial selection)
       for (let gongstruct of toUpdate) {
-        this.gongstructService.updateGongStruct(gongstruct)
+        this.gongstructService.updateGongStruct(gongstruct, this.GONG__StackPath)
           .subscribe(gongstruct => {
             this.gongstructService.GongStructServiceChanged.next("update")
           });

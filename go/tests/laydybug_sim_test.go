@@ -11,6 +11,9 @@ import (
 	"time"
 
 	"github.com/fullstack-lang/gongsim/go/models"
+
+	gongsim_fullstack "github.com/fullstack-lang/gongsim/go/fullstack"
+	gongsim_static "github.com/fullstack-lang/gongsim/go/static"
 )
 
 var LadybugRadius = 0.00005 // a ladybug is 1mm wide
@@ -153,23 +156,33 @@ func TestLadybugSim(t *testing.T) {
 
 	// rand.Seed(time.Now().UnixNano())
 
+	// setup the static file server and get the controller
+	r := gongsim_static.ServeStaticFiles(false)
+
+	// setup stack
+	gongsim_stage := gongsim_fullstack.NewStackInstance(r, "github.com/fullstack-lang/gongsim/go/models")
+
+	engine := new(models.Engine)
+	engine.Name = "Simulation Engine"
+	engine.Stage(gongsim_stage)
+
 	// Kills Engine Simulation goroutine
 	models.Quit <- true
 
 	// seven days of simulation
-	models.EngineSingloton.SetStartTime(time.Date(2021, time.July, 1, 0, 0, 0, 0, time.UTC))
-	models.EngineSingloton.SetCurrentTime(models.EngineSingloton.GetStartTime())
-	models.EngineSingloton.State = models.PAUSED
-	models.EngineSingloton.Speed = 1.0 // realtime
-	// log.Printf("Sim start \t\t\t%s\n", models.EngineSingloton.GetStartTime())
+	engine.SetStartTime(time.Date(2021, time.July, 1, 0, 0, 0, 0, time.UTC))
+	engine.SetCurrentTime(engine.GetStartTime())
+	engine.State = models.PAUSED
+	engine.Speed = 1.0 // realtime
+	// log.Printf("Sim start \t\t\t%s\n", engine.GetStartTime())
 
 	// Three years
-	models.EngineSingloton.SetEndTime(time.Date(2021, time.July, 1, 0, 30, 0, 0, time.UTC))
-	// log.Printf("Sim end  \t\t\t%s\n", models.EngineSingloton.GetEndTime())
+	engine.SetEndTime(time.Date(2021, time.July, 1, 0, 30, 0, 0, time.UTC))
+	// log.Printf("Sim end  \t\t\t%s\n", engine.GetEndTime())
 
 	// PLUMBING n°1: callback for treating model specific action. In this case, see specific engine
 	var ladyBugSimulation LadybugSimulation
-	models.EngineSingloton.Simulation = &ladyBugSimulation
+	engine.Simulation = &ladyBugSimulation
 
 	// initial positions of ladybugs cannot be close to each others than the radius
 	initialXPosition := make(map[float64]*Ladybug)
@@ -200,9 +213,9 @@ func TestLadybugSim(t *testing.T) {
 			ladyBug.Speed = -AbsoluteSpeed
 		}
 
-		models.EngineSingloton.AppendAgent(ladyBug)
+		engine.AppendAgent(ladyBug)
 		var step models.UpdateState
-		step.SetFireTime(models.EngineSingloton.GetStartTime())
+		step.SetFireTime(engine.GetStartTime())
 		step.Period = simulationStep //
 		step.Name = "update of laybug motion"
 		ladyBug.QueueEvent(&step)
@@ -248,9 +261,9 @@ func TestLadybugSim(t *testing.T) {
 	maxRelayDistanceFromBorder := math.Max(leftRelayInitialPosX, 1.0-rightRelayInitialPosX)
 	log.Printf("max distance relay to border %1.4f", maxRelayDistanceFromBorder)
 
-	_, nextSimTime, _ := models.EngineSingloton.GetNextEvent()
-	for nextSimTime.Before(models.EngineSingloton.GetEndTime()) {
-		_, nextSimTime, _ = models.EngineSingloton.FireNextEvent()
+	_, nextSimTime, _ := engine.GetNextEvent()
+	for nextSimTime.Before(engine.GetEndTime()) {
+		_, nextSimTime, _ = engine.FireNextEvent()
 	}
 
 	log.Printf("Ladybug sim over")

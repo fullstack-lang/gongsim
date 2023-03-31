@@ -5,8 +5,6 @@ import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 
-
-
 // for angular material
 import { MatSliderModule } from '@angular/material/slider';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -35,7 +33,8 @@ import { GongdocdiagramsModule } from 'gongdocdiagrams'
 import { GongModule } from 'gong'
 
 import { GongsimModule } from 'gongsim'
-import { GongsimcontrolModule } from 'gongsimcontrol'
+import { GongsimspecificModule } from 'gongsimspecific'
+import { GongstructSelectionService } from 'gongsim'
 
 // mandatory
 import { HttpClientModule } from '@angular/common/http';
@@ -47,6 +46,8 @@ import { HttpClientModule } from '@angular/common/http';
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
+
+    HttpClientModule,
 
     MatSliderModule,
     MatSelectModule,
@@ -73,11 +74,12 @@ import { HttpClientModule } from '@angular/common/http';
     GongdocModule,
     GongdocdiagramsModule,
 
-    HttpClientModule,
     GongsimModule,
-    GongsimcontrolModule
+    GongsimspecificModule,
   ],
-  providers: [],
+  providers: [
+    GongstructSelectionService
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

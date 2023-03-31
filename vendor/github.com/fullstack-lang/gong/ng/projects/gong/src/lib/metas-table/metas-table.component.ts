@@ -19,6 +19,8 @@ import { MetaService } from '../meta.service'
 
 // insertion point for additional imports
 
+import { RouteService } from '../route-service';
+
 // TableComponent is initilizaed from different routes
 // TableComponentMode detail different cases 
 enum TableComponentMode {
@@ -116,6 +118,8 @@ export class MetasTableComponent implements OnInit {
 
     private router: Router,
     private activatedRoute: ActivatedRoute,
+
+    private routeService: RouteService,
   ) {
 
     // compute mode
@@ -159,7 +163,7 @@ export class MetasTableComponent implements OnInit {
 
   ngOnInit(): void {
     let stackPath = this.activatedRoute.snapshot.paramMap.get('GONG__StackPath')
-    if ( stackPath != undefined) {
+    if (stackPath != undefined) {
       this.GONG__StackPath = stackPath
     }
 
@@ -195,10 +199,14 @@ export class MetasTableComponent implements OnInit {
           let mapOfSourceInstances = this.frontRepo[this.dialogData.SourceStruct + "s" as keyof FrontRepo] as Map<number, MetaDB>
           let sourceInstance = mapOfSourceInstances.get(this.dialogData.ID)!
 
-          let sourceField = sourceInstance[this.dialogData.SourceField as keyof typeof sourceInstance]! as unknown as MetaDB[]
-          for (let associationInstance of sourceField) {
-            let meta = associationInstance[this.dialogData.IntermediateStructField as keyof typeof associationInstance] as unknown as MetaDB
-            this.initialSelection.push(meta)
+          // we associates on sourceInstance of type SourceStruct with a MANY MANY associations to MetaDB
+          // the field name is sourceField
+          let sourceFieldArray = sourceInstance[this.dialogData.SourceField as keyof typeof sourceInstance]! as unknown as MetaDB[]
+          if (sourceFieldArray != null) {
+            for (let associationInstance of sourceFieldArray) {
+              let meta = associationInstance[this.dialogData.IntermediateStructField as keyof typeof associationInstance] as unknown as MetaDB
+              this.initialSelection.push(meta)
+            }
           }
 
           this.selection = new SelectionModel<MetaDB>(allowMultiSelect, this.initialSelection);
@@ -219,7 +227,7 @@ export class MetasTableComponent implements OnInit {
     // list of metas is truncated of meta before the delete
     this.metas = this.metas.filter(h => h !== meta);
 
-    this.metaService.deleteMeta(metaID).subscribe(
+    this.metaService.deleteMeta(metaID, this.GONG__StackPath).subscribe(
       meta => {
         this.metaService.MetaServiceChanged.next("delete")
       }
@@ -230,18 +238,15 @@ export class MetasTableComponent implements OnInit {
 
   }
 
-  // display meta in router
-  displayMetaInRouter(metaID: number) {
-    this.router.navigate(["github_com_fullstack_lang_gong_go-" + "meta-display", metaID])
-  }
-
   // set editor outlet
   setEditorRouterOutlet(metaID: number) {
-    this.router.navigate([{
-      outlets: {
-        github_com_fullstack_lang_gong_go_editor: ["github_com_fullstack_lang_gong_go-" + "meta-detail", metaID, this.GONG__StackPath]
-      }
-    }]);
+    let outletName = this.routeService.getEditorOutlet(this.GONG__StackPath)
+    let fullPath = this.routeService.getPathRoot() + "-" + "meta" + "-detail"
+
+    let outletConf: any = {}
+    outletConf[outletName] = [fullPath, metaID, this.GONG__StackPath]
+
+    this.router.navigate([{ outlets: outletConf }])
   }
 
   /** Whether the number of selected elements matches the total number of rows. */
@@ -285,7 +290,7 @@ export class MetasTableComponent implements OnInit {
 
       // update all meta (only update selection & initial selection)
       for (let meta of toUpdate) {
-        this.metaService.updateMeta(meta)
+        this.metaService.updateMeta(meta, this.GONG__StackPath)
           .subscribe(meta => {
             this.metaService.MetaServiceChanged.next("update")
           });

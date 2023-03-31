@@ -19,6 +19,8 @@ import { GongEnumValueService } from '../gongenumvalue.service'
 
 // insertion point for additional imports
 
+import { RouteService } from '../route-service';
+
 // TableComponent is initilizaed from different routes
 // TableComponentMode detail different cases 
 enum TableComponentMode {
@@ -127,6 +129,8 @@ export class GongEnumValuesTableComponent implements OnInit {
 
     private router: Router,
     private activatedRoute: ActivatedRoute,
+
+    private routeService: RouteService,
   ) {
 
     // compute mode
@@ -172,7 +176,7 @@ export class GongEnumValuesTableComponent implements OnInit {
 
   ngOnInit(): void {
     let stackPath = this.activatedRoute.snapshot.paramMap.get('GONG__StackPath')
-    if ( stackPath != undefined) {
+    if (stackPath != undefined) {
       this.GONG__StackPath = stackPath
     }
 
@@ -208,10 +212,14 @@ export class GongEnumValuesTableComponent implements OnInit {
           let mapOfSourceInstances = this.frontRepo[this.dialogData.SourceStruct + "s" as keyof FrontRepo] as Map<number, GongEnumValueDB>
           let sourceInstance = mapOfSourceInstances.get(this.dialogData.ID)!
 
-          let sourceField = sourceInstance[this.dialogData.SourceField as keyof typeof sourceInstance]! as unknown as GongEnumValueDB[]
-          for (let associationInstance of sourceField) {
-            let gongenumvalue = associationInstance[this.dialogData.IntermediateStructField as keyof typeof associationInstance] as unknown as GongEnumValueDB
-            this.initialSelection.push(gongenumvalue)
+          // we associates on sourceInstance of type SourceStruct with a MANY MANY associations to GongEnumValueDB
+          // the field name is sourceField
+          let sourceFieldArray = sourceInstance[this.dialogData.SourceField as keyof typeof sourceInstance]! as unknown as GongEnumValueDB[]
+          if (sourceFieldArray != null) {
+            for (let associationInstance of sourceFieldArray) {
+              let gongenumvalue = associationInstance[this.dialogData.IntermediateStructField as keyof typeof associationInstance] as unknown as GongEnumValueDB
+              this.initialSelection.push(gongenumvalue)
+            }
           }
 
           this.selection = new SelectionModel<GongEnumValueDB>(allowMultiSelect, this.initialSelection);
@@ -232,7 +240,7 @@ export class GongEnumValuesTableComponent implements OnInit {
     // list of gongenumvalues is truncated of gongenumvalue before the delete
     this.gongenumvalues = this.gongenumvalues.filter(h => h !== gongenumvalue);
 
-    this.gongenumvalueService.deleteGongEnumValue(gongenumvalueID).subscribe(
+    this.gongenumvalueService.deleteGongEnumValue(gongenumvalueID, this.GONG__StackPath).subscribe(
       gongenumvalue => {
         this.gongenumvalueService.GongEnumValueServiceChanged.next("delete")
       }
@@ -243,18 +251,15 @@ export class GongEnumValuesTableComponent implements OnInit {
 
   }
 
-  // display gongenumvalue in router
-  displayGongEnumValueInRouter(gongenumvalueID: number) {
-    this.router.navigate(["github_com_fullstack_lang_gong_go-" + "gongenumvalue-display", gongenumvalueID])
-  }
-
   // set editor outlet
   setEditorRouterOutlet(gongenumvalueID: number) {
-    this.router.navigate([{
-      outlets: {
-        github_com_fullstack_lang_gong_go_editor: ["github_com_fullstack_lang_gong_go-" + "gongenumvalue-detail", gongenumvalueID, this.GONG__StackPath]
-      }
-    }]);
+    let outletName = this.routeService.getEditorOutlet(this.GONG__StackPath)
+    let fullPath = this.routeService.getPathRoot() + "-" + "gongenumvalue" + "-detail"
+
+    let outletConf: any = {}
+    outletConf[outletName] = [fullPath, gongenumvalueID, this.GONG__StackPath]
+
+    this.router.navigate([{ outlets: outletConf }])
   }
 
   /** Whether the number of selected elements matches the total number of rows. */
@@ -298,7 +303,7 @@ export class GongEnumValuesTableComponent implements OnInit {
 
       // update all gongenumvalue (only update selection & initial selection)
       for (let gongenumvalue of toUpdate) {
-        this.gongenumvalueService.updateGongEnumValue(gongenumvalue)
+        this.gongenumvalueService.updateGongEnumValue(gongenumvalue, this.GONG__StackPath)
           .subscribe(gongenumvalue => {
             this.gongenumvalueService.GongEnumValueServiceChanged.next("update")
           });

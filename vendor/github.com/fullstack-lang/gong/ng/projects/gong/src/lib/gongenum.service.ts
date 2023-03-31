@@ -20,10 +20,6 @@ import { GongEnumDB } from './gongenum-db';
 })
 export class GongEnumService {
 
-  httpOptions = {
-    headers: new HttpHeaders({ 'Content-Type': 'application/json' })
-  };
-
   // Kamar Raïmo: Adding a way to communicate between components that share information
   // so that they are notified of a change.
   GongEnumServiceChanged: BehaviorSubject<string> = new BehaviorSubject("");
@@ -32,7 +28,6 @@ export class GongEnumService {
 
   constructor(
     private http: HttpClient,
-    private location: Location,
     @Inject(DOCUMENT) private document: Document
   ) {
     // path to the service share the same origin with the path to the document
@@ -49,11 +44,12 @@ export class GongEnumService {
   /** GET gongenums from the server */
   getGongEnums(GONG__StackPath: string = ""): Observable<GongEnumDB[]> {
 
-	let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
+    let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
 
     return this.http.get<GongEnumDB[]>(this.gongenumsUrl, { params: params })
       .pipe(
-        tap(_ => this.log('fetched gongenums')),
+        tap(),
+		// tap(_ => this.log('fetched gongenums')),
         catchError(this.handleError<GongEnumDB[]>('getGongEnums', []))
       );
   }
@@ -67,15 +63,19 @@ export class GongEnumService {
     );
   }
 
-  //////// Save methods //////////
-
   /** POST: add a new gongenum to the server */
-  postGongEnum(gongenumdb: GongEnumDB): Observable<GongEnumDB> {
+  postGongEnum(gongenumdb: GongEnumDB, GONG__StackPath: string): Observable<GongEnumDB> {
 
     // insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
     gongenumdb.GongEnumValues = []
 
-    return this.http.post<GongEnumDB>(this.gongenumsUrl, gongenumdb, this.httpOptions).pipe(
+    let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
+    let httpOptions = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+      params: params
+    }
+
+    return this.http.post<GongEnumDB>(this.gongenumsUrl, gongenumdb, httpOptions).pipe(
       tap(_ => {
         // insertion point for restoration of reverse pointers
         this.log(`posted gongenumdb id=${gongenumdb.ID}`)
@@ -85,25 +85,37 @@ export class GongEnumService {
   }
 
   /** DELETE: delete the gongenumdb from the server */
-  deleteGongEnum(gongenumdb: GongEnumDB | number): Observable<GongEnumDB> {
+  deleteGongEnum(gongenumdb: GongEnumDB | number, GONG__StackPath: string): Observable<GongEnumDB> {
     const id = typeof gongenumdb === 'number' ? gongenumdb : gongenumdb.ID;
     const url = `${this.gongenumsUrl}/${id}`;
 
-    return this.http.delete<GongEnumDB>(url, this.httpOptions).pipe(
+    let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
+    let httpOptions = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+      params: params
+    };
+
+    return this.http.delete<GongEnumDB>(url, httpOptions).pipe(
       tap(_ => this.log(`deleted gongenumdb id=${id}`)),
       catchError(this.handleError<GongEnumDB>('deleteGongEnum'))
     );
   }
 
   /** PUT: update the gongenumdb on the server */
-  updateGongEnum(gongenumdb: GongEnumDB): Observable<GongEnumDB> {
+  updateGongEnum(gongenumdb: GongEnumDB, GONG__StackPath: string): Observable<GongEnumDB> {
     const id = typeof gongenumdb === 'number' ? gongenumdb : gongenumdb.ID;
     const url = `${this.gongenumsUrl}/${id}`;
 
     // insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
     gongenumdb.GongEnumValues = []
 
-    return this.http.put<GongEnumDB>(url, gongenumdb, this.httpOptions).pipe(
+    let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
+    let httpOptions = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+      params: params
+    };
+
+    return this.http.put<GongEnumDB>(url, gongenumdb, httpOptions).pipe(
       tap(_ => {
         // insertion point for restoration of reverse pointers
         this.log(`updated gongenumdb id=${gongenumdb.ID}`)
@@ -118,11 +130,11 @@ export class GongEnumService {
    * @param operation - name of the operation that failed
    * @param result - optional value to return as the observable result
    */
-  private handleError<T>(operation = 'operation', result?: T) {
+  private handleError<T>(operation = 'operation in GongEnumService', result?: T) {
     return (error: any): Observable<T> => {
 
       // TODO: send the error to remote logging infrastructure
-      console.error(error); // log to console instead
+      console.error("GongEnumService" + error); // log to console instead
 
       // TODO: better job of transforming error for user consumption
       this.log(`${operation} failed: ${error.message}`);
@@ -133,6 +145,6 @@ export class GongEnumService {
   }
 
   private log(message: string) {
-
+      console.log(message)
   }
 }
