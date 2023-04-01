@@ -34,6 +34,11 @@
 			"group": "build"
 		},
 		{
+			"label": "01 - kill 4200",
+			"group": "build",
+			"command": "lsof -ti :4200 | xargs kill",
+		},
+		{
 			"label": "00 - update gong dependencies",
 			"type": "shell",
 			"command": "go",
