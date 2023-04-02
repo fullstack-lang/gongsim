@@ -19,6 +19,8 @@ import { GongLinkService } from '../gonglink.service'
 
 // insertion point for additional imports
 
+import { RouteService } from '../route-service';
+
 // TableComponent is initilizaed from different routes
 // TableComponentMode detail different cases 
 enum TableComponentMode {
@@ -131,6 +133,8 @@ export class GongLinksTableComponent implements OnInit {
 
     private router: Router,
     private activatedRoute: ActivatedRoute,
+
+    private routeService: RouteService,
   ) {
 
     // compute mode
@@ -178,7 +182,7 @@ export class GongLinksTableComponent implements OnInit {
 
   ngOnInit(): void {
     let stackPath = this.activatedRoute.snapshot.paramMap.get('GONG__StackPath')
-    if ( stackPath != undefined) {
+    if (stackPath != undefined) {
       this.GONG__StackPath = stackPath
     }
 
@@ -214,10 +218,14 @@ export class GongLinksTableComponent implements OnInit {
           let mapOfSourceInstances = this.frontRepo[this.dialogData.SourceStruct + "s" as keyof FrontRepo] as Map<number, GongLinkDB>
           let sourceInstance = mapOfSourceInstances.get(this.dialogData.ID)!
 
-          let sourceField = sourceInstance[this.dialogData.SourceField as keyof typeof sourceInstance]! as unknown as GongLinkDB[]
-          for (let associationInstance of sourceField) {
-            let gonglink = associationInstance[this.dialogData.IntermediateStructField as keyof typeof associationInstance] as unknown as GongLinkDB
-            this.initialSelection.push(gonglink)
+          // we associates on sourceInstance of type SourceStruct with a MANY MANY associations to GongLinkDB
+          // the field name is sourceField
+          let sourceFieldArray = sourceInstance[this.dialogData.SourceField as keyof typeof sourceInstance]! as unknown as GongLinkDB[]
+          if (sourceFieldArray != null) {
+            for (let associationInstance of sourceFieldArray) {
+              let gonglink = associationInstance[this.dialogData.IntermediateStructField as keyof typeof associationInstance] as unknown as GongLinkDB
+              this.initialSelection.push(gonglink)
+            }
           }
 
           this.selection = new SelectionModel<GongLinkDB>(allowMultiSelect, this.initialSelection);
@@ -238,7 +246,7 @@ export class GongLinksTableComponent implements OnInit {
     // list of gonglinks is truncated of gonglink before the delete
     this.gonglinks = this.gonglinks.filter(h => h !== gonglink);
 
-    this.gonglinkService.deleteGongLink(gonglinkID).subscribe(
+    this.gonglinkService.deleteGongLink(gonglinkID, this.GONG__StackPath).subscribe(
       gonglink => {
         this.gonglinkService.GongLinkServiceChanged.next("delete")
       }
@@ -249,18 +257,15 @@ export class GongLinksTableComponent implements OnInit {
 
   }
 
-  // display gonglink in router
-  displayGongLinkInRouter(gonglinkID: number) {
-    this.router.navigate(["github_com_fullstack_lang_gong_go-" + "gonglink-display", gonglinkID])
-  }
-
   // set editor outlet
   setEditorRouterOutlet(gonglinkID: number) {
-    this.router.navigate([{
-      outlets: {
-        github_com_fullstack_lang_gong_go_editor: ["github_com_fullstack_lang_gong_go-" + "gonglink-detail", gonglinkID, this.GONG__StackPath]
-      }
-    }]);
+    let outletName = this.routeService.getEditorOutlet(this.GONG__StackPath)
+    let fullPath = this.routeService.getPathRoot() + "-" + "gonglink" + "-detail"
+
+    let outletConf: any = {}
+    outletConf[outletName] = [fullPath, gonglinkID, this.GONG__StackPath]
+
+    this.router.navigate([{ outlets: outletConf }])
   }
 
   /** Whether the number of selected elements matches the total number of rows. */
@@ -304,7 +309,7 @@ export class GongLinksTableComponent implements OnInit {
 
       // update all gonglink (only update selection & initial selection)
       for (let gonglink of toUpdate) {
-        this.gonglinkService.updateGongLink(gonglink)
+        this.gonglinkService.updateGongLink(gonglink, this.GONG__StackPath)
           .subscribe(gonglink => {
             this.gonglinkService.GongLinkServiceChanged.next("update")
           });

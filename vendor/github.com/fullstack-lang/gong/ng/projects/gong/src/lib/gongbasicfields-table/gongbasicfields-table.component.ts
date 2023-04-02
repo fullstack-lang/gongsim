@@ -19,6 +19,8 @@ import { GongBasicFieldService } from '../gongbasicfield.service'
 
 // insertion point for additional imports
 
+import { RouteService } from '../route-service';
+
 // TableComponent is initilizaed from different routes
 // TableComponentMode detail different cases 
 enum TableComponentMode {
@@ -148,6 +150,8 @@ export class GongBasicFieldsTableComponent implements OnInit {
 
     private router: Router,
     private activatedRoute: ActivatedRoute,
+
+    private routeService: RouteService,
   ) {
 
     // compute mode
@@ -203,7 +207,7 @@ export class GongBasicFieldsTableComponent implements OnInit {
 
   ngOnInit(): void {
     let stackPath = this.activatedRoute.snapshot.paramMap.get('GONG__StackPath')
-    if ( stackPath != undefined) {
+    if (stackPath != undefined) {
       this.GONG__StackPath = stackPath
     }
 
@@ -239,10 +243,14 @@ export class GongBasicFieldsTableComponent implements OnInit {
           let mapOfSourceInstances = this.frontRepo[this.dialogData.SourceStruct + "s" as keyof FrontRepo] as Map<number, GongBasicFieldDB>
           let sourceInstance = mapOfSourceInstances.get(this.dialogData.ID)!
 
-          let sourceField = sourceInstance[this.dialogData.SourceField as keyof typeof sourceInstance]! as unknown as GongBasicFieldDB[]
-          for (let associationInstance of sourceField) {
-            let gongbasicfield = associationInstance[this.dialogData.IntermediateStructField as keyof typeof associationInstance] as unknown as GongBasicFieldDB
-            this.initialSelection.push(gongbasicfield)
+          // we associates on sourceInstance of type SourceStruct with a MANY MANY associations to GongBasicFieldDB
+          // the field name is sourceField
+          let sourceFieldArray = sourceInstance[this.dialogData.SourceField as keyof typeof sourceInstance]! as unknown as GongBasicFieldDB[]
+          if (sourceFieldArray != null) {
+            for (let associationInstance of sourceFieldArray) {
+              let gongbasicfield = associationInstance[this.dialogData.IntermediateStructField as keyof typeof associationInstance] as unknown as GongBasicFieldDB
+              this.initialSelection.push(gongbasicfield)
+            }
           }
 
           this.selection = new SelectionModel<GongBasicFieldDB>(allowMultiSelect, this.initialSelection);
@@ -263,7 +271,7 @@ export class GongBasicFieldsTableComponent implements OnInit {
     // list of gongbasicfields is truncated of gongbasicfield before the delete
     this.gongbasicfields = this.gongbasicfields.filter(h => h !== gongbasicfield);
 
-    this.gongbasicfieldService.deleteGongBasicField(gongbasicfieldID).subscribe(
+    this.gongbasicfieldService.deleteGongBasicField(gongbasicfieldID, this.GONG__StackPath).subscribe(
       gongbasicfield => {
         this.gongbasicfieldService.GongBasicFieldServiceChanged.next("delete")
       }
@@ -274,18 +282,15 @@ export class GongBasicFieldsTableComponent implements OnInit {
 
   }
 
-  // display gongbasicfield in router
-  displayGongBasicFieldInRouter(gongbasicfieldID: number) {
-    this.router.navigate(["github_com_fullstack_lang_gong_go-" + "gongbasicfield-display", gongbasicfieldID])
-  }
-
   // set editor outlet
   setEditorRouterOutlet(gongbasicfieldID: number) {
-    this.router.navigate([{
-      outlets: {
-        github_com_fullstack_lang_gong_go_editor: ["github_com_fullstack_lang_gong_go-" + "gongbasicfield-detail", gongbasicfieldID, this.GONG__StackPath]
-      }
-    }]);
+    let outletName = this.routeService.getEditorOutlet(this.GONG__StackPath)
+    let fullPath = this.routeService.getPathRoot() + "-" + "gongbasicfield" + "-detail"
+
+    let outletConf: any = {}
+    outletConf[outletName] = [fullPath, gongbasicfieldID, this.GONG__StackPath]
+
+    this.router.navigate([{ outlets: outletConf }])
   }
 
   /** Whether the number of selected elements matches the total number of rows. */
@@ -329,7 +334,7 @@ export class GongBasicFieldsTableComponent implements OnInit {
 
       // update all gongbasicfield (only update selection & initial selection)
       for (let gongbasicfield of toUpdate) {
-        this.gongbasicfieldService.updateGongBasicField(gongbasicfield)
+        this.gongbasicfieldService.updateGongBasicField(gongbasicfield, this.GONG__StackPath)
           .subscribe(gongbasicfield => {
             this.gongbasicfieldService.GongBasicFieldServiceChanged.next("update")
           });

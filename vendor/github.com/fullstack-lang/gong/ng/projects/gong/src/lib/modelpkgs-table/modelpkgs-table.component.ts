@@ -19,6 +19,8 @@ import { ModelPkgService } from '../modelpkg.service'
 
 // insertion point for additional imports
 
+import { RouteService } from '../route-service';
+
 // TableComponent is initilizaed from different routes
 // TableComponentMode detail different cases 
 enum TableComponentMode {
@@ -116,6 +118,8 @@ export class ModelPkgsTableComponent implements OnInit {
 
     private router: Router,
     private activatedRoute: ActivatedRoute,
+
+    private routeService: RouteService,
   ) {
 
     // compute mode
@@ -159,7 +163,7 @@ export class ModelPkgsTableComponent implements OnInit {
 
   ngOnInit(): void {
     let stackPath = this.activatedRoute.snapshot.paramMap.get('GONG__StackPath')
-    if ( stackPath != undefined) {
+    if (stackPath != undefined) {
       this.GONG__StackPath = stackPath
     }
 
@@ -195,10 +199,14 @@ export class ModelPkgsTableComponent implements OnInit {
           let mapOfSourceInstances = this.frontRepo[this.dialogData.SourceStruct + "s" as keyof FrontRepo] as Map<number, ModelPkgDB>
           let sourceInstance = mapOfSourceInstances.get(this.dialogData.ID)!
 
-          let sourceField = sourceInstance[this.dialogData.SourceField as keyof typeof sourceInstance]! as unknown as ModelPkgDB[]
-          for (let associationInstance of sourceField) {
-            let modelpkg = associationInstance[this.dialogData.IntermediateStructField as keyof typeof associationInstance] as unknown as ModelPkgDB
-            this.initialSelection.push(modelpkg)
+          // we associates on sourceInstance of type SourceStruct with a MANY MANY associations to ModelPkgDB
+          // the field name is sourceField
+          let sourceFieldArray = sourceInstance[this.dialogData.SourceField as keyof typeof sourceInstance]! as unknown as ModelPkgDB[]
+          if (sourceFieldArray != null) {
+            for (let associationInstance of sourceFieldArray) {
+              let modelpkg = associationInstance[this.dialogData.IntermediateStructField as keyof typeof associationInstance] as unknown as ModelPkgDB
+              this.initialSelection.push(modelpkg)
+            }
           }
 
           this.selection = new SelectionModel<ModelPkgDB>(allowMultiSelect, this.initialSelection);
@@ -219,7 +227,7 @@ export class ModelPkgsTableComponent implements OnInit {
     // list of modelpkgs is truncated of modelpkg before the delete
     this.modelpkgs = this.modelpkgs.filter(h => h !== modelpkg);
 
-    this.modelpkgService.deleteModelPkg(modelpkgID).subscribe(
+    this.modelpkgService.deleteModelPkg(modelpkgID, this.GONG__StackPath).subscribe(
       modelpkg => {
         this.modelpkgService.ModelPkgServiceChanged.next("delete")
       }
@@ -230,18 +238,15 @@ export class ModelPkgsTableComponent implements OnInit {
 
   }
 
-  // display modelpkg in router
-  displayModelPkgInRouter(modelpkgID: number) {
-    this.router.navigate(["github_com_fullstack_lang_gong_go-" + "modelpkg-display", modelpkgID])
-  }
-
   // set editor outlet
   setEditorRouterOutlet(modelpkgID: number) {
-    this.router.navigate([{
-      outlets: {
-        github_com_fullstack_lang_gong_go_editor: ["github_com_fullstack_lang_gong_go-" + "modelpkg-detail", modelpkgID, this.GONG__StackPath]
-      }
-    }]);
+    let outletName = this.routeService.getEditorOutlet(this.GONG__StackPath)
+    let fullPath = this.routeService.getPathRoot() + "-" + "modelpkg" + "-detail"
+
+    let outletConf: any = {}
+    outletConf[outletName] = [fullPath, modelpkgID, this.GONG__StackPath]
+
+    this.router.navigate([{ outlets: outletConf }])
   }
 
   /** Whether the number of selected elements matches the total number of rows. */
@@ -285,7 +290,7 @@ export class ModelPkgsTableComponent implements OnInit {
 
       // update all modelpkg (only update selection & initial selection)
       for (let modelpkg of toUpdate) {
-        this.modelpkgService.updateModelPkg(modelpkg)
+        this.modelpkgService.updateModelPkg(modelpkg, this.GONG__StackPath)
           .subscribe(modelpkg => {
             this.modelpkgService.ModelPkgServiceChanged.next("update")
           });

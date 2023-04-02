@@ -22,10 +22,6 @@ import { GongStructDB } from './gongstruct-db'
 })
 export class GongBasicFieldService {
 
-  httpOptions = {
-    headers: new HttpHeaders({ 'Content-Type': 'application/json' })
-  };
-
   // Kamar Raïmo: Adding a way to communicate between components that share information
   // so that they are notified of a change.
   GongBasicFieldServiceChanged: BehaviorSubject<string> = new BehaviorSubject("");
@@ -34,7 +30,6 @@ export class GongBasicFieldService {
 
   constructor(
     private http: HttpClient,
-    private location: Location,
     @Inject(DOCUMENT) private document: Document
   ) {
     // path to the service share the same origin with the path to the document
@@ -51,11 +46,12 @@ export class GongBasicFieldService {
   /** GET gongbasicfields from the server */
   getGongBasicFields(GONG__StackPath: string = ""): Observable<GongBasicFieldDB[]> {
 
-	let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
+    let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
 
     return this.http.get<GongBasicFieldDB[]>(this.gongbasicfieldsUrl, { params: params })
       .pipe(
-        tap(_ => this.log('fetched gongbasicfields')),
+        tap(),
+		// tap(_ => this.log('fetched gongbasicfields')),
         catchError(this.handleError<GongBasicFieldDB[]>('getGongBasicFields', []))
       );
   }
@@ -69,17 +65,21 @@ export class GongBasicFieldService {
     );
   }
 
-  //////// Save methods //////////
-
   /** POST: add a new gongbasicfield to the server */
-  postGongBasicField(gongbasicfielddb: GongBasicFieldDB): Observable<GongBasicFieldDB> {
+  postGongBasicField(gongbasicfielddb: GongBasicFieldDB, GONG__StackPath: string): Observable<GongBasicFieldDB> {
 
     // insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
     gongbasicfielddb.GongEnum = new GongEnumDB
     let _GongStruct_GongBasicFields_reverse = gongbasicfielddb.GongStruct_GongBasicFields_reverse
     gongbasicfielddb.GongStruct_GongBasicFields_reverse = new GongStructDB
 
-    return this.http.post<GongBasicFieldDB>(this.gongbasicfieldsUrl, gongbasicfielddb, this.httpOptions).pipe(
+    let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
+    let httpOptions = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+      params: params
+    }
+
+    return this.http.post<GongBasicFieldDB>(this.gongbasicfieldsUrl, gongbasicfielddb, httpOptions).pipe(
       tap(_ => {
         // insertion point for restoration of reverse pointers
         gongbasicfielddb.GongStruct_GongBasicFields_reverse = _GongStruct_GongBasicFields_reverse
@@ -90,18 +90,24 @@ export class GongBasicFieldService {
   }
 
   /** DELETE: delete the gongbasicfielddb from the server */
-  deleteGongBasicField(gongbasicfielddb: GongBasicFieldDB | number): Observable<GongBasicFieldDB> {
+  deleteGongBasicField(gongbasicfielddb: GongBasicFieldDB | number, GONG__StackPath: string): Observable<GongBasicFieldDB> {
     const id = typeof gongbasicfielddb === 'number' ? gongbasicfielddb : gongbasicfielddb.ID;
     const url = `${this.gongbasicfieldsUrl}/${id}`;
 
-    return this.http.delete<GongBasicFieldDB>(url, this.httpOptions).pipe(
+    let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
+    let httpOptions = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+      params: params
+    };
+
+    return this.http.delete<GongBasicFieldDB>(url, httpOptions).pipe(
       tap(_ => this.log(`deleted gongbasicfielddb id=${id}`)),
       catchError(this.handleError<GongBasicFieldDB>('deleteGongBasicField'))
     );
   }
 
   /** PUT: update the gongbasicfielddb on the server */
-  updateGongBasicField(gongbasicfielddb: GongBasicFieldDB): Observable<GongBasicFieldDB> {
+  updateGongBasicField(gongbasicfielddb: GongBasicFieldDB, GONG__StackPath: string): Observable<GongBasicFieldDB> {
     const id = typeof gongbasicfielddb === 'number' ? gongbasicfielddb : gongbasicfielddb.ID;
     const url = `${this.gongbasicfieldsUrl}/${id}`;
 
@@ -110,7 +116,13 @@ export class GongBasicFieldService {
     let _GongStruct_GongBasicFields_reverse = gongbasicfielddb.GongStruct_GongBasicFields_reverse
     gongbasicfielddb.GongStruct_GongBasicFields_reverse = new GongStructDB
 
-    return this.http.put<GongBasicFieldDB>(url, gongbasicfielddb, this.httpOptions).pipe(
+    let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
+    let httpOptions = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+      params: params
+    };
+
+    return this.http.put<GongBasicFieldDB>(url, gongbasicfielddb, httpOptions).pipe(
       tap(_ => {
         // insertion point for restoration of reverse pointers
         gongbasicfielddb.GongStruct_GongBasicFields_reverse = _GongStruct_GongBasicFields_reverse
@@ -126,11 +138,11 @@ export class GongBasicFieldService {
    * @param operation - name of the operation that failed
    * @param result - optional value to return as the observable result
    */
-  private handleError<T>(operation = 'operation', result?: T) {
+  private handleError<T>(operation = 'operation in GongBasicFieldService', result?: T) {
     return (error: any): Observable<T> => {
 
       // TODO: send the error to remote logging infrastructure
-      console.error(error); // log to console instead
+      console.error("GongBasicFieldService" + error); // log to console instead
 
       // TODO: better job of transforming error for user consumption
       this.log(`${operation} failed: ${error.message}`);
@@ -141,6 +153,6 @@ export class GongBasicFieldService {
   }
 
   private log(message: string) {
-
+      console.log(message)
   }
 }

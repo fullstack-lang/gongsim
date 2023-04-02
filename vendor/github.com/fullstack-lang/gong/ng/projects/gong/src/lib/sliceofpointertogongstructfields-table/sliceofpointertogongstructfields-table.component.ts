@@ -19,6 +19,8 @@ import { SliceOfPointerToGongStructFieldService } from '../sliceofpointertogongs
 
 // insertion point for additional imports
 
+import { RouteService } from '../route-service';
+
 // TableComponent is initilizaed from different routes
 // TableComponentMode detail different cases 
 enum TableComponentMode {
@@ -137,6 +139,8 @@ export class SliceOfPointerToGongStructFieldsTableComponent implements OnInit {
 
     private router: Router,
     private activatedRoute: ActivatedRoute,
+
+    private routeService: RouteService,
   ) {
 
     // compute mode
@@ -186,7 +190,7 @@ export class SliceOfPointerToGongStructFieldsTableComponent implements OnInit {
 
   ngOnInit(): void {
     let stackPath = this.activatedRoute.snapshot.paramMap.get('GONG__StackPath')
-    if ( stackPath != undefined) {
+    if (stackPath != undefined) {
       this.GONG__StackPath = stackPath
     }
 
@@ -222,10 +226,14 @@ export class SliceOfPointerToGongStructFieldsTableComponent implements OnInit {
           let mapOfSourceInstances = this.frontRepo[this.dialogData.SourceStruct + "s" as keyof FrontRepo] as Map<number, SliceOfPointerToGongStructFieldDB>
           let sourceInstance = mapOfSourceInstances.get(this.dialogData.ID)!
 
-          let sourceField = sourceInstance[this.dialogData.SourceField as keyof typeof sourceInstance]! as unknown as SliceOfPointerToGongStructFieldDB[]
-          for (let associationInstance of sourceField) {
-            let sliceofpointertogongstructfield = associationInstance[this.dialogData.IntermediateStructField as keyof typeof associationInstance] as unknown as SliceOfPointerToGongStructFieldDB
-            this.initialSelection.push(sliceofpointertogongstructfield)
+          // we associates on sourceInstance of type SourceStruct with a MANY MANY associations to SliceOfPointerToGongStructFieldDB
+          // the field name is sourceField
+          let sourceFieldArray = sourceInstance[this.dialogData.SourceField as keyof typeof sourceInstance]! as unknown as SliceOfPointerToGongStructFieldDB[]
+          if (sourceFieldArray != null) {
+            for (let associationInstance of sourceFieldArray) {
+              let sliceofpointertogongstructfield = associationInstance[this.dialogData.IntermediateStructField as keyof typeof associationInstance] as unknown as SliceOfPointerToGongStructFieldDB
+              this.initialSelection.push(sliceofpointertogongstructfield)
+            }
           }
 
           this.selection = new SelectionModel<SliceOfPointerToGongStructFieldDB>(allowMultiSelect, this.initialSelection);
@@ -246,7 +254,7 @@ export class SliceOfPointerToGongStructFieldsTableComponent implements OnInit {
     // list of sliceofpointertogongstructfields is truncated of sliceofpointertogongstructfield before the delete
     this.sliceofpointertogongstructfields = this.sliceofpointertogongstructfields.filter(h => h !== sliceofpointertogongstructfield);
 
-    this.sliceofpointertogongstructfieldService.deleteSliceOfPointerToGongStructField(sliceofpointertogongstructfieldID).subscribe(
+    this.sliceofpointertogongstructfieldService.deleteSliceOfPointerToGongStructField(sliceofpointertogongstructfieldID, this.GONG__StackPath).subscribe(
       sliceofpointertogongstructfield => {
         this.sliceofpointertogongstructfieldService.SliceOfPointerToGongStructFieldServiceChanged.next("delete")
       }
@@ -257,18 +265,15 @@ export class SliceOfPointerToGongStructFieldsTableComponent implements OnInit {
 
   }
 
-  // display sliceofpointertogongstructfield in router
-  displaySliceOfPointerToGongStructFieldInRouter(sliceofpointertogongstructfieldID: number) {
-    this.router.navigate(["github_com_fullstack_lang_gong_go-" + "sliceofpointertogongstructfield-display", sliceofpointertogongstructfieldID])
-  }
-
   // set editor outlet
   setEditorRouterOutlet(sliceofpointertogongstructfieldID: number) {
-    this.router.navigate([{
-      outlets: {
-        github_com_fullstack_lang_gong_go_editor: ["github_com_fullstack_lang_gong_go-" + "sliceofpointertogongstructfield-detail", sliceofpointertogongstructfieldID, this.GONG__StackPath]
-      }
-    }]);
+    let outletName = this.routeService.getEditorOutlet(this.GONG__StackPath)
+    let fullPath = this.routeService.getPathRoot() + "-" + "sliceofpointertogongstructfield" + "-detail"
+
+    let outletConf: any = {}
+    outletConf[outletName] = [fullPath, sliceofpointertogongstructfieldID, this.GONG__StackPath]
+
+    this.router.navigate([{ outlets: outletConf }])
   }
 
   /** Whether the number of selected elements matches the total number of rows. */
@@ -312,7 +317,7 @@ export class SliceOfPointerToGongStructFieldsTableComponent implements OnInit {
 
       // update all sliceofpointertogongstructfield (only update selection & initial selection)
       for (let sliceofpointertogongstructfield of toUpdate) {
-        this.sliceofpointertogongstructfieldService.updateSliceOfPointerToGongStructField(sliceofpointertogongstructfield)
+        this.sliceofpointertogongstructfieldService.updateSliceOfPointerToGongStructField(sliceofpointertogongstructfield, this.GONG__StackPath)
           .subscribe(sliceofpointertogongstructfield => {
             this.sliceofpointertogongstructfieldService.SliceOfPointerToGongStructFieldServiceChanged.next("update")
           });

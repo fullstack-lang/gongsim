@@ -20,10 +20,6 @@ import { GongStructDB } from './gongstruct-db';
 })
 export class GongStructService {
 
-  httpOptions = {
-    headers: new HttpHeaders({ 'Content-Type': 'application/json' })
-  };
-
   // Kamar Raïmo: Adding a way to communicate between components that share information
   // so that they are notified of a change.
   GongStructServiceChanged: BehaviorSubject<string> = new BehaviorSubject("");
@@ -32,7 +28,6 @@ export class GongStructService {
 
   constructor(
     private http: HttpClient,
-    private location: Location,
     @Inject(DOCUMENT) private document: Document
   ) {
     // path to the service share the same origin with the path to the document
@@ -49,11 +44,12 @@ export class GongStructService {
   /** GET gongstructs from the server */
   getGongStructs(GONG__StackPath: string = ""): Observable<GongStructDB[]> {
 
-	let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
+    let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
 
     return this.http.get<GongStructDB[]>(this.gongstructsUrl, { params: params })
       .pipe(
-        tap(_ => this.log('fetched gongstructs')),
+        tap(),
+		// tap(_ => this.log('fetched gongstructs')),
         catchError(this.handleError<GongStructDB[]>('getGongStructs', []))
       );
   }
@@ -67,10 +63,8 @@ export class GongStructService {
     );
   }
 
-  //////// Save methods //////////
-
   /** POST: add a new gongstruct to the server */
-  postGongStruct(gongstructdb: GongStructDB): Observable<GongStructDB> {
+  postGongStruct(gongstructdb: GongStructDB, GONG__StackPath: string): Observable<GongStructDB> {
 
     // insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
     gongstructdb.GongBasicFields = []
@@ -78,7 +72,13 @@ export class GongStructService {
     gongstructdb.PointerToGongStructFields = []
     gongstructdb.SliceOfPointerToGongStructFields = []
 
-    return this.http.post<GongStructDB>(this.gongstructsUrl, gongstructdb, this.httpOptions).pipe(
+    let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
+    let httpOptions = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+      params: params
+    }
+
+    return this.http.post<GongStructDB>(this.gongstructsUrl, gongstructdb, httpOptions).pipe(
       tap(_ => {
         // insertion point for restoration of reverse pointers
         this.log(`posted gongstructdb id=${gongstructdb.ID}`)
@@ -88,18 +88,24 @@ export class GongStructService {
   }
 
   /** DELETE: delete the gongstructdb from the server */
-  deleteGongStruct(gongstructdb: GongStructDB | number): Observable<GongStructDB> {
+  deleteGongStruct(gongstructdb: GongStructDB | number, GONG__StackPath: string): Observable<GongStructDB> {
     const id = typeof gongstructdb === 'number' ? gongstructdb : gongstructdb.ID;
     const url = `${this.gongstructsUrl}/${id}`;
 
-    return this.http.delete<GongStructDB>(url, this.httpOptions).pipe(
+    let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
+    let httpOptions = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+      params: params
+    };
+
+    return this.http.delete<GongStructDB>(url, httpOptions).pipe(
       tap(_ => this.log(`deleted gongstructdb id=${id}`)),
       catchError(this.handleError<GongStructDB>('deleteGongStruct'))
     );
   }
 
   /** PUT: update the gongstructdb on the server */
-  updateGongStruct(gongstructdb: GongStructDB): Observable<GongStructDB> {
+  updateGongStruct(gongstructdb: GongStructDB, GONG__StackPath: string): Observable<GongStructDB> {
     const id = typeof gongstructdb === 'number' ? gongstructdb : gongstructdb.ID;
     const url = `${this.gongstructsUrl}/${id}`;
 
@@ -109,7 +115,13 @@ export class GongStructService {
     gongstructdb.PointerToGongStructFields = []
     gongstructdb.SliceOfPointerToGongStructFields = []
 
-    return this.http.put<GongStructDB>(url, gongstructdb, this.httpOptions).pipe(
+    let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
+    let httpOptions = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+      params: params
+    };
+
+    return this.http.put<GongStructDB>(url, gongstructdb, httpOptions).pipe(
       tap(_ => {
         // insertion point for restoration of reverse pointers
         this.log(`updated gongstructdb id=${gongstructdb.ID}`)
@@ -124,11 +136,11 @@ export class GongStructService {
    * @param operation - name of the operation that failed
    * @param result - optional value to return as the observable result
    */
-  private handleError<T>(operation = 'operation', result?: T) {
+  private handleError<T>(operation = 'operation in GongStructService', result?: T) {
     return (error: any): Observable<T> => {
 
       // TODO: send the error to remote logging infrastructure
-      console.error(error); // log to console instead
+      console.error("GongStructService" + error); // log to console instead
 
       // TODO: better job of transforming error for user consumption
       this.log(`${operation} failed: ${error.message}`);
@@ -139,6 +151,6 @@ export class GongStructService {
   }
 
   private log(message: string) {
-
+      console.log(message)
   }
 }

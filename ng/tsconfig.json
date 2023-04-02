@@ -1,22 +1,21 @@
+/* To learn more about this file see: https://angular.io/config/tsconfig. */
 {
   "compileOnSave": false,
   "compilerOptions": {
     "baseUrl": "./",
     "outDir": "./dist/out-tsc",
-    "sourceMap": true,
-    "declaration": false,
-    "downlevelIteration": true,
-    "experimentalDecorators": true,
-    "module": "es2020",
-    "moduleResolution": "node",
-    "importHelpers": true,
-    "target": "es2020",
+    "forceConsistentCasingInFileNames": true,
     "strict": true,
-    "lib": [
-      "es2018",
-      "dom"
-    ],
+    "noImplicitOverride": true,
     "paths": {
+
+      // 
+      // https://angular.io/guide/creating-libraries#use-typescript-path-mapping-for-peer-dependencies
+      //
+      // Angular libraries should list any @angular/* 
+      // dependencies the library depends on as peer dependencies. This ensures that when modules ask for Angular, 
+      // they all get the exact same module. If a library lists @angular/core in dependencies instead of peerDependencies, 
+      // it might get a different Angular module instead, which would cause your application to break.
       "@angular/*": [
         "./node_modules/@angular/*"
       ],
@@ -50,8 +49,9 @@
       "jointjs": [
         "./node_modules/jointjs"
       ],
-      "@types/jointjs": [
-        "./node_modules/@types/jointjs"
+      "gongsimspecific": [
+        "projects/gongsimspecific/src/public-api.ts",
+        "dist/gongsimspecific"
       ],
       "@angular-material-components/datetime-picker": [
         "./node_modules/@angular-material-components/datetime-picker"
@@ -63,24 +63,41 @@
         "./node_modules/tslib"
       ],
       "gong": [
-        "../vendor/github.com/fullstack-lang/gong/ng/projects/gong/src/public-api.ts"
+      "../vendor/github.com/fullstack-lang/gong/ng/projects/gong/src/public-api.ts"
       ],
       "gongdoc": [
-        "../vendor/github.com/fullstack-lang/gongdoc/ng/projects/gongdoc/src/public-api.ts"
+      "../vendor/github.com/fullstack-lang/gongdoc/ng/projects/gongdoc/src/public-api.ts"
       ],
       "gongdocdiagrams": [
-        "../vendor/github.com/fullstack-lang/gongdoc/ng/projects/gongdocdiagrams/src/public-api.ts"
+      "../vendor/github.com/fullstack-lang/gongdoc/ng/projects/gongdocdiagrams/src/public-api.ts"
       ],
+
       "gongsim": [
-        "./projects/gongsim/src/public-api.ts"
-      ],
-      "gongsimcontrol": [
-        "./projects/gongsimcontrol/src/public-api.ts"
+        "projects/gongsim/src/public-api.ts",
+        "dist/gongsim"
       ]
-    }
+    },
+    "noPropertyAccessFromIndexSignature": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "sourceMap": true,
+    "declaration": false,
+    "downlevelIteration": true,
+    "experimentalDecorators": true,
+    "moduleResolution": "node",
+    "importHelpers": true,
+    "target": "ES2022",
+    "module": "ES2022",
+    "useDefineForClassFields": false,
+    "lib": [
+      "ES2022",
+      "dom"
+    ]
   ,"skipLibCheck":true},
   "angularCompilerOptions": {
-    "fullTemplateTypeCheck": true,
-    "strictInjectionParameters": true
+    "enableI18nLegacyMessageIdFormat": false,
+    "strictInjectionParameters": true,
+    "strictInputAccessModifiers": true,
+    "strictTemplates": true
   }
 }
