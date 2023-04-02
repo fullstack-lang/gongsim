@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/fullstack-lang/gongsim/go/models"
+	gongsim_models "github.com/fullstack-lang/gongsim/go/models"
 
 	gongsim_fullstack "github.com/fullstack-lang/gongsim/go/fullstack"
 	gongsim_static "github.com/fullstack-lang/gongsim/go/static"
@@ -30,16 +30,18 @@ type LadybugSimulation struct {
 
 var nbOfCollision = 0
 
-func (specificEngine *LadybugSimulation) EventFired(engine *models.Engine)              {}
-func (specificEngine *LadybugSimulation) HasAnyStateChanged(engine *models.Engine) bool { return true }
-func (specificEngine *LadybugSimulation) Reset(engine *models.Engine)                   {}
-func (specificEngine *LadybugSimulation) CommitAgents(engine *models.Engine)            {}
-func (specificEngine *LadybugSimulation) CheckoutAgents(engine *models.Engine)          {}
-func (specificEngine *LadybugSimulation) GetLastCommitNb() uint                         { return 0 }
-func (specificEngine *LadybugSimulation) GetLastCommitNbFromFront() uint                { return 0 }
+func (specificEngine *LadybugSimulation) EventFired(engine *gongsim_models.Engine) {}
+func (specificEngine *LadybugSimulation) HasAnyStateChanged(engine *gongsim_models.Engine) bool {
+	return true
+}
+func (specificEngine *LadybugSimulation) Reset(engine *gongsim_models.Engine)          {}
+func (specificEngine *LadybugSimulation) CommitAgents(engine *gongsim_models.Engine)   {}
+func (specificEngine *LadybugSimulation) CheckoutAgents(engine *gongsim_models.Engine) {}
+func (specificEngine *LadybugSimulation) GetLastCommitNb() uint                        { return 0 }
+func (specificEngine *LadybugSimulation) GetLastCommitNbFromFront() uint               { return 0 }
 
 type Ladybug struct {
-	models.Agent
+	gongsim_models.Agent
 
 	Name string
 
@@ -74,8 +76,8 @@ func (ladybug *Ladybug) FireNextEvent() {
 	}
 
 	switch event.(type) {
-	case *models.UpdateState:
-		checkStateEvent := event.(*models.UpdateState)
+	case *gongsim_models.UpdateState:
+		checkStateEvent := event.(*gongsim_models.UpdateState)
 
 		// if eventNb%5000 == 0 && ladybug.Id == 0 {
 		// 	log.Printf("Event %10d Time : %s Ladybug %s Position %10f Speed %10f", eventNb, eventTime.Format("15:04:05.000000"), ladybug.Name, ladybug.Position, ladybug.Speed)
@@ -162,17 +164,18 @@ func TestLadybugSim(t *testing.T) {
 	// setup stack
 	gongsim_stage := gongsim_fullstack.NewStackInstance(r, "github.com/fullstack-lang/gongsim/go/models")
 
-	engine := new(models.Engine)
+	engine := new(gongsim_models.Engine)
 	engine.Name = "Simulation Engine"
 	engine.Stage(gongsim_stage)
+	gongsim_models.NewGongSimCommand(gongsim_stage, engine)
 
 	// Kills Engine Simulation goroutine
-	models.Quit <- true
+	gongsim_models.Quit <- true
 
 	// seven days of simulation
 	engine.SetStartTime(time.Date(2021, time.July, 1, 0, 0, 0, 0, time.UTC))
 	engine.SetCurrentTime(engine.GetStartTime())
-	engine.State = models.PAUSED
+	engine.State = gongsim_models.PAUSED
 	engine.Speed = 1.0 // realtime
 	// log.Printf("Sim start \t\t\t%s\n", engine.GetStartTime())
 
@@ -214,7 +217,7 @@ func TestLadybugSim(t *testing.T) {
 		}
 
 		engine.AppendAgent(ladyBug)
-		var step models.UpdateState
+		var step gongsim_models.UpdateState
 		step.SetFireTime(engine.GetStartTime())
 		step.Period = simulationStep //
 		step.Name = "update of laybug motion"
