@@ -14,9 +14,22 @@ type GongsimCommand struct {
 	SpeedCommandType SpeedCommandType
 	DateSpeedCommand string
 	Engine           *Engine
+
+	stage *StageStruct
 }
 
-var GongsimCommandSingloton *GongsimCommand
+func NewGongSimCommand(stage *StageStruct, engine *Engine) (gongsimCommand *GongsimCommand) {
+	gongsimCommand = &(GongsimCommand{
+		Name:        "Gongsim Command Singloton",
+		Command:     COMMAND_PAUSE,
+		CommandDate: "",
+		Engine:      engine,
+		stage:       stage,
+	})
+
+	gongsimCommand.Stage(stage).SetupGongsimThreads()
+	return
+}
 
 // the states of the engine drivers
 type EngineDriverState int
@@ -68,13 +81,13 @@ func (gongsimCommand *GongsimCommand) commandPooler() {
 		select {
 		case t := <-CommandPoolerPeriod.C:
 
-			gongsimCommand.Checkout(GetDefaultStage())
+			gongsimCommand.Checkout(gongsimCommand.stage)
 			if GongsimStatusSingloton.CompletionDate != gongsimCommand.CommandDate {
 				log.Println("commandPooler reads new command ", gongsimCommand.Command, "  timestamp ", gongsimCommand.CommandDate, " at ", t)
 
 				GongsimStatusSingloton.CurrentCommand = gongsimCommand.Command
 				GongsimStatusSingloton.CompletionDate = gongsimCommand.CommandDate
-				GongsimStatusSingloton.Commit(GetDefaultStage())
+				GongsimStatusSingloton.Commit(gongsimCommand.stage)
 			}
 			if GongsimStatusSingloton.SpeedCommandCompletionDate != gongsimCommand.DateSpeedCommand {
 				log.Println("commandPooler reads new speed command ", gongsimCommand.SpeedCommandType, "  timestamp ", gongsimCommand.CommandDate, " at ", t)
@@ -82,15 +95,15 @@ func (gongsimCommand *GongsimCommand) commandPooler() {
 				switch gongsimCommand.SpeedCommandType {
 				case COMMAND_DECREASE_SPEED_50_PERCENTS:
 					gongsimCommand.Engine.Speed *= 0.5
-					gongsimCommand.Engine.Commit(GetDefaultStage())
+					gongsimCommand.Engine.Commit(gongsimCommand.stage)
 				case COMMAND_INCREASE_SPEED_100_PERCENTS:
 					gongsimCommand.Engine.Speed *= 2.0
-					gongsimCommand.Engine.Commit(GetDefaultStage())
+					gongsimCommand.Engine.Commit(gongsimCommand.stage)
 				}
 
 				GongsimStatusSingloton.CurrentSpeedCommand = gongsimCommand.SpeedCommandType
 				GongsimStatusSingloton.SpeedCommandCompletionDate = gongsimCommand.DateSpeedCommand
-				GongsimStatusSingloton.Commit(GetDefaultStage())
+				GongsimStatusSingloton.Commit(gongsimCommand.stage)
 			}
 		}
 	}
@@ -278,7 +291,7 @@ func (gongsimCommand *GongsimCommand) SetupGongsimThreads() *GongsimCommand {
 						gongsimCommand.Engine.Simulation.Reset(gongsimCommand.Engine)
 					}
 					// commit the engine state
-					gongsimCommand.Engine.Commit(GetDefaultStage())
+					gongsimCommand.Engine.Commit(gongsimCommand.stage)
 				case COMMIT_AGENT_STATES:
 					if gongsimCommand.Engine.Simulation != nil {
 						gongsimCommand.Engine.Simulation.CommitAgents(gongsimCommand.Engine)
@@ -295,7 +308,7 @@ func (gongsimCommand *GongsimCommand) SetupGongsimThreads() *GongsimCommand {
 				case FIRE_ONE_EVENT:
 					if gongsimCommand.Engine.State != RUNNING {
 						gongsimCommand.Engine.State = RUNNING
-						gongsimCommand.Engine.Commit(GetDefaultStage())
+						gongsimCommand.Engine.Commit(gongsimCommand.stage)
 					}
 
 					if nextMode == RELATIVE_SPEED {
@@ -319,7 +332,7 @@ func (gongsimCommand *GongsimCommand) SetupGongsimThreads() *GongsimCommand {
 						sleepTime := gongsimCommand.Engine.nextRealtimeHorizon.Sub(time.Now())
 						time.Sleep(sleepTime)
 
-						gongsimCommand.Engine.Commit(GetDefaultStage())
+						gongsimCommand.Engine.Commit(gongsimCommand.stage)
 
 						// // log.Printf(lastSimTime.String() + " " + nextSimTime.String())
 						// if nextSimTime.Sub(gongsimCommand.Engine.GetCurrentTime()) > 0 {
@@ -345,7 +358,7 @@ func (gongsimCommand *GongsimCommand) SetupGongsimThreads() *GongsimCommand {
 						// 		gongsimCommand.Engine.SetCurrentTime(gongsimCommand.Engine.GetCurrentTime().Add(
 						// 			time.Duration(progressInSimulatedTimeInMiliseconds) * time.Millisecond))
 						// 		// log.Printf("Engine current time " + gongsimCommand.Engine.CurrentTime.String())
-						// 		gongsimCommand.Engine.Commit(GetDefaultStage())
+						// 		gongsimCommand.Engine.Commit(gongsimCommand.stage)
 						// 	}
 						// }
 						// _, nextSimTime, _ = gongsimCommand.Engine.FireNextEvent()
@@ -379,13 +392,13 @@ func (gongsimCommand *GongsimCommand) SetupGongsimThreads() *GongsimCommand {
 						}
 
 						// time has progressed, therefore an update is necessary
-						gongsimCommand.Engine.Commit(GetDefaultStage())
+						gongsimCommand.Engine.Commit(gongsimCommand.stage)
 					}
 
 				case SLEEP_100_MS:
 					if gongsimCommand.Engine.State != PAUSED {
 						gongsimCommand.Engine.State = PAUSED
-						gongsimCommand.Engine.Commit(GetDefaultStage())
+						gongsimCommand.Engine.Commit(gongsimCommand.stage)
 					}
 					time.Sleep(time.Duration(100 * time.Millisecond))
 				default:
