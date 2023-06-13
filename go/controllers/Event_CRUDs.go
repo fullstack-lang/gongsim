@@ -58,7 +58,7 @@ func (controller *Controller) GetEvents(c *gin.Context) {
 		value := values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
-			log.Println("GetEvents", "GONG__StackPath", stackPath)
+			// log.Println("GetEvents", "GONG__StackPath", stackPath)
 		}
 	}
 	backRepo := controller.Map_BackRepos[stackPath]
@@ -115,7 +115,7 @@ func (controller *Controller) PostEvent(c *gin.Context) {
 		value := values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
-			log.Println("PostEvents", "GONG__StackPath", stackPath)
+			// log.Println("PostEvents", "GONG__StackPath", stackPath)
 		}
 	}
 	backRepo := controller.Map_BackRepos[stackPath]
@@ -182,7 +182,7 @@ func (controller *Controller) GetEvent(c *gin.Context) {
 		value := values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
-			log.Println("GetEvent", "GONG__StackPath", stackPath)
+			// log.Println("GetEvent", "GONG__StackPath", stackPath)
 		}
 	}
 	backRepo := controller.Map_BackRepos[stackPath]
@@ -225,7 +225,7 @@ func (controller *Controller) UpdateEvent(c *gin.Context) {
 		value := values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
-			log.Println("UpdateEvent", "GONG__StackPath", stackPath)
+			// log.Println("UpdateEvent", "GONG__StackPath", stackPath)
 		}
 	}
 	backRepo := controller.Map_BackRepos[stackPath]
@@ -305,7 +305,7 @@ func (controller *Controller) DeleteEvent(c *gin.Context) {
 		value := values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
-			log.Println("DeleteEvent", "GONG__StackPath", stackPath)
+			// log.Println("DeleteEvent", "GONG__StackPath", stackPath)
 		}
 	}
 	backRepo := controller.Map_BackRepos[stackPath]

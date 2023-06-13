@@ -58,7 +58,7 @@ func (controller *Controller) GetDummyAgents(c *gin.Context) {
 		value := values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
-			log.Println("GetDummyAgents", "GONG__StackPath", stackPath)
+			// log.Println("GetDummyAgents", "GONG__StackPath", stackPath)
 		}
 	}
 	backRepo := controller.Map_BackRepos[stackPath]
@@ -115,7 +115,7 @@ func (controller *Controller) PostDummyAgent(c *gin.Context) {
 		value := values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
-			log.Println("PostDummyAgents", "GONG__StackPath", stackPath)
+			// log.Println("PostDummyAgents", "GONG__StackPath", stackPath)
 		}
 	}
 	backRepo := controller.Map_BackRepos[stackPath]
@@ -182,7 +182,7 @@ func (controller *Controller) GetDummyAgent(c *gin.Context) {
 		value := values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
-			log.Println("GetDummyAgent", "GONG__StackPath", stackPath)
+			// log.Println("GetDummyAgent", "GONG__StackPath", stackPath)
 		}
 	}
 	backRepo := controller.Map_BackRepos[stackPath]
@@ -225,7 +225,7 @@ func (controller *Controller) UpdateDummyAgent(c *gin.Context) {
 		value := values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
-			log.Println("UpdateDummyAgent", "GONG__StackPath", stackPath)
+			// log.Println("UpdateDummyAgent", "GONG__StackPath", stackPath)
 		}
 	}
 	backRepo := controller.Map_BackRepos[stackPath]
@@ -305,7 +305,7 @@ func (controller *Controller) DeleteDummyAgent(c *gin.Context) {
 		value := values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
-			log.Println("DeleteDummyAgent", "GONG__StackPath", stackPath)
+			// log.Println("DeleteDummyAgent", "GONG__StackPath", stackPath)
 		}
 	}
 	backRepo := controller.Map_BackRepos[stackPath]

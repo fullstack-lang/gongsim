@@ -4,7 +4,7 @@ import { GongsimspecificComponent } from './gongsimspecific.component';
 import { DataModelPanelComponent } from './data-model-panel/data-model-panel.component';
 
 import { GongdocModule } from 'gongdoc'
-import { GongdocdiagramsModule } from 'gongdocdiagrams'
+import { GongdocspecificModule } from 'gongdocspecific'
 
 import { GongsimModule } from 'gongsim'
 
@@ -25,7 +25,7 @@ import { EngineControlComponent } from './engine-control/engine-control.componen
   ],
   imports: [
     GongdocModule,
-    GongdocdiagramsModule,
+    GongdocspecificModule,
 
     MatToolbarModule,
     MatIconModule,

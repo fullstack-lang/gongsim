@@ -119,7 +119,7 @@ export class DummyAgentService {
     return this.http.put<DummyAgentDB>(url, dummyagentdb, httpOptions).pipe(
       tap(_ => {
         // insertion point for restoration of reverse pointers
-        this.log(`updated dummyagentdb id=${dummyagentdb.ID}`)
+        // this.log(`updated dummyagentdb id=${dummyagentdb.ID}`)
       }),
       catchError(this.handleError<DummyAgentDB>('updateDummyAgent'))
     );

@@ -122,7 +122,7 @@ export class GongsimCommandService {
     return this.http.put<GongsimCommandDB>(url, gongsimcommanddb, httpOptions).pipe(
       tap(_ => {
         // insertion point for restoration of reverse pointers
-        this.log(`updated gongsimcommanddb id=${gongsimcommanddb.ID}`)
+        // this.log(`updated gongsimcommanddb id=${gongsimcommanddb.ID}`)
       }),
       catchError(this.handleError<GongsimCommandDB>('updateGongsimCommand'))
     );

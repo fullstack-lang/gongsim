@@ -105,6 +105,8 @@ var map_DocLink_Identifier_NewDiagram map[string]any = map[string]any{
 
 	"ref_models.GongsimCommand.DateSpeedCommand": (ref_models.GongsimCommand{}).DateSpeedCommand,
 
+	"ref_models.GongsimCommand.Engine": (ref_models.GongsimCommand{}).Engine,
+
 	"ref_models.GongsimCommand.Name": (ref_models.GongsimCommand{}).Name,
 
 	"ref_models.GongsimCommand.SpeedCommandType": (ref_models.GongsimCommand{}).SpeedCommandType,
@@ -155,6 +157,8 @@ var map_DocLink_Identifier_NewDiagram map[string]any = map[string]any{
 func NewDiagramInjection(stage *models.StageStruct) {
 
 	// Declaration of instances to stage
+
+	// Declarations of staged instances of Button
 
 	// Declarations of staged instances of Classdiagram
 	__Classdiagram__000000_NewDiagram := (&models.Classdiagram{Name: `NewDiagram`}).Stage(stage)
@@ -228,6 +232,7 @@ func NewDiagramInjection(stage *models.StageStruct) {
 	__GongStructShape__000004_NewDiagram_GongsimStatus := (&models.GongStructShape{Name: `NewDiagram-GongsimStatus`}).Stage(stage)
 
 	// Declarations of staged instances of Link
+	__Link__000000_Engine := (&models.Link{Name: `Engine`}).Stage(stage)
 
 	// Declarations of staged instances of Node
 
@@ -256,6 +261,7 @@ func NewDiagramInjection(stage *models.StageStruct) {
 	// Declarations of staged instances of Umlsc
 
 	// Declarations of staged instances of Vertice
+	__Vertice__000000_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_GongsimCommand_and_NewDiagram_Engine := (&models.Vertice{Name: `Verticle in class diagram NewDiagram in middle between NewDiagram-GongsimCommand and NewDiagram-Engine`}).Stage(stage)
 
 	// Setup of values
 
@@ -389,10 +395,10 @@ func NewDiagramInjection(stage *models.StageStruct) {
 
 	// comment added to overcome the problem with the comment map association
 
-	//gong:ident [ref_models.GongsimCommand.Name]
-	__Field__000011_Name.Identifier = `ref_models.GongsimCommand.Name`
+	//gong:ident [ref_models.Engine.Name]
+	__Field__000011_Name.Identifier = `ref_models.Engine.Name`
 	__Field__000011_Name.FieldTypeAsString = ``
-	__Field__000011_Name.Structname = `GongsimCommand`
+	__Field__000011_Name.Structname = `Engine`
 	__Field__000011_Name.Fieldtypename = `string`
 
 	// Field values setup
@@ -400,10 +406,10 @@ func NewDiagramInjection(stage *models.StageStruct) {
 
 	// comment added to overcome the problem with the comment map association
 
-	//gong:ident [ref_models.Engine.Name]
-	__Field__000012_Name.Identifier = `ref_models.Engine.Name`
+	//gong:ident [ref_models.DummyAgent.Name]
+	__Field__000012_Name.Identifier = `ref_models.DummyAgent.Name`
 	__Field__000012_Name.FieldTypeAsString = ``
-	__Field__000012_Name.Structname = `Engine`
+	__Field__000012_Name.Structname = `DummyAgent`
 	__Field__000012_Name.Fieldtypename = `string`
 
 	// Field values setup
@@ -411,10 +417,10 @@ func NewDiagramInjection(stage *models.StageStruct) {
 
 	// comment added to overcome the problem with the comment map association
 
-	//gong:ident [ref_models.DummyAgent.Name]
-	__Field__000013_Name.Identifier = `ref_models.DummyAgent.Name`
+	//gong:ident [ref_models.Event.Name]
+	__Field__000013_Name.Identifier = `ref_models.Event.Name`
 	__Field__000013_Name.FieldTypeAsString = ``
-	__Field__000013_Name.Structname = `DummyAgent`
+	__Field__000013_Name.Structname = `Event`
 	__Field__000013_Name.Fieldtypename = `string`
 
 	// Field values setup
@@ -422,10 +428,10 @@ func NewDiagramInjection(stage *models.StageStruct) {
 
 	// comment added to overcome the problem with the comment map association
 
-	//gong:ident [ref_models.GongsimStatus.Name]
-	__Field__000014_Name.Identifier = `ref_models.GongsimStatus.Name`
+	//gong:ident [ref_models.GongsimCommand.Name]
+	__Field__000014_Name.Identifier = `ref_models.GongsimCommand.Name`
 	__Field__000014_Name.FieldTypeAsString = ``
-	__Field__000014_Name.Structname = `GongsimStatus`
+	__Field__000014_Name.Structname = `GongsimCommand`
 	__Field__000014_Name.Fieldtypename = `string`
 
 	// Field values setup
@@ -433,10 +439,10 @@ func NewDiagramInjection(stage *models.StageStruct) {
 
 	// comment added to overcome the problem with the comment map association
 
-	//gong:ident [ref_models.Event.Name]
-	__Field__000015_Name.Identifier = `ref_models.Event.Name`
+	//gong:ident [ref_models.GongsimStatus.Name]
+	__Field__000015_Name.Identifier = `ref_models.GongsimStatus.Name`
 	__Field__000015_Name.FieldTypeAsString = ``
-	__Field__000015_Name.Structname = `Event`
+	__Field__000015_Name.Structname = `GongsimStatus`
 	__Field__000015_Name.Fieldtypename = `string`
 
 	// Field values setup
@@ -552,7 +558,7 @@ func NewDiagramInjection(stage *models.StageStruct) {
 
 	//gong:ident [ref_models.EngineStopMode]
 	__GongEnumShape__000004_NewDiagram_EngineStopMode.Identifier = `ref_models.EngineStopMode`
-	__GongEnumShape__000004_NewDiagram_EngineStopMode.Width = 240.000000
+	__GongEnumShape__000004_NewDiagram_EngineStopMode.Width = 451.999939
 	__GongEnumShape__000004_NewDiagram_EngineStopMode.Heigth = 93.000000
 
 	// GongEnumShape values setup
@@ -562,7 +568,7 @@ func NewDiagramInjection(stage *models.StageStruct) {
 
 	//gong:ident [ref_models.GongsimCommandType]
 	__GongEnumShape__000005_NewDiagram_GongsimCommandType.Identifier = `ref_models.GongsimCommandType`
-	__GongEnumShape__000005_NewDiagram_GongsimCommandType.Width = 240.000000
+	__GongEnumShape__000005_NewDiagram_GongsimCommandType.Width = 450.999939
 	__GongEnumShape__000005_NewDiagram_GongsimCommandType.Heigth = 153.000000
 
 	// GongEnumShape values setup
@@ -572,7 +578,7 @@ func NewDiagramInjection(stage *models.StageStruct) {
 
 	//gong:ident [ref_models.SpeedCommandType]
 	__GongEnumShape__000006_NewDiagram_SpeedCommandType.Identifier = `ref_models.SpeedCommandType`
-	__GongEnumShape__000006_NewDiagram_SpeedCommandType.Width = 240.000000
+	__GongEnumShape__000006_NewDiagram_SpeedCommandType.Width = 435.999939
 	__GongEnumShape__000006_NewDiagram_SpeedCommandType.Heigth = 108.000000
 
 	// GongEnumValueEntry values setup
@@ -774,7 +780,7 @@ func NewDiagramInjection(stage *models.StageStruct) {
 
 	//gong:ident [ref_models.DummyAgent]
 	__GongStructShape__000000_NewDiagram_DummyAgent.Identifier = `ref_models.DummyAgent`
-	__GongStructShape__000000_NewDiagram_DummyAgent.ShowNbInstances = false
+	__GongStructShape__000000_NewDiagram_DummyAgent.ShowNbInstances = true
 	__GongStructShape__000000_NewDiagram_DummyAgent.NbInstances = 0
 	__GongStructShape__000000_NewDiagram_DummyAgent.Width = 240.000000
 	__GongStructShape__000000_NewDiagram_DummyAgent.Heigth = 93.000000
@@ -800,7 +806,7 @@ func NewDiagramInjection(stage *models.StageStruct) {
 
 	//gong:ident [ref_models.Event]
 	__GongStructShape__000002_NewDiagram_Event.Identifier = `ref_models.Event`
-	__GongStructShape__000002_NewDiagram_Event.ShowNbInstances = false
+	__GongStructShape__000002_NewDiagram_Event.ShowNbInstances = true
 	__GongStructShape__000002_NewDiagram_Event.NbInstances = 0
 	__GongStructShape__000002_NewDiagram_Event.Width = 240.000000
 	__GongStructShape__000002_NewDiagram_Event.Heigth = 93.000000
@@ -815,7 +821,7 @@ func NewDiagramInjection(stage *models.StageStruct) {
 	__GongStructShape__000003_NewDiagram_GongsimCommand.Identifier = `ref_models.GongsimCommand`
 	__GongStructShape__000003_NewDiagram_GongsimCommand.ShowNbInstances = true
 	__GongStructShape__000003_NewDiagram_GongsimCommand.NbInstances = 0
-	__GongStructShape__000003_NewDiagram_GongsimCommand.Width = 240.000000
+	__GongStructShape__000003_NewDiagram_GongsimCommand.Width = 389.000000
 	__GongStructShape__000003_NewDiagram_GongsimCommand.Heigth = 138.000000
 	__GongStructShape__000003_NewDiagram_GongsimCommand.IsSelected = false
 
@@ -828,13 +834,39 @@ func NewDiagramInjection(stage *models.StageStruct) {
 	__GongStructShape__000004_NewDiagram_GongsimStatus.Identifier = `ref_models.GongsimStatus`
 	__GongStructShape__000004_NewDiagram_GongsimStatus.ShowNbInstances = true
 	__GongStructShape__000004_NewDiagram_GongsimStatus.NbInstances = 0
-	__GongStructShape__000004_NewDiagram_GongsimStatus.Width = 240.000000
+	__GongStructShape__000004_NewDiagram_GongsimStatus.Width = 365.000000
 	__GongStructShape__000004_NewDiagram_GongsimStatus.Heigth = 138.000000
 	__GongStructShape__000004_NewDiagram_GongsimStatus.IsSelected = false
 
+	// Link values setup
+	__Link__000000_Engine.Name = `Engine`
+
+	// comment added to overcome the problem with the comment map association
+
+	//gong:ident [ref_models.GongsimCommand.Engine]
+	__Link__000000_Engine.Identifier = `ref_models.GongsimCommand.Engine`
+
+	// comment added to overcome the problem with the comment map association
+
+	//gong:ident [ref_models.Engine]
+	__Link__000000_Engine.Fieldtypename = `ref_models.Engine`
+	__Link__000000_Engine.FieldOffsetX = 15.000000
+	__Link__000000_Engine.FieldOffsetY = -19.000000
+	__Link__000000_Engine.TargetMultiplicity = models.ZERO_ONE
+	__Link__000000_Engine.TargetMultiplicityOffsetX = 13.000000
+	__Link__000000_Engine.TargetMultiplicityOffsetY = 29.000000
+	__Link__000000_Engine.SourceMultiplicity = models.MANY
+	__Link__000000_Engine.SourceMultiplicityOffsetX = 9.000000
+	__Link__000000_Engine.SourceMultiplicityOffsetY = 34.000000
+	__Link__000000_Engine.StartOrientation = models.ORIENTATION_HORIZONTAL
+	__Link__000000_Engine.StartRatio = 0.500000
+	__Link__000000_Engine.EndOrientation = models.ORIENTATION_HORIZONTAL
+	__Link__000000_Engine.EndRatio = 0.500000
+	__Link__000000_Engine.CornerOffsetRatio = 1.052099
+
 	// Position values setup
-	__Position__000000_Pos_NewDiagram_ControlMode.X = 740.000000
-	__Position__000000_Pos_NewDiagram_ControlMode.Y = 780.000000
+	__Position__000000_Pos_NewDiagram_ControlMode.X = 798.000000
+	__Position__000000_Pos_NewDiagram_ControlMode.Y = 783.000000
 	__Position__000000_Pos_NewDiagram_ControlMode.Name = `Pos-NewDiagram-ControlMode`
 
 	// Position values setup
@@ -843,28 +875,28 @@ func NewDiagramInjection(stage *models.StageStruct) {
 	__Position__000001_Pos_NewDiagram_DummyAgent.Name = `Pos-NewDiagram-DummyAgent`
 
 	// Position values setup
-	__Position__000002_Pos_NewDiagram_Engine.X = 74.000000
-	__Position__000002_Pos_NewDiagram_Engine.Y = 89.000000
+	__Position__000002_Pos_NewDiagram_Engine.X = 44.000000
+	__Position__000002_Pos_NewDiagram_Engine.Y = 85.000000
 	__Position__000002_Pos_NewDiagram_Engine.Name = `Pos-NewDiagram-Engine`
 
 	// Position values setup
-	__Position__000003_Pos_NewDiagram_EngineDriverState.X = 760.000000
-	__Position__000003_Pos_NewDiagram_EngineDriverState.Y = 600.000000
+	__Position__000003_Pos_NewDiagram_EngineDriverState.X = 785.000000
+	__Position__000003_Pos_NewDiagram_EngineDriverState.Y = 589.000000
 	__Position__000003_Pos_NewDiagram_EngineDriverState.Name = `Pos-NewDiagram-EngineDriverState`
 
 	// Position values setup
-	__Position__000004_Pos_NewDiagram_EngineRunMode.X = 380.000000
-	__Position__000004_Pos_NewDiagram_EngineRunMode.Y = 250.000000
+	__Position__000004_Pos_NewDiagram_EngineRunMode.X = 476.000000
+	__Position__000004_Pos_NewDiagram_EngineRunMode.Y = 259.000000
 	__Position__000004_Pos_NewDiagram_EngineRunMode.Name = `Pos-NewDiagram-EngineRunMode`
 
 	// Position values setup
-	__Position__000005_Pos_NewDiagram_EngineState.X = 380.000000
-	__Position__000005_Pos_NewDiagram_EngineState.Y = 80.000000
+	__Position__000005_Pos_NewDiagram_EngineState.X = 488.000000
+	__Position__000005_Pos_NewDiagram_EngineState.Y = 86.000000
 	__Position__000005_Pos_NewDiagram_EngineState.Name = `Pos-NewDiagram-EngineState`
 
 	// Position values setup
-	__Position__000006_Pos_NewDiagram_EngineStopMode.X = 750.000000
-	__Position__000006_Pos_NewDiagram_EngineStopMode.Y = 450.000000
+	__Position__000006_Pos_NewDiagram_EngineStopMode.X = 780.000000
+	__Position__000006_Pos_NewDiagram_EngineStopMode.Y = 431.000000
 	__Position__000006_Pos_NewDiagram_EngineStopMode.Name = `Pos-NewDiagram-EngineStopMode`
 
 	// Position values setup
@@ -873,24 +905,29 @@ func NewDiagramInjection(stage *models.StageStruct) {
 	__Position__000007_Pos_NewDiagram_Event.Name = `Pos-NewDiagram-Event`
 
 	// Position values setup
-	__Position__000008_Pos_NewDiagram_GongsimCommand.X = 70.000000
-	__Position__000008_Pos_NewDiagram_GongsimCommand.Y = 330.000000
+	__Position__000008_Pos_NewDiagram_GongsimCommand.X = 29.000000
+	__Position__000008_Pos_NewDiagram_GongsimCommand.Y = 318.000000
 	__Position__000008_Pos_NewDiagram_GongsimCommand.Name = `Pos-NewDiagram-GongsimCommand`
 
 	// Position values setup
-	__Position__000009_Pos_NewDiagram_GongsimCommandType.X = 740.000000
-	__Position__000009_Pos_NewDiagram_GongsimCommandType.Y = 250.000000
+	__Position__000009_Pos_NewDiagram_GongsimCommandType.X = 778.000000
+	__Position__000009_Pos_NewDiagram_GongsimCommandType.Y = 236.000000
 	__Position__000009_Pos_NewDiagram_GongsimCommandType.Name = `Pos-NewDiagram-GongsimCommandType`
 
 	// Position values setup
-	__Position__000010_Pos_NewDiagram_GongsimStatus.X = 440.000000
-	__Position__000010_Pos_NewDiagram_GongsimStatus.Y = 470.000000
+	__Position__000010_Pos_NewDiagram_GongsimStatus.X = 367.000000
+	__Position__000010_Pos_NewDiagram_GongsimStatus.Y = 534.000000
 	__Position__000010_Pos_NewDiagram_GongsimStatus.Name = `Pos-NewDiagram-GongsimStatus`
 
 	// Position values setup
-	__Position__000011_Pos_NewDiagram_SpeedCommandType.X = 720.000000
-	__Position__000011_Pos_NewDiagram_SpeedCommandType.Y = 100.000000
+	__Position__000011_Pos_NewDiagram_SpeedCommandType.X = 777.000000
+	__Position__000011_Pos_NewDiagram_SpeedCommandType.Y = 83.000000
 	__Position__000011_Pos_NewDiagram_SpeedCommandType.Name = `Pos-NewDiagram-SpeedCommandType`
+
+	// Vertice values setup
+	__Vertice__000000_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_GongsimCommand_and_NewDiagram_Engine.X = 644.500000
+	__Vertice__000000_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_GongsimCommand_and_NewDiagram_Engine.Y = 274.000000
+	__Vertice__000000_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_GongsimCommand_and_NewDiagram_Engine.Name = `Verticle in class diagram NewDiagram in middle between NewDiagram-GongsimCommand and NewDiagram-Engine`
 
 	// Setup of pointers
 	__Classdiagram__000000_NewDiagram.GongStructShapes = append(__Classdiagram__000000_NewDiagram.GongStructShapes, __GongStructShape__000001_NewDiagram_Engine)
@@ -938,9 +975,9 @@ func NewDiagramInjection(stage *models.StageStruct) {
 	__GongEnumShape__000006_NewDiagram_SpeedCommandType.GongEnumValueEntrys = append(__GongEnumShape__000006_NewDiagram_SpeedCommandType.GongEnumValueEntrys, __GongEnumValueEntry__000011_COMMAND_SPEED_STEADY)
 	__GongStructShape__000000_NewDiagram_DummyAgent.Position = __Position__000001_Pos_NewDiagram_DummyAgent
 	__GongStructShape__000000_NewDiagram_DummyAgent.Fields = append(__GongStructShape__000000_NewDiagram_DummyAgent.Fields, __Field__000021_TechName)
-	__GongStructShape__000000_NewDiagram_DummyAgent.Fields = append(__GongStructShape__000000_NewDiagram_DummyAgent.Fields, __Field__000013_Name)
+	__GongStructShape__000000_NewDiagram_DummyAgent.Fields = append(__GongStructShape__000000_NewDiagram_DummyAgent.Fields, __Field__000012_Name)
 	__GongStructShape__000001_NewDiagram_Engine.Position = __Position__000002_Pos_NewDiagram_Engine
-	__GongStructShape__000001_NewDiagram_Engine.Fields = append(__GongStructShape__000001_NewDiagram_Engine.Fields, __Field__000012_Name)
+	__GongStructShape__000001_NewDiagram_Engine.Fields = append(__GongStructShape__000001_NewDiagram_Engine.Fields, __Field__000011_Name)
 	__GongStructShape__000001_NewDiagram_Engine.Fields = append(__GongStructShape__000001_NewDiagram_Engine.Fields, __Field__000009_EndTime)
 	__GongStructShape__000001_NewDiagram_Engine.Fields = append(__GongStructShape__000001_NewDiagram_Engine.Fields, __Field__000006_CurrentTime)
 	__GongStructShape__000001_NewDiagram_Engine.Fields = append(__GongStructShape__000001_NewDiagram_Engine.Fields, __Field__000016_SecondsSinceStart)
@@ -949,20 +986,22 @@ func NewDiagramInjection(stage *models.StageStruct) {
 	__GongStructShape__000001_NewDiagram_Engine.Fields = append(__GongStructShape__000001_NewDiagram_Engine.Fields, __Field__000020_State)
 	__GongStructShape__000001_NewDiagram_Engine.Fields = append(__GongStructShape__000001_NewDiagram_Engine.Fields, __Field__000017_Speed)
 	__GongStructShape__000002_NewDiagram_Event.Position = __Position__000007_Pos_NewDiagram_Event
-	__GongStructShape__000002_NewDiagram_Event.Fields = append(__GongStructShape__000002_NewDiagram_Event.Fields, __Field__000015_Name)
+	__GongStructShape__000002_NewDiagram_Event.Fields = append(__GongStructShape__000002_NewDiagram_Event.Fields, __Field__000013_Name)
 	__GongStructShape__000002_NewDiagram_Event.Fields = append(__GongStructShape__000002_NewDiagram_Event.Fields, __Field__000008_Duration)
 	__GongStructShape__000003_NewDiagram_GongsimCommand.Position = __Position__000008_Pos_NewDiagram_GongsimCommand
-	__GongStructShape__000003_NewDiagram_GongsimCommand.Fields = append(__GongStructShape__000003_NewDiagram_GongsimCommand.Fields, __Field__000011_Name)
+	__GongStructShape__000003_NewDiagram_GongsimCommand.Fields = append(__GongStructShape__000003_NewDiagram_GongsimCommand.Fields, __Field__000014_Name)
 	__GongStructShape__000003_NewDiagram_GongsimCommand.Fields = append(__GongStructShape__000003_NewDiagram_GongsimCommand.Fields, __Field__000000_Command)
 	__GongStructShape__000003_NewDiagram_GongsimCommand.Fields = append(__GongStructShape__000003_NewDiagram_GongsimCommand.Fields, __Field__000001_CommandDate)
 	__GongStructShape__000003_NewDiagram_GongsimCommand.Fields = append(__GongStructShape__000003_NewDiagram_GongsimCommand.Fields, __Field__000019_SpeedCommandType)
 	__GongStructShape__000003_NewDiagram_GongsimCommand.Fields = append(__GongStructShape__000003_NewDiagram_GongsimCommand.Fields, __Field__000007_DateSpeedCommand)
+	__GongStructShape__000003_NewDiagram_GongsimCommand.Links = append(__GongStructShape__000003_NewDiagram_GongsimCommand.Links, __Link__000000_Engine)
 	__GongStructShape__000004_NewDiagram_GongsimStatus.Position = __Position__000010_Pos_NewDiagram_GongsimStatus
-	__GongStructShape__000004_NewDiagram_GongsimStatus.Fields = append(__GongStructShape__000004_NewDiagram_GongsimStatus.Fields, __Field__000014_Name)
+	__GongStructShape__000004_NewDiagram_GongsimStatus.Fields = append(__GongStructShape__000004_NewDiagram_GongsimStatus.Fields, __Field__000015_Name)
 	__GongStructShape__000004_NewDiagram_GongsimStatus.Fields = append(__GongStructShape__000004_NewDiagram_GongsimStatus.Fields, __Field__000004_CurrentCommand)
 	__GongStructShape__000004_NewDiagram_GongsimStatus.Fields = append(__GongStructShape__000004_NewDiagram_GongsimStatus.Fields, __Field__000002_CompletionDate)
 	__GongStructShape__000004_NewDiagram_GongsimStatus.Fields = append(__GongStructShape__000004_NewDiagram_GongsimStatus.Fields, __Field__000005_CurrentSpeedCommand)
 	__GongStructShape__000004_NewDiagram_GongsimStatus.Fields = append(__GongStructShape__000004_NewDiagram_GongsimStatus.Fields, __Field__000018_SpeedCommandCompletionDate)
+	__Link__000000_Engine.Middlevertice = __Vertice__000000_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_GongsimCommand_and_NewDiagram_Engine
 }
 
 

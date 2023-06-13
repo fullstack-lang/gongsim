@@ -58,7 +58,7 @@ func (controller *Controller) GetGongsimCommands(c *gin.Context) {
 		value := values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
-			log.Println("GetGongsimCommands", "GONG__StackPath", stackPath)
+			// log.Println("GetGongsimCommands", "GONG__StackPath", stackPath)
 		}
 	}
 	backRepo := controller.Map_BackRepos[stackPath]
@@ -115,7 +115,7 @@ func (controller *Controller) PostGongsimCommand(c *gin.Context) {
 		value := values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
-			log.Println("PostGongsimCommands", "GONG__StackPath", stackPath)
+			// log.Println("PostGongsimCommands", "GONG__StackPath", stackPath)
 		}
 	}
 	backRepo := controller.Map_BackRepos[stackPath]
@@ -182,7 +182,7 @@ func (controller *Controller) GetGongsimCommand(c *gin.Context) {
 		value := values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
-			log.Println("GetGongsimCommand", "GONG__StackPath", stackPath)
+			// log.Println("GetGongsimCommand", "GONG__StackPath", stackPath)
 		}
 	}
 	backRepo := controller.Map_BackRepos[stackPath]
@@ -225,7 +225,7 @@ func (controller *Controller) UpdateGongsimCommand(c *gin.Context) {
 		value := values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
-			log.Println("UpdateGongsimCommand", "GONG__StackPath", stackPath)
+			// log.Println("UpdateGongsimCommand", "GONG__StackPath", stackPath)
 		}
 	}
 	backRepo := controller.Map_BackRepos[stackPath]
@@ -305,7 +305,7 @@ func (controller *Controller) DeleteGongsimCommand(c *gin.Context) {
 		value := values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
-			log.Println("DeleteGongsimCommand", "GONG__StackPath", stackPath)
+			// log.Println("DeleteGongsimCommand", "GONG__StackPath", stackPath)
 		}
 	}
 	backRepo := controller.Map_BackRepos[stackPath]

@@ -119,7 +119,7 @@ export class GongsimStatusService {
     return this.http.put<GongsimStatusDB>(url, gongsimstatusdb, httpOptions).pipe(
       tap(_ => {
         // insertion point for restoration of reverse pointers
-        this.log(`updated gongsimstatusdb id=${gongsimstatusdb.ID}`)
+        // this.log(`updated gongsimstatusdb id=${gongsimstatusdb.ID}`)
       }),
       catchError(this.handleError<GongsimStatusDB>('updateGongsimStatus'))
     );

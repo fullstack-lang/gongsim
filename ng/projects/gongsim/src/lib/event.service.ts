@@ -119,7 +119,7 @@ export class EventService {
     return this.http.put<EventDB>(url, eventdb, httpOptions).pipe(
       tap(_ => {
         // insertion point for restoration of reverse pointers
-        this.log(`updated eventdb id=${eventdb.ID}`)
+        // this.log(`updated eventdb id=${eventdb.ID}`)
       }),
       catchError(this.handleError<EventDB>('updateEvent'))
     );

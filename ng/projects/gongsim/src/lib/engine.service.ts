@@ -119,7 +119,7 @@ export class EngineService {
     return this.http.put<EngineDB>(url, enginedb, httpOptions).pipe(
       tap(_ => {
         // insertion point for restoration of reverse pointers
-        this.log(`updated enginedb id=${enginedb.ID}`)
+        // this.log(`updated enginedb id=${enginedb.ID}`)
       }),
       catchError(this.handleError<EngineDB>('updateEngine'))
     );

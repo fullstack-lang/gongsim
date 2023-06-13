@@ -58,7 +58,7 @@ func (controller *Controller) GetEngines(c *gin.Context) {
 		value := values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
-			log.Println("GetEngines", "GONG__StackPath", stackPath)
+			// log.Println("GetEngines", "GONG__StackPath", stackPath)
 		}
 	}
 	backRepo := controller.Map_BackRepos[stackPath]
@@ -115,7 +115,7 @@ func (controller *Controller) PostEngine(c *gin.Context) {
 		value := values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
-			log.Println("PostEngines", "GONG__StackPath", stackPath)
+			// log.Println("PostEngines", "GONG__StackPath", stackPath)
 		}
 	}
 	backRepo := controller.Map_BackRepos[stackPath]
@@ -182,7 +182,7 @@ func (controller *Controller) GetEngine(c *gin.Context) {
 		value := values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
-			log.Println("GetEngine", "GONG__StackPath", stackPath)
+			// log.Println("GetEngine", "GONG__StackPath", stackPath)
 		}
 	}
 	backRepo := controller.Map_BackRepos[stackPath]
@@ -225,7 +225,7 @@ func (controller *Controller) UpdateEngine(c *gin.Context) {
 		value := values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
-			log.Println("UpdateEngine", "GONG__StackPath", stackPath)
+			// log.Println("UpdateEngine", "GONG__StackPath", stackPath)
 		}
 	}
 	backRepo := controller.Map_BackRepos[stackPath]
@@ -305,7 +305,7 @@ func (controller *Controller) DeleteEngine(c *gin.Context) {
 		value := values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
-			log.Println("DeleteEngine", "GONG__StackPath", stackPath)
+			// log.Println("DeleteEngine", "GONG__StackPath", stackPath)
 		}
 	}
 	backRepo := controller.Map_BackRepos[stackPath]
