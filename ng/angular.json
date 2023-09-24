@@ -168,39 +168,6 @@
           }
         }
       }
-    },
-    "gongsimdatamodel": {
-      "projectType": "library",
-      "root": "projects/gongsimdatamodel",
-      "sourceRoot": "projects/gongsimdatamodel/src",
-      "prefix": "lib",
-      "architect": {
-        "build": {
-          "builder": "@angular-devkit/build-angular:ng-packagr",
-          "options": {
-            "project": "projects/gongsimdatamodel/ng-package.json"
-          },
-          "configurations": {
-            "production": {
-              "tsConfig": "projects/gongsimdatamodel/tsconfig.lib.prod.json"
-            },
-            "development": {
-              "tsConfig": "projects/gongsimdatamodel/tsconfig.lib.json"
-            }
-          },
-          "defaultConfiguration": "production"
-        },
-        "test": {
-          "builder": "@angular-devkit/build-angular:karma",
-          "options": {
-            "tsConfig": "projects/gongsimdatamodel/tsconfig.spec.json",
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ]
-          }
-        }
-      }
     }
   },
   "version": 1
