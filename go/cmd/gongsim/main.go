@@ -11,9 +11,8 @@ import (
 	gongsim_go "github.com/fullstack-lang/gongsim/go"
 	gongsim_fullstack "github.com/fullstack-lang/gongsim/go/fullstack"
 	gongsim_models "github.com/fullstack-lang/gongsim/go/models"
+	gongsim_probe "github.com/fullstack-lang/gongsim/go/probe"
 	gongsim_static "github.com/fullstack-lang/gongsim/go/static"
-
-	gongdoc_load "github.com/fullstack-lang/gongdoc/go/load"
 )
 
 var (
@@ -66,7 +65,8 @@ func main() {
 	r := gongsim_static.ServeStaticFiles(*logGINFlag)
 
 	// setup stack
-	gongsim_stage := gongsim_fullstack.NewStackInstance(r, "github.com/fullstack-lang/gongsim/go/models")
+	stage, gongsimBackRepo := gongsim_fullstack.NewStackInstance(
+		r, "gongsim")
 
 	// generate injection code from the stage
 	if *marshallOnStartup != "" {
@@ -84,30 +84,30 @@ func main() {
 		}
 		defer file.Close()
 
-		gongsim_stage.Checkout()
-		gongsim_stage.Marshall(file, "github.com/fullstack-lang/gongsim/go/models", "main")
+		stage.Checkout()
+		stage.Marshall(file, "github.com/fullstack-lang/gongsim/go/models", "main")
 		os.Exit(0)
 	}
 
 	// setup the stage by injecting the code from code database
 	if *unmarshall != "" {
-		gongsim_stage.Checkout()
-		gongsim_stage.Reset()
-		gongsim_stage.Commit()
+		stage.Checkout()
+		stage.Reset()
+		stage.Commit()
 		if InjectionGateway[*unmarshall] != nil {
 			InjectionGateway[*unmarshall]()
 		}
-		gongsim_stage.Commit()
+		stage.Commit()
 	} else {
 		// in case the database is used, checkout the content to the stage
-		gongsim_stage.Checkout()
+		stage.Checkout()
 	}
 
 	if *unmarshallFromCode != "" {
-		gongsim_stage.Checkout()
-		gongsim_stage.Reset()
-		gongsim_stage.Commit()
-		err := gongsim_models.ParseAstFile(gongsim_stage, *unmarshallFromCode)
+		stage.Checkout()
+		stage.Reset()
+		stage.Commit()
+		err := gongsim_models.ParseAstFile(stage, *unmarshallFromCode)
 
 		// if the application is run with -unmarshallFromCode=xxx.go -marshallOnCommit
 		// xxx.go might be absent the first time. However, this shall not be a show stopper.
@@ -115,35 +115,26 @@ func main() {
 			log.Println("no file to read " + err.Error())
 		}
 
-		gongsim_stage.Commit()
+		stage.Commit()
 	} else {
 		// in case the database is used, checkout the content to the stage
-		gongsim_stage.Checkout()
+		stage.Checkout()
 	}
 
 	// hook automatic marshall to go code at every commit
 	if *marshallOnCommit != "" {
 		hook := new(BeforeCommitImplementation)
-		gongsim_stage.OnInitCommitFromFrontCallback = hook
+		stage.OnInitCommitFromFrontCallback = hook
 	}
-
-	gongdoc_load.Load(
-		"gongsim",
-		"github.com/fullstack-lang/gongsim/go/models",
-		gongsim_go.GoModelsDir,
-		gongsim_go.GoDiagramsDir,
-		r,
-		*embeddedDiagrams,
-		&gongsim_stage.Map_GongStructName_InstancesNb)
 
 	engine := new(gongsim_models.Engine)
 	engine.Name = "Simulation Engine"
-	engine.Stage(gongsim_stage)
+	engine.Stage(stage)
 
 	// the gongsim command orchestrates the simulation engine regarding to the
 	// the rest of the stack. It manages when the stage has to be commited to the
 	// back repo or when the back repo has to be checked out to the stage
-	gongsimCommand := gongsim_models.NewGongSimCommand(gongsim_stage, engine)
+	gongsimCommand := gongsim_models.NewGongSimCommand(stage, engine)
 	_ = gongsimCommand
 
 	// seven days of simulation
@@ -181,7 +172,11 @@ func main() {
 	}
 
 	// commit simulation stage
-	gongsim_stage.Commit()
+	stage.Commit()
+
+	gongsim_probe.NewProbe(r, gongsim_go.GoModelsDir, gongsim_go.GoDiagramsDir,
+		*embeddedDiagrams, "gongsim", stage, gongsimBackRepo)
+
 	log.Printf("Server ready serve on localhost:8080")
 	r.Run()
 }

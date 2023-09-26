@@ -1,7 +1,9 @@
+// generated code - do not edit
 package controllers
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -93,6 +95,9 @@ func (controller *Controller) GetLastCommitFromBackNb(c *gin.Context) {
 		}
 	}
 	backRepo := controller.Map_BackRepos[stackPath]
+	if backRepo == nil {
+		log.Panic("Stack github.com/fullstack-lang/gongsim/go/models, Unkown stack", stackPath)
+	}
 	res := backRepo.GetLastCommitFromBackNb()
 
 	c.JSON(http.StatusOK, res)
@@ -110,6 +115,9 @@ func (controller *Controller) GetLastPushFromFrontNb(c *gin.Context) {
 		}
 	}
 	backRepo := controller.Map_BackRepos[stackPath]
+	if backRepo == nil {
+		log.Panic("Stack github.com/fullstack-lang/gongsim/go/models, Unkown stack", stackPath)
+	}
 	res := backRepo.GetLastPushFromFrontNb()
 
 	c.JSON(http.StatusOK, res)

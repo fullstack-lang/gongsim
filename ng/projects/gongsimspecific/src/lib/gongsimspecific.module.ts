@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 
 import { GongsimspecificComponent } from './gongsimspecific.component';
-import { DataModelPanelComponent } from './data-model-panel/data-model-panel.component';
 
 import { GongdocModule } from 'gongdoc'
 import { GongdocspecificModule } from 'gongdocspecific'
@@ -20,7 +19,6 @@ import { EngineControlComponent } from './engine-control/engine-control.componen
 @NgModule({
   declarations: [
     GongsimspecificComponent,
-    DataModelPanelComponent,
     EngineControlComponent
   ],
   imports: [
@@ -40,7 +38,6 @@ import { EngineControlComponent } from './engine-control/engine-control.componen
   ],
   exports: [
     GongsimspecificComponent,
-    DataModelPanelComponent,
     EngineControlComponent
   ]
 })
