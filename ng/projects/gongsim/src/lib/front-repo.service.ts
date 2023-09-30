@@ -1,9 +1,9 @@
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Injectable } from '@angular/core'
+import { HttpClient, HttpHeaders } from '@angular/common/http'
 
-import { Observable, combineLatest, BehaviorSubject, of } from 'rxjs';
+import { Observable, combineLatest, BehaviorSubject, of } from 'rxjs'
 
-// insertion point sub template for services imports 
+// insertion point sub template for services imports
 import { DummyAgentDB } from './dummyagent-db'
 import { DummyAgentService } from './dummyagent.service'
 
@@ -21,22 +21,67 @@ import { GongsimStatusService } from './gongsimstatus.service'
 
 
 // FrontRepo stores all instances in a front repository (design pattern repository)
-export class FrontRepo { // insertion point sub template 
-  DummyAgents_array = new Array<DummyAgentDB>(); // array of repo instances
-  DummyAgents = new Map<number, DummyAgentDB>(); // map of repo instances
-  DummyAgents_batch = new Map<number, DummyAgentDB>(); // same but only in last GET (for finding repo instances to delete)
-  Engines_array = new Array<EngineDB>(); // array of repo instances
-  Engines = new Map<number, EngineDB>(); // map of repo instances
-  Engines_batch = new Map<number, EngineDB>(); // same but only in last GET (for finding repo instances to delete)
-  Events_array = new Array<EventDB>(); // array of repo instances
-  Events = new Map<number, EventDB>(); // map of repo instances
-  Events_batch = new Map<number, EventDB>(); // same but only in last GET (for finding repo instances to delete)
-  GongsimCommands_array = new Array<GongsimCommandDB>(); // array of repo instances
-  GongsimCommands = new Map<number, GongsimCommandDB>(); // map of repo instances
-  GongsimCommands_batch = new Map<number, GongsimCommandDB>(); // same but only in last GET (for finding repo instances to delete)
-  GongsimStatuss_array = new Array<GongsimStatusDB>(); // array of repo instances
-  GongsimStatuss = new Map<number, GongsimStatusDB>(); // map of repo instances
-  GongsimStatuss_batch = new Map<number, GongsimStatusDB>(); // same but only in last GET (for finding repo instances to delete)
+export class FrontRepo { // insertion point sub template
+  DummyAgents_array = new Array<DummyAgentDB>() // array of repo instances
+  DummyAgents = new Map<number, DummyAgentDB>() // map of repo instances
+  DummyAgents_batch = new Map<number, DummyAgentDB>() // same but only in last GET (for finding repo instances to delete)
+
+  Engines_array = new Array<EngineDB>() // array of repo instances
+  Engines = new Map<number, EngineDB>() // map of repo instances
+  Engines_batch = new Map<number, EngineDB>() // same but only in last GET (for finding repo instances to delete)
+
+  Events_array = new Array<EventDB>() // array of repo instances
+  Events = new Map<number, EventDB>() // map of repo instances
+  Events_batch = new Map<number, EventDB>() // same but only in last GET (for finding repo instances to delete)
+
+  GongsimCommands_array = new Array<GongsimCommandDB>() // array of repo instances
+  GongsimCommands = new Map<number, GongsimCommandDB>() // map of repo instances
+  GongsimCommands_batch = new Map<number, GongsimCommandDB>() // same but only in last GET (for finding repo instances to delete)
+
+  GongsimStatuss_array = new Array<GongsimStatusDB>() // array of repo instances
+  GongsimStatuss = new Map<number, GongsimStatusDB>() // map of repo instances
+  GongsimStatuss_batch = new Map<number, GongsimStatusDB>() // same but only in last GET (for finding repo instances to delete)
+
+
+  // getArray allows for a get function that is robust to refactoring of the named struct name
+  // for instance frontRepo.getArray<Astruct>( Astruct.GONGSTRUCT_NAME), is robust to a refactoring of Astruct identifier
+  // contrary to frontRepo.Astructs_array which is not refactored when Astruct identifier is modified
+  getArray<Type>(gongStructName: string): Array<Type> {
+    switch (gongStructName) {
+      // insertion point
+      case 'DummyAgent':
+        return this.DummyAgents_array as unknown as Array<Type>
+      case 'Engine':
+        return this.Engines_array as unknown as Array<Type>
+      case 'Event':
+        return this.Events_array as unknown as Array<Type>
+      case 'GongsimCommand':
+        return this.GongsimCommands_array as unknown as Array<Type>
+      case 'GongsimStatus':
+        return this.GongsimStatuss_array as unknown as Array<Type>
+      default:
+        throw new Error("Type not recognized");
+    }
+  }
+
+  // getMap allows for a get function that is robust to refactoring of the named struct name
+  getMap<Type>(gongStructName: string): Map<number, Type> {
+    switch (gongStructName) {
+      // insertion point
+      case 'DummyAgent':
+        return this.DummyAgents_array as unknown as Map<number, Type>
+      case 'Engine':
+        return this.Engines_array as unknown as Map<number, Type>
+      case 'Event':
+        return this.Events_array as unknown as Map<number, Type>
+      case 'GongsimCommand':
+        return this.GongsimCommands_array as unknown as Map<number, Type>
+      case 'GongsimStatus':
+        return this.GongsimStatuss_array as unknown as Map<number, Type>
+      default:
+        throw new Error("Type not recognized");
+    }
+  }
 }
 
 // the table component is called in different ways
@@ -133,7 +178,7 @@ export class FrontRepoService {
   }
 
   // typing of observable can be messy in typescript. Therefore, one force the type
-  observableFrontRepo: [ 
+  observableFrontRepo: [
     Observable<null>, // see below for the of(null) observable
     // insertion point sub template 
     Observable<DummyAgentDB[]>,
@@ -141,16 +186,16 @@ export class FrontRepoService {
     Observable<EventDB[]>,
     Observable<GongsimCommandDB[]>,
     Observable<GongsimStatusDB[]>,
-  ] = [ 
-    // Using "combineLatest" with a placeholder observable.
-    //
-    // This allows the typescript compiler to pass when no GongStruct is present in the front API
-    //
-    // The "of(null)" is a "meaningless" observable that emits a single value (null) and completes.
-    // This is used as a workaround to satisfy TypeScript requirements and the "combineLatest" 
-    // expectation for a non-empty array of observables.
-    of(null), // 
-    // insertion point sub template
+  ] = [
+      // Using "combineLatest" with a placeholder observable.
+      //
+      // This allows the typescript compiler to pass when no GongStruct is present in the front API
+      //
+      // The "of(null)" is a "meaningless" observable that emits a single value (null) and completes.
+      // This is used as a workaround to satisfy TypeScript requirements and the "combineLatest" 
+      // expectation for a non-empty array of observables.
+      of(null), // 
+      // insertion point sub template
       this.dummyagentService.getDummyAgents(this.GONG__StackPath),
       this.engineService.getEngines(this.GONG__StackPath),
       this.eventService.getEvents(this.GONG__StackPath),
@@ -168,7 +213,7 @@ export class FrontRepoService {
 
     this.GONG__StackPath = GONG__StackPath
 
-    this.observableFrontRepo = [ 
+    this.observableFrontRepo = [
       of(null), // see above for justification
       // insertion point sub template
       this.dummyagentService.getDummyAgents(this.GONG__StackPath),
@@ -183,7 +228,7 @@ export class FrontRepoService {
         combineLatest(
           this.observableFrontRepo
         ).subscribe(
-          ([ 
+          ([
             ___of_null, // see above for the explanation about of
             // insertion point sub template for declarations 
             dummyagents_,
