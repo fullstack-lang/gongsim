@@ -38,7 +38,7 @@ type GongsimStatusAPI struct {
 	models.GongsimStatus_WOP
 
 	// encoding of pointers
-	GongsimStatusPointersEncoding
+	GongsimStatusPointersEncoding GongsimStatusPointersEncoding
 }
 
 // GongsimStatusPointersEncoding encodes pointers to Struct and

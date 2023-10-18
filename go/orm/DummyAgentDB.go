@@ -38,7 +38,7 @@ type DummyAgentAPI struct {
 	models.DummyAgent_WOP
 
 	// encoding of pointers
-	DummyAgentPointersEncoding
+	DummyAgentPointersEncoding DummyAgentPointersEncoding
 }
 
 // DummyAgentPointersEncoding encodes pointers to Struct and

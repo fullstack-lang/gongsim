@@ -448,7 +448,7 @@ export class FrontRepoService {
                 // insertion point sub sub template for ONE-/ZERO-ONE associations pointers redeeming
                 // insertion point for pointer field Engine redeeming
                 {
-                  let _engine = this.frontRepo.Engines.get(gongsimcommand.EngineID.Int64)
+                  let _engine = this.frontRepo.Engines.get(gongsimcommand.GongsimCommandPointersEncoding.EngineID.Int64)
                   if (_engine) {
                     gongsimcommand.Engine = _engine
                   }
@@ -684,7 +684,7 @@ export class FrontRepoService {
                 // insertion point for redeeming ONE/ZERO-ONE associations
                 // insertion point for pointer field Engine redeeming
                 {
-                  let _engine = this.frontRepo.Engines.get(gongsimcommand.EngineID.Int64)
+                  let _engine = this.frontRepo.Engines.get(gongsimcommand.GongsimCommandPointersEncoding.EngineID.Int64)
                   if (_engine) {
                     gongsimcommand.Engine = _engine
                   }

@@ -38,7 +38,7 @@ type EventAPI struct {
 	models.Event_WOP
 
 	// encoding of pointers
-	EventPointersEncoding
+	EventPointersEncoding EventPointersEncoding
 }
 
 // EventPointersEncoding encodes pointers to Struct and

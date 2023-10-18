@@ -38,7 +38,7 @@ type EngineAPI struct {
 	models.Engine_WOP
 
 	// encoding of pointers
-	EnginePointersEncoding
+	EnginePointersEncoding EnginePointersEncoding
 }
 
 // EnginePointersEncoding encodes pointers to Struct and

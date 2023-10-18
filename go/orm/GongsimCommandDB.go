@@ -38,7 +38,7 @@ type GongsimCommandAPI struct {
 	models.GongsimCommand_WOP
 
 	// encoding of pointers
-	GongsimCommandPointersEncoding
+	GongsimCommandPointersEncoding GongsimCommandPointersEncoding
 }
 
 // GongsimCommandPointersEncoding encodes pointers to Struct and
