@@ -162,7 +162,7 @@ func TestLadybugSim(t *testing.T) {
 	r := gongsim_static.ServeStaticFiles(false)
 
 	// setup stack
-	gongsim_stage := gongsim_fullstack.NewStackInstance(r, "github.com/fullstack-lang/gongsim/go/models")
+	gongsim_stage, _ := gongsim_fullstack.NewStackInstance(r, "github.com/fullstack-lang/gongsim/go/models")
 
 	engine := new(gongsim_models.Engine)
 	engine.Name = "Simulation Engine"
