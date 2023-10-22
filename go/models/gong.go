@@ -48,6 +48,8 @@ type StageStruct struct {
 	DummyAgents           map[*DummyAgent]any
 	DummyAgents_mapString map[string]*DummyAgent
 
+	// insertion point for slice of pointers maps
+
 	OnAfterDummyAgentCreateCallback OnAfterCreateInterface[DummyAgent]
 	OnAfterDummyAgentUpdateCallback OnAfterUpdateInterface[DummyAgent]
 	OnAfterDummyAgentDeleteCallback OnAfterDeleteInterface[DummyAgent]
@@ -55,6 +57,8 @@ type StageStruct struct {
 
 	Engines           map[*Engine]any
 	Engines_mapString map[string]*Engine
+
+	// insertion point for slice of pointers maps
 
 	OnAfterEngineCreateCallback OnAfterCreateInterface[Engine]
 	OnAfterEngineUpdateCallback OnAfterUpdateInterface[Engine]
@@ -64,6 +68,8 @@ type StageStruct struct {
 	Events           map[*Event]any
 	Events_mapString map[string]*Event
 
+	// insertion point for slice of pointers maps
+
 	OnAfterEventCreateCallback OnAfterCreateInterface[Event]
 	OnAfterEventUpdateCallback OnAfterUpdateInterface[Event]
 	OnAfterEventDeleteCallback OnAfterDeleteInterface[Event]
@@ -72,6 +78,8 @@ type StageStruct struct {
 	GongsimCommands           map[*GongsimCommand]any
 	GongsimCommands_mapString map[string]*GongsimCommand
 
+	// insertion point for slice of pointers maps
+
 	OnAfterGongsimCommandCreateCallback OnAfterCreateInterface[GongsimCommand]
 	OnAfterGongsimCommandUpdateCallback OnAfterUpdateInterface[GongsimCommand]
 	OnAfterGongsimCommandDeleteCallback OnAfterDeleteInterface[GongsimCommand]
@@ -79,6 +87,8 @@ type StageStruct struct {
 
 	GongsimStatuss           map[*GongsimStatus]any
 	GongsimStatuss_mapString map[string]*GongsimStatus
+
+	// insertion point for slice of pointers maps
 
 	OnAfterGongsimStatusCreateCallback OnAfterCreateInterface[GongsimStatus]
 	OnAfterGongsimStatusUpdateCallback OnAfterUpdateInterface[GongsimStatus]
@@ -207,6 +217,8 @@ func (stage *StageStruct) CommitWithSuspendedCallbacks() {
 }
 
 func (stage *StageStruct) Commit() {
+	stage.ComputeReverseMaps()
+
 	if stage.BackRepo != nil {
 		stage.BackRepo.Commit(stage)
 	}
@@ -225,6 +237,7 @@ func (stage *StageStruct) Checkout() {
 		stage.BackRepo.Checkout(stage)
 	}
 
+	stage.ComputeReverseMaps()
 	// insertion point for computing the map of number of instances per gongstruct
 	stage.Map_GongStructName_InstancesNb["DummyAgent"] = len(stage.DummyAgents)
 	stage.Map_GongStructName_InstancesNb["Engine"] = len(stage.Engines)

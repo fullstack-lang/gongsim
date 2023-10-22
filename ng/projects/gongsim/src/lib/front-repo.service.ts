@@ -196,11 +196,11 @@ export class FrontRepoService {
       // expectation for a non-empty array of observables.
       of(null), // 
       // insertion point sub template
-      this.dummyagentService.getDummyAgents(this.GONG__StackPath),
-      this.engineService.getEngines(this.GONG__StackPath),
-      this.eventService.getEvents(this.GONG__StackPath),
-      this.gongsimcommandService.getGongsimCommands(this.GONG__StackPath),
-      this.gongsimstatusService.getGongsimStatuss(this.GONG__StackPath),
+      this.dummyagentService.getDummyAgents(this.GONG__StackPath, this.frontRepo),
+      this.engineService.getEngines(this.GONG__StackPath, this.frontRepo),
+      this.eventService.getEvents(this.GONG__StackPath, this.frontRepo),
+      this.gongsimcommandService.getGongsimCommands(this.GONG__StackPath, this.frontRepo),
+      this.gongsimstatusService.getGongsimStatuss(this.GONG__StackPath, this.frontRepo),
     ];
 
   //
@@ -216,11 +216,11 @@ export class FrontRepoService {
     this.observableFrontRepo = [
       of(null), // see above for justification
       // insertion point sub template
-      this.dummyagentService.getDummyAgents(this.GONG__StackPath),
-      this.engineService.getEngines(this.GONG__StackPath),
-      this.eventService.getEvents(this.GONG__StackPath),
-      this.gongsimcommandService.getGongsimCommands(this.GONG__StackPath),
-      this.gongsimstatusService.getGongsimStatuss(this.GONG__StackPath),
+      this.dummyagentService.getDummyAgents(this.GONG__StackPath, this.frontRepo),
+      this.engineService.getEngines(this.GONG__StackPath, this.frontRepo),
+      this.eventService.getEvents(this.GONG__StackPath, this.frontRepo),
+      this.gongsimcommandService.getGongsimCommands(this.GONG__StackPath, this.frontRepo),
+      this.gongsimstatusService.getGongsimStatuss(this.GONG__StackPath, this.frontRepo),
     ]
 
     return new Observable<FrontRepo>(
@@ -420,27 +420,24 @@ export class FrontRepoService {
 
 
             // 
-            // Second Step: redeem pointers between instances (thanks to maps in the First Step)
+            // Second Step: reddeem slice of pointers fields
             // insertion point sub template for redeem 
             dummyagents.forEach(
               dummyagent => {
                 // insertion point sub sub template for ONE-/ZERO-ONE associations pointers redeeming
-
-                // insertion point for redeeming ONE-MANY associations
+                // insertion point for pointers decoding
               }
             )
             engines.forEach(
               engine => {
                 // insertion point sub sub template for ONE-/ZERO-ONE associations pointers redeeming
-
-                // insertion point for redeeming ONE-MANY associations
+                // insertion point for pointers decoding
               }
             )
             events.forEach(
               event => {
                 // insertion point sub sub template for ONE-/ZERO-ONE associations pointers redeeming
-
-                // insertion point for redeeming ONE-MANY associations
+                // insertion point for pointers decoding
               }
             )
             gongsimcommands.forEach(
@@ -453,44 +450,13 @@ export class FrontRepoService {
                     gongsimcommand.Engine = _engine
                   }
                 }
-
-                // insertion point for redeeming ONE-MANY associations
+                // insertion point for pointers decoding
               }
             )
             gongsimstatuss.forEach(
               gongsimstatus => {
                 // insertion point sub sub template for ONE-/ZERO-ONE associations pointers redeeming
-
-                // insertion point for redeeming ONE-MANY associations
-              }
-            )
-
-            // 
-            // Third Step: sort arrays (slices in go) according to their index
-            // insertion point sub template for redeem 
-            dummyagents.forEach(
-              dummyagent => {
-                // insertion point for sorting
-              }
-            )
-            engines.forEach(
-              engine => {
-                // insertion point for sorting
-              }
-            )
-            events.forEach(
-              event => {
-                // insertion point for sorting
-              }
-            )
-            gongsimcommands.forEach(
-              gongsimcommand => {
-                // insertion point for sorting
-              }
-            )
-            gongsimstatuss.forEach(
-              gongsimstatus => {
-                // insertion point for sorting
+                // insertion point for pointers decoding
               }
             )
 
@@ -509,7 +475,7 @@ export class FrontRepoService {
     return new Observable<FrontRepo>(
       (observer) => {
         combineLatest([
-          this.dummyagentService.getDummyAgents(this.GONG__StackPath)
+          this.dummyagentService.getDummyAgents(this.GONG__StackPath, this.frontRepo)
         ]).subscribe(
           ([ // insertion point sub template 
             dummyagents,
@@ -529,8 +495,6 @@ export class FrontRepoService {
                 this.frontRepo.DummyAgents_batch.set(dummyagent.ID, dummyagent)
 
                 // insertion point for redeeming ONE/ZERO-ONE associations
-
-                // insertion point for redeeming ONE-MANY associations
               }
             )
 
@@ -560,7 +524,7 @@ export class FrontRepoService {
     return new Observable<FrontRepo>(
       (observer) => {
         combineLatest([
-          this.engineService.getEngines(this.GONG__StackPath)
+          this.engineService.getEngines(this.GONG__StackPath, this.frontRepo)
         ]).subscribe(
           ([ // insertion point sub template 
             engines,
@@ -580,8 +544,6 @@ export class FrontRepoService {
                 this.frontRepo.Engines_batch.set(engine.ID, engine)
 
                 // insertion point for redeeming ONE/ZERO-ONE associations
-
-                // insertion point for redeeming ONE-MANY associations
               }
             )
 
@@ -611,7 +573,7 @@ export class FrontRepoService {
     return new Observable<FrontRepo>(
       (observer) => {
         combineLatest([
-          this.eventService.getEvents(this.GONG__StackPath)
+          this.eventService.getEvents(this.GONG__StackPath, this.frontRepo)
         ]).subscribe(
           ([ // insertion point sub template 
             events,
@@ -631,8 +593,6 @@ export class FrontRepoService {
                 this.frontRepo.Events_batch.set(event.ID, event)
 
                 // insertion point for redeeming ONE/ZERO-ONE associations
-
-                // insertion point for redeeming ONE-MANY associations
               }
             )
 
@@ -662,7 +622,7 @@ export class FrontRepoService {
     return new Observable<FrontRepo>(
       (observer) => {
         combineLatest([
-          this.gongsimcommandService.getGongsimCommands(this.GONG__StackPath)
+          this.gongsimcommandService.getGongsimCommands(this.GONG__StackPath, this.frontRepo)
         ]).subscribe(
           ([ // insertion point sub template 
             gongsimcommands,
@@ -689,8 +649,6 @@ export class FrontRepoService {
                     gongsimcommand.Engine = _engine
                   }
                 }
-
-                // insertion point for redeeming ONE-MANY associations
               }
             )
 
@@ -720,7 +678,7 @@ export class FrontRepoService {
     return new Observable<FrontRepo>(
       (observer) => {
         combineLatest([
-          this.gongsimstatusService.getGongsimStatuss(this.GONG__StackPath)
+          this.gongsimstatusService.getGongsimStatuss(this.GONG__StackPath, this.frontRepo)
         ]).subscribe(
           ([ // insertion point sub template 
             gongsimstatuss,
@@ -740,8 +698,6 @@ export class FrontRepoService {
                 this.frontRepo.GongsimStatuss_batch.set(gongsimstatus.ID, gongsimstatus)
 
                 // insertion point for redeeming ONE/ZERO-ONE associations
-
-                // insertion point for redeeming ONE-MANY associations
               }
             )
 
