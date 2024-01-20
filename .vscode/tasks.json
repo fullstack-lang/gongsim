@@ -24,6 +24,13 @@
 			"group": "build"
 		},
 		{
+			"label": "04 - ng serve --host=127.0.0.1",
+			"type": "shell",
+			"command": "cd ng; ng serve --host=127.0.0.1",
+			"group": "build",
+			"problemMatcher": []
+		},
+		{
 			"label": "01 - gongc",
 			"type": "shell",
 			"options": {
