@@ -3,23 +3,24 @@
 // usefull for managing pointer ID values that can be nullable
 import { NullInt64 } from './null-int64'
 
-export class DummyAgentDB {
+export class EventAPI {
 
-	static GONGSTRUCT_NAME = "DummyAgent"
+	static GONGSTRUCT_NAME = "Event"
 
 	CreatedAt?: string
 	DeletedAt?: string
 	ID: number = 0
 
 	// insertion point for basic fields declarations
-	TechName: string = ""
 	Name: string = ""
+	Duration: number = 0
 
 	// insertion point for other decls
+	Duration_string?: string
 
-	DummyAgentPointersEncoding: DummyAgentPointersEncoding = new DummyAgentPointersEncoding
+	EventPointersEncoding: EventPointersEncoding = new EventPointersEncoding
 }
 
-export class DummyAgentPointersEncoding {
+export class EventPointersEncoding {
 	// insertion point for pointers and slices of pointers encoding fields
 }

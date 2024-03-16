@@ -3,9 +3,9 @@
 // usefull for managing pointer ID values that can be nullable
 import { NullInt64 } from './null-int64'
 
-export class EventDB {
+export class GongsimStatusAPI {
 
-	static GONGSTRUCT_NAME = "Event"
+	static GONGSTRUCT_NAME = "GongsimStatus"
 
 	CreatedAt?: string
 	DeletedAt?: string
@@ -13,14 +13,16 @@ export class EventDB {
 
 	// insertion point for basic fields declarations
 	Name: string = ""
-	Duration: number = 0
+	CurrentCommand: string = ""
+	CompletionDate: string = ""
+	CurrentSpeedCommand: string = ""
+	SpeedCommandCompletionDate: string = ""
 
 	// insertion point for other decls
-	Duration_string?: string
 
-	EventPointersEncoding: EventPointersEncoding = new EventPointersEncoding
+	GongsimStatusPointersEncoding: GongsimStatusPointersEncoding = new GongsimStatusPointersEncoding
 }
 
-export class EventPointersEncoding {
+export class GongsimStatusPointersEncoding {
 	// insertion point for pointers and slices of pointers encoding fields
 }

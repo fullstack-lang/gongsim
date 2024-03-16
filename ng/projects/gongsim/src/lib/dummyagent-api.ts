@@ -3,26 +3,23 @@
 // usefull for managing pointer ID values that can be nullable
 import { NullInt64 } from './null-int64'
 
-export class GongsimStatusDB {
+export class DummyAgentAPI {
 
-	static GONGSTRUCT_NAME = "GongsimStatus"
+	static GONGSTRUCT_NAME = "DummyAgent"
 
 	CreatedAt?: string
 	DeletedAt?: string
 	ID: number = 0
 
 	// insertion point for basic fields declarations
+	TechName: string = ""
 	Name: string = ""
-	CurrentCommand: string = ""
-	CompletionDate: string = ""
-	CurrentSpeedCommand: string = ""
-	SpeedCommandCompletionDate: string = ""
 
 	// insertion point for other decls
 
-	GongsimStatusPointersEncoding: GongsimStatusPointersEncoding = new GongsimStatusPointersEncoding
+	DummyAgentPointersEncoding: DummyAgentPointersEncoding = new DummyAgentPointersEncoding
 }
 
-export class GongsimStatusPointersEncoding {
+export class DummyAgentPointersEncoding {
 	// insertion point for pointers and slices of pointers encoding fields
 }

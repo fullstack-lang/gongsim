@@ -3,7 +3,7 @@
 // usefull for managing pointer ID values that can be nullable
 import { NullInt64 } from './null-int64'
 
-export class EngineDB {
+export class EngineAPI {
 
 	static GONGSTRUCT_NAME = "Engine"
 

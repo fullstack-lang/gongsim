@@ -1,10 +1,10 @@
 // insertion point for imports
-import { EngineDB } from './engine-db'
+import { EngineAPI } from './engine-api'
 
 // usefull for managing pointer ID values that can be nullable
 import { NullInt64 } from './null-int64'
 
-export class GongsimCommandDB {
+export class GongsimCommandAPI {
 
 	static GONGSTRUCT_NAME = "GongsimCommand"
 
