@@ -1,7 +1,5 @@
 import { NgModule } from '@angular/core';
 
-import { GongsimspecificComponent } from './gongsimspecific.component';
-
 import { GongdocModule } from 'gongdoc'
 import { GongdocspecificModule } from 'gongdocspecific'
 
@@ -18,7 +16,6 @@ import { EngineControlComponent } from './engine-control/engine-control.componen
 
 @NgModule({
   declarations: [
-    GongsimspecificComponent,
     EngineControlComponent
   ],
   imports: [
@@ -37,7 +34,6 @@ import { EngineControlComponent } from './engine-control/engine-control.componen
     GongsimModule,
   ],
   exports: [
-    GongsimspecificComponent,
     EngineControlComponent
   ]
 })
