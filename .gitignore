@@ -7,3 +7,5 @@ go/cmd/gongsim/gongsim
 go/cmd/gongsim/__debug_bin.exe
 go/cmd/gongsim/test.db
 go/cmd/gongsim/__debug_bin*
+
+node_modules
