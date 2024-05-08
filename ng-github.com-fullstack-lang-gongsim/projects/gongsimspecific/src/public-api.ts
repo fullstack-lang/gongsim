@@ -2,4 +2,4 @@
  * Public API Surface of gongsimspecific
  */
 
-export * from './lib/gongsimspecific.module';
+export * from './lib/engine-control/engine-control.component';

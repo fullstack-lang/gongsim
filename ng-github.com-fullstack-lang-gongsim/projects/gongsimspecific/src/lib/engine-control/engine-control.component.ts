@@ -1,17 +1,33 @@
 import { Component, OnInit, Input } from '@angular/core';
 
-import * as gongsim from 'gongsim'
+import * as gongsim from '../../../../gongsim/src/public-api'
 
 import { Router, RouterState, ActivatedRoute } from '@angular/router';
 
 import { Observable, combineLatest, timer } from 'rxjs'
-import { GongsimCommandTypeList } from 'gongsim';
+// import { GongsimCommandTypeList } from '../../../../gongsim/src/public-api'
 
+import { MatToolbarModule } from '@angular/material/toolbar'
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { AngularSplitModule } from 'angular-split';
 
 @Component({
   selector: 'lib-engine-control',
   templateUrl: './engine-control.component.html',
-  styleUrls: ['./engine-control.component.css']
+  styleUrls: ['./engine-control.component.css'],
+  standalone: true,
+  imports: [
+    MatToolbarModule,
+    MatIconModule,
+    MatButtonModule,
+    FormsModule,
+    CommonModule,
+
+    AngularSplitModule,
+  ],
 })
 export class EngineControlComponent implements OnInit {
 
