@@ -1,9 +1,6 @@
 <mat-toolbar *ngIf="engine">
     <mat-toolbar-row>
         <span>{{ simulationTitle }}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-        <!-- <span class="example-spacer"></span>
-        <span class="example-spacer"></span>
-        <span class="example-spacer"></span> -->
         <span class="example-spacer status-indicator" [ngStyle]="
             {
                 'color': engine.State === 'PAUSED' ? 
