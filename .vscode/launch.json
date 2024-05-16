@@ -9,7 +9,7 @@
             "request": "launch",
             "type": "msedge",
             "url": "http://localhost:4200",
-            "webRoot": "${workspaceFolder}/ng"
+            "webRoot": "${workspaceFolder}/ng-github.com-fullstack-lang-gongsim"
         },
         {
             "name": "go run gongsim",

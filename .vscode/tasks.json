@@ -5,7 +5,7 @@
 			"label": "03 - ng serve",
 			"type": "shell",
 			"options": {
-				"cwd": "ng"
+				"cwd": "ng-github.com-fullstack-lang-gongsim"
 			},
 			"command": "ng serve",
 			"group": "build"
@@ -26,7 +26,7 @@
 		{
 			"label": "04 - ng serve --host=127.0.0.1",
 			"type": "shell",
-			"command": "cd ng; ng serve --host=127.0.0.1",
+			"command": "cd ng-github.com-fullstack-lang-gongsim; ng serve --host=127.0.0.1",
 			"group": "build",
 			"problemMatcher": []
 		},
