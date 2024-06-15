@@ -5,7 +5,6 @@ import (
 	"log"
 	"math"
 	"math/rand"
-	"os"
 	"sort"
 	"testing"
 	"time"
@@ -41,11 +40,13 @@ func (specificEngine *LadybugSimulation) GetLastCommitNb() uint                 
 func (specificEngine *LadybugSimulation) GetLastCommitNbFromFront() uint               { return 0 }
 
 type Ladybug struct {
+	// Agent contains fields necessary for the simulation
+	// You can reuse this struct
 	gongsim_models.Agent
 
-	Name string
+	Name string // necessary because it is a gongstruct
 
-	Id int
+	UniqueId int // usefull for sorting between lady bus
 
 	Position float64 // between 0.0 and 1.0
 
@@ -58,8 +59,14 @@ const nbLadybugs = 32
 
 var ladybugs []*Ladybug
 
+// FireNextEvent is the minimal function that is necessary to run the simulation
 func (ladybug *Ladybug) FireNextEvent() {
+
 	event, eventTime := ladybug.GetNextEventAndRemoveIt()
+	// log.Println("Ladybug", "FireNextEvent", ladybug.UniqueId, eventTime.Format("15:04:05.000000"))
+	if eventNb%5000 == 0 && ladybug.UniqueId == 0 {
+		log.Printf("Event %10d Time : %s Ladybug %s Position %10f Speed %10f", eventNb, eventTime.Format("15:04:05.000000"), ladybug.Name, ladybug.Position, ladybug.Speed)
+	}
 
 	if eventNb%32 == 0 && ladybug.Speed != 0.0 {
 
@@ -98,7 +105,7 @@ func (ladybug *Ladybug) FireNextEvent() {
 		if sumOfSpeeds == 0 {
 			log.Printf("Event %10d Time : %s, nbOfCollisions %d simulation over",
 				eventNb, eventTime.Format("15:04:05.000000"), nbOfCollision/2)
-			os.Exit(0)
+			return
 		}
 
 		// check for colisions (and compute)
@@ -107,7 +114,7 @@ func (ladybug *Ladybug) FireNextEvent() {
 			sumOfSpeeds = sumOfSpeeds + math.Abs(otherLadybug.Speed)
 
 			// do not compute collision of a ladybug with itslef
-			if otherLadybug.Id == ladybug.Id {
+			if otherLadybug.UniqueId == ladybug.UniqueId {
 				continue
 			}
 
@@ -122,20 +129,20 @@ func (ladybug *Ladybug) FireNextEvent() {
 			// there is a collision if both are within a Ladybug diameter
 			if math.Abs(deltaX) < 2*LadybugRadius {
 
-				if ladybug.Id == 0 {
+				if ladybug.UniqueId == 0 {
 					log.Printf("Event %10d Time : %s Pos %10f dist %10f ladybug %2d / %2d",
-						eventNb, eventTime.Format("15:04:05.000000"), otherLadybug.Position, deltaX, ladybug.Id, otherLadybug.Id)
+						eventNb, eventTime.Format("15:04:05.000000"), otherLadybug.Position, deltaX, ladybug.UniqueId, otherLadybug.UniqueId)
 				}
 
 				if deltaX > 0 && ladybug.Speed > 0 {
 					// return
 					ladybug.Speed = -ladybug.Speed
-					ladybug.Position = 10.0 + float64(ladybug.Id)*1.0
+					ladybug.Position = 10.0 + float64(ladybug.UniqueId)*1.0
 				}
 				if deltaX < 0 && ladybug.Speed < 0 {
 					// return
 					ladybug.Speed = -ladybug.Speed
-					ladybug.Position = 10.0 + float64(ladybug.Id)*1.0
+					ladybug.Position = 10.0 + float64(ladybug.UniqueId)*1.0
 				}
 
 				nbOfCollision = nbOfCollision + 1
@@ -146,7 +153,6 @@ func (ladybug *Ladybug) FireNextEvent() {
 			ladybug.Speed = 0.0
 		}
 
-		// post next event
 		checkStateEvent.SetFireTime(checkStateEvent.GetFireTime().Add(checkStateEvent.Period))
 		ladybug.QueueEvent(checkStateEvent)
 	}
@@ -183,9 +189,9 @@ func TestLadybugSim(t *testing.T) {
 	engine.SetEndTime(time.Date(2021, time.July, 1, 0, 30, 0, 0, time.UTC))
 	// log.Printf("Sim end  \t\t\t%s\n", engine.GetEndTime())
 
-	// PLUMBING n°1: callback for treating model specific action. In this case, see specific engine
-	var ladyBugSimulation LadybugSimulation
-	engine.Simulation = &ladyBugSimulation
+	// // PLUMBING n°1: callback for treating model specific action. In this case, see specific engine
+	// var ladyBugSimulation LadybugSimulation
+	// engine.Simulation = &ladyBugSimulation
 
 	// initial positions of ladybugs cannot be close to each others than the radius
 	initialXPosition := make(map[float64]*Ladybug)
@@ -194,7 +200,7 @@ func TestLadybugSim(t *testing.T) {
 	for ladybugId := 0; ladybugId < nbLadybugs; ladybugId = ladybugId + 1 {
 		ladyBug := new(Ladybug)
 		ladyBug.Name = fmt.Sprintf("Ladybug #%2d", ladybugId)
-		ladyBug.Id = ladybugId
+		ladyBug.UniqueId = ladybugId
 
 		ladybugs = append(ladybugs, ladyBug)
 

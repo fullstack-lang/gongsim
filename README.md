@@ -12,3 +12,19 @@ at the root of the repository (requires go >= 1.16)
 
 launch browser on http://localhost:8080
 
+# Architecture of a simulation
+
+Gongsim allows implementation of Agent Based simuation.
+
+For instance, let's simulation N lady bugs walking on a ruler of one meter.
+
+```go
+type Ladybug struct {
+
+
+}
+```
+
+
+
+
