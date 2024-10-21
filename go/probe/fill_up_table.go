@@ -30,6 +30,8 @@ func fillUpTablePointerToGongstruct[T models.PointerToGongstruct](
 		fillUpTable[models.GongsimCommand](probe)
 	case *models.GongsimStatus:
 		fillUpTable[models.GongsimStatus](probe)
+	case *models.UpdateState:
+		fillUpTable[models.UpdateState](probe)
 	default:
 		log.Println("unknow type")
 	}

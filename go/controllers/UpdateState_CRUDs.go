@@ -14,16 +14,16 @@ import (
 )
 
 // declaration in order to justify use of the models import
-var __GongsimStatus__dummysDeclaration__ models.GongsimStatus
-var __GongsimStatus_time__dummyDeclaration time.Duration
+var __UpdateState__dummysDeclaration__ models.UpdateState
+var __UpdateState_time__dummyDeclaration time.Duration
 
-var mutexGongsimStatus sync.Mutex
+var mutexUpdateState sync.Mutex
 
-// An GongsimStatusID parameter model.
+// An UpdateStateID parameter model.
 //
 // This is used for operations that want the ID of an order in the path
-// swagger:parameters getGongsimStatus updateGongsimStatus deleteGongsimStatus
-type GongsimStatusID struct {
+// swagger:parameters getUpdateState updateUpdateState deleteUpdateState
+type UpdateStateID struct {
 	// The ID of the order
 	//
 	// in: path
@@ -31,29 +31,29 @@ type GongsimStatusID struct {
 	ID int64
 }
 
-// GongsimStatusInput is a schema that can validate the user’s
+// UpdateStateInput is a schema that can validate the user’s
 // input to prevent us from getting invalid data
-// swagger:parameters postGongsimStatus updateGongsimStatus
-type GongsimStatusInput struct {
-	// The GongsimStatus to submit or modify
+// swagger:parameters postUpdateState updateUpdateState
+type UpdateStateInput struct {
+	// The UpdateState to submit or modify
 	// in: body
-	GongsimStatus *orm.GongsimStatusAPI
+	UpdateState *orm.UpdateStateAPI
 }
 
-// GetGongsimStatuss
+// GetUpdateStates
 //
-// swagger:route GET /gongsimstatuss gongsimstatuss getGongsimStatuss
+// swagger:route GET /updatestates updatestates getUpdateStates
 //
-// # Get all gongsimstatuss
+// # Get all updatestates
 //
 // Responses:
 // default: genericError
 //
-//	200: gongsimstatusDBResponse
-func (controller *Controller) GetGongsimStatuss(c *gin.Context) {
+//	200: updatestateDBResponse
+func (controller *Controller) GetUpdateStates(c *gin.Context) {
 
 	// source slice
-	var gongsimstatusDBs []orm.GongsimStatusDB
+	var updatestateDBs []orm.UpdateStateDB
 
 	_values := c.Request.URL.Query()
 	stackPath := ""
@@ -61,16 +61,16 @@ func (controller *Controller) GetGongsimStatuss(c *gin.Context) {
 		value := _values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
-			// log.Println("GetGongsimStatuss", "GONG__StackPath", stackPath)
+			// log.Println("GetUpdateStates", "GONG__StackPath", stackPath)
 		}
 	}
 	backRepo := controller.Map_BackRepos[stackPath]
 	if backRepo == nil {
 		log.Panic("Stack github.com/fullstack-lang/gongsim/go/models, Unkown stack", stackPath)
 	}
-	db := backRepo.BackRepoGongsimStatus.GetDB()
+	db := backRepo.BackRepoUpdateState.GetDB()
 
-	_, err := db.Find(&gongsimstatusDBs)
+	_, err := db.Find(&updatestateDBs)
 	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
@@ -81,29 +81,29 @@ func (controller *Controller) GetGongsimStatuss(c *gin.Context) {
 	}
 
 	// slice that will be transmitted to the front
-	gongsimstatusAPIs := make([]orm.GongsimStatusAPI, 0)
+	updatestateAPIs := make([]orm.UpdateStateAPI, 0)
 
-	// for each gongsimstatus, update fields from the database nullable fields
-	for idx := range gongsimstatusDBs {
-		gongsimstatusDB := &gongsimstatusDBs[idx]
-		_ = gongsimstatusDB
-		var gongsimstatusAPI orm.GongsimStatusAPI
+	// for each updatestate, update fields from the database nullable fields
+	for idx := range updatestateDBs {
+		updatestateDB := &updatestateDBs[idx]
+		_ = updatestateDB
+		var updatestateAPI orm.UpdateStateAPI
 
 		// insertion point for updating fields
-		gongsimstatusAPI.ID = gongsimstatusDB.ID
-		gongsimstatusDB.CopyBasicFieldsToGongsimStatus_WOP(&gongsimstatusAPI.GongsimStatus_WOP)
-		gongsimstatusAPI.GongsimStatusPointersEncoding = gongsimstatusDB.GongsimStatusPointersEncoding
-		gongsimstatusAPIs = append(gongsimstatusAPIs, gongsimstatusAPI)
+		updatestateAPI.ID = updatestateDB.ID
+		updatestateDB.CopyBasicFieldsToUpdateState_WOP(&updatestateAPI.UpdateState_WOP)
+		updatestateAPI.UpdateStatePointersEncoding = updatestateDB.UpdateStatePointersEncoding
+		updatestateAPIs = append(updatestateAPIs, updatestateAPI)
 	}
 
-	c.JSON(http.StatusOK, gongsimstatusAPIs)
+	c.JSON(http.StatusOK, updatestateAPIs)
 }
 
-// PostGongsimStatus
+// PostUpdateState
 //
-// swagger:route POST /gongsimstatuss gongsimstatuss postGongsimStatus
+// swagger:route POST /updatestates updatestates postUpdateState
 //
-// Creates a gongsimstatus
+// Creates a updatestate
 //
 //	Consumes:
 //	- application/json
@@ -113,10 +113,10 @@ func (controller *Controller) GetGongsimStatuss(c *gin.Context) {
 //
 //	Responses:
 //	  200: nodeDBResponse
-func (controller *Controller) PostGongsimStatus(c *gin.Context) {
+func (controller *Controller) PostUpdateState(c *gin.Context) {
 
-	mutexGongsimStatus.Lock()
-	defer mutexGongsimStatus.Unlock()
+	mutexUpdateState.Lock()
+	defer mutexUpdateState.Unlock()
 
 	_values := c.Request.URL.Query()
 	stackPath := ""
@@ -124,17 +124,17 @@ func (controller *Controller) PostGongsimStatus(c *gin.Context) {
 		value := _values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
-			// log.Println("PostGongsimStatuss", "GONG__StackPath", stackPath)
+			// log.Println("PostUpdateStates", "GONG__StackPath", stackPath)
 		}
 	}
 	backRepo := controller.Map_BackRepos[stackPath]
 	if backRepo == nil {
 		log.Panic("Stack github.com/fullstack-lang/gongsim/go/models, Unkown stack", stackPath)
 	}
-	db := backRepo.BackRepoGongsimStatus.GetDB()
+	db := backRepo.BackRepoUpdateState.GetDB()
 
 	// Validate input
-	var input orm.GongsimStatusAPI
+	var input orm.UpdateStateAPI
 
 	err := c.ShouldBindJSON(&input)
 	if err != nil {
@@ -146,12 +146,12 @@ func (controller *Controller) PostGongsimStatus(c *gin.Context) {
 		return
 	}
 
-	// Create gongsimstatus
-	gongsimstatusDB := orm.GongsimStatusDB{}
-	gongsimstatusDB.GongsimStatusPointersEncoding = input.GongsimStatusPointersEncoding
-	gongsimstatusDB.CopyBasicFieldsFromGongsimStatus_WOP(&input.GongsimStatus_WOP)
+	// Create updatestate
+	updatestateDB := orm.UpdateStateDB{}
+	updatestateDB.UpdateStatePointersEncoding = input.UpdateStatePointersEncoding
+	updatestateDB.CopyBasicFieldsFromUpdateState_WOP(&input.UpdateState_WOP)
 
-	_, err = db.Create(&gongsimstatusDB)
+	_, err = db.Create(&updatestateDB)
 	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
@@ -162,31 +162,31 @@ func (controller *Controller) PostGongsimStatus(c *gin.Context) {
 	}
 
 	// get an instance (not staged) from DB instance, and call callback function
-	backRepo.BackRepoGongsimStatus.CheckoutPhaseOneInstance(&gongsimstatusDB)
-	gongsimstatus := backRepo.BackRepoGongsimStatus.Map_GongsimStatusDBID_GongsimStatusPtr[gongsimstatusDB.ID]
+	backRepo.BackRepoUpdateState.CheckoutPhaseOneInstance(&updatestateDB)
+	updatestate := backRepo.BackRepoUpdateState.Map_UpdateStateDBID_UpdateStatePtr[updatestateDB.ID]
 
-	if gongsimstatus != nil {
-		models.AfterCreateFromFront(backRepo.GetStage(), gongsimstatus)
+	if updatestate != nil {
+		models.AfterCreateFromFront(backRepo.GetStage(), updatestate)
 	}
 
 	// a POST is equivalent to a back repo commit increase
 	// (this will be improved with implementation of unit of work design pattern)
 	backRepo.IncrementPushFromFrontNb()
 
-	c.JSON(http.StatusOK, gongsimstatusDB)
+	c.JSON(http.StatusOK, updatestateDB)
 }
 
-// GetGongsimStatus
+// GetUpdateState
 //
-// swagger:route GET /gongsimstatuss/{ID} gongsimstatuss getGongsimStatus
+// swagger:route GET /updatestates/{ID} updatestates getUpdateState
 //
-// Gets the details for a gongsimstatus.
+// Gets the details for a updatestate.
 //
 // Responses:
 // default: genericError
 //
-//	200: gongsimstatusDBResponse
-func (controller *Controller) GetGongsimStatus(c *gin.Context) {
+//	200: updatestateDBResponse
+func (controller *Controller) GetUpdateState(c *gin.Context) {
 
 	_values := c.Request.URL.Query()
 	stackPath := ""
@@ -194,18 +194,18 @@ func (controller *Controller) GetGongsimStatus(c *gin.Context) {
 		value := _values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
-			// log.Println("GetGongsimStatus", "GONG__StackPath", stackPath)
+			// log.Println("GetUpdateState", "GONG__StackPath", stackPath)
 		}
 	}
 	backRepo := controller.Map_BackRepos[stackPath]
 	if backRepo == nil {
 		log.Panic("Stack github.com/fullstack-lang/gongsim/go/models, Unkown stack", stackPath)
 	}
-	db := backRepo.BackRepoGongsimStatus.GetDB()
+	db := backRepo.BackRepoUpdateState.GetDB()
 
-	// Get gongsimstatusDB in DB
-	var gongsimstatusDB orm.GongsimStatusDB
-	if _, err := db.First(&gongsimstatusDB, c.Param("id")); err != nil {
+	// Get updatestateDB in DB
+	var updatestateDB orm.UpdateStateDB
+	if _, err := db.First(&updatestateDB, c.Param("id")); err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
 		returnError.Body.Message = err.Error()
@@ -214,28 +214,28 @@ func (controller *Controller) GetGongsimStatus(c *gin.Context) {
 		return
 	}
 
-	var gongsimstatusAPI orm.GongsimStatusAPI
-	gongsimstatusAPI.ID = gongsimstatusDB.ID
-	gongsimstatusAPI.GongsimStatusPointersEncoding = gongsimstatusDB.GongsimStatusPointersEncoding
-	gongsimstatusDB.CopyBasicFieldsToGongsimStatus_WOP(&gongsimstatusAPI.GongsimStatus_WOP)
+	var updatestateAPI orm.UpdateStateAPI
+	updatestateAPI.ID = updatestateDB.ID
+	updatestateAPI.UpdateStatePointersEncoding = updatestateDB.UpdateStatePointersEncoding
+	updatestateDB.CopyBasicFieldsToUpdateState_WOP(&updatestateAPI.UpdateState_WOP)
 
-	c.JSON(http.StatusOK, gongsimstatusAPI)
+	c.JSON(http.StatusOK, updatestateAPI)
 }
 
-// UpdateGongsimStatus
+// UpdateUpdateState
 //
-// swagger:route PATCH /gongsimstatuss/{ID} gongsimstatuss updateGongsimStatus
+// swagger:route PATCH /updatestates/{ID} updatestates updateUpdateState
 //
-// # Update a gongsimstatus
+// # Update a updatestate
 //
 // Responses:
 // default: genericError
 //
-//	200: gongsimstatusDBResponse
-func (controller *Controller) UpdateGongsimStatus(c *gin.Context) {
+//	200: updatestateDBResponse
+func (controller *Controller) UpdateUpdateState(c *gin.Context) {
 
-	mutexGongsimStatus.Lock()
-	defer mutexGongsimStatus.Unlock()
+	mutexUpdateState.Lock()
+	defer mutexUpdateState.Unlock()
 
 	_values := c.Request.URL.Query()
 	stackPath := ""
@@ -243,17 +243,17 @@ func (controller *Controller) UpdateGongsimStatus(c *gin.Context) {
 		value := _values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
-			// log.Println("UpdateGongsimStatus", "GONG__StackPath", stackPath)
+			// log.Println("UpdateUpdateState", "GONG__StackPath", stackPath)
 		}
 	}
 	backRepo := controller.Map_BackRepos[stackPath]
 	if backRepo == nil {
 		log.Panic("Stack github.com/fullstack-lang/gongsim/go/models, Unkown stack", stackPath)
 	}
-	db := backRepo.BackRepoGongsimStatus.GetDB()
+	db := backRepo.BackRepoUpdateState.GetDB()
 
 	// Validate input
-	var input orm.GongsimStatusAPI
+	var input orm.UpdateStateAPI
 	if err := c.ShouldBindJSON(&input); err != nil {
 		log.Println(err.Error())
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -261,10 +261,10 @@ func (controller *Controller) UpdateGongsimStatus(c *gin.Context) {
 	}
 
 	// Get model if exist
-	var gongsimstatusDB orm.GongsimStatusDB
+	var updatestateDB orm.UpdateStateDB
 
-	// fetch the gongsimstatus
-	_, err := db.First(&gongsimstatusDB, c.Param("id"))
+	// fetch the updatestate
+	_, err := db.First(&updatestateDB, c.Param("id"))
 
 	if err != nil {
 		var returnError GenericError
@@ -276,11 +276,11 @@ func (controller *Controller) UpdateGongsimStatus(c *gin.Context) {
 	}
 
 	// update
-	gongsimstatusDB.CopyBasicFieldsFromGongsimStatus_WOP(&input.GongsimStatus_WOP)
-	gongsimstatusDB.GongsimStatusPointersEncoding = input.GongsimStatusPointersEncoding
+	updatestateDB.CopyBasicFieldsFromUpdateState_WOP(&input.UpdateState_WOP)
+	updatestateDB.UpdateStatePointersEncoding = input.UpdateStatePointersEncoding
 
-	db, _ = db.Model(&gongsimstatusDB)
-	_, err = db.Updates(gongsimstatusDB)
+	db, _ = db.Model(&updatestateDB)
+	_, err = db.Updates(updatestateDB)
 	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
@@ -291,16 +291,16 @@ func (controller *Controller) UpdateGongsimStatus(c *gin.Context) {
 	}
 
 	// get an instance (not staged) from DB instance, and call callback function
-	gongsimstatusNew := new(models.GongsimStatus)
-	gongsimstatusDB.CopyBasicFieldsToGongsimStatus(gongsimstatusNew)
+	updatestateNew := new(models.UpdateState)
+	updatestateDB.CopyBasicFieldsToUpdateState(updatestateNew)
 
 	// redeem pointers
-	gongsimstatusDB.DecodePointers(backRepo, gongsimstatusNew)
+	updatestateDB.DecodePointers(backRepo, updatestateNew)
 
 	// get stage instance from DB instance, and call callback function
-	gongsimstatusOld := backRepo.BackRepoGongsimStatus.Map_GongsimStatusDBID_GongsimStatusPtr[gongsimstatusDB.ID]
-	if gongsimstatusOld != nil {
-		models.AfterUpdateFromFront(backRepo.GetStage(), gongsimstatusOld, gongsimstatusNew)
+	updatestateOld := backRepo.BackRepoUpdateState.Map_UpdateStateDBID_UpdateStatePtr[updatestateDB.ID]
+	if updatestateOld != nil {
+		models.AfterUpdateFromFront(backRepo.GetStage(), updatestateOld, updatestateNew)
 	}
 
 	// an UPDATE generates a back repo commit increase
@@ -309,23 +309,23 @@ func (controller *Controller) UpdateGongsimStatus(c *gin.Context) {
 	// generates a checkout
 	backRepo.IncrementPushFromFrontNb()
 
-	// return status OK with the marshalling of the the gongsimstatusDB
-	c.JSON(http.StatusOK, gongsimstatusDB)
+	// return status OK with the marshalling of the the updatestateDB
+	c.JSON(http.StatusOK, updatestateDB)
 }
 
-// DeleteGongsimStatus
+// DeleteUpdateState
 //
-// swagger:route DELETE /gongsimstatuss/{ID} gongsimstatuss deleteGongsimStatus
+// swagger:route DELETE /updatestates/{ID} updatestates deleteUpdateState
 //
-// # Delete a gongsimstatus
+// # Delete a updatestate
 //
 // default: genericError
 //
-//	200: gongsimstatusDBResponse
-func (controller *Controller) DeleteGongsimStatus(c *gin.Context) {
+//	200: updatestateDBResponse
+func (controller *Controller) DeleteUpdateState(c *gin.Context) {
 
-	mutexGongsimStatus.Lock()
-	defer mutexGongsimStatus.Unlock()
+	mutexUpdateState.Lock()
+	defer mutexUpdateState.Unlock()
 
 	_values := c.Request.URL.Query()
 	stackPath := ""
@@ -333,18 +333,18 @@ func (controller *Controller) DeleteGongsimStatus(c *gin.Context) {
 		value := _values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
-			// log.Println("DeleteGongsimStatus", "GONG__StackPath", stackPath)
+			// log.Println("DeleteUpdateState", "GONG__StackPath", stackPath)
 		}
 	}
 	backRepo := controller.Map_BackRepos[stackPath]
 	if backRepo == nil {
 		log.Panic("Stack github.com/fullstack-lang/gongsim/go/models, Unkown stack", stackPath)
 	}
-	db := backRepo.BackRepoGongsimStatus.GetDB()
+	db := backRepo.BackRepoUpdateState.GetDB()
 
 	// Get model if exist
-	var gongsimstatusDB orm.GongsimStatusDB
-	if _, err := db.First(&gongsimstatusDB, c.Param("id")); err != nil {
+	var updatestateDB orm.UpdateStateDB
+	if _, err := db.First(&updatestateDB, c.Param("id")); err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
 		returnError.Body.Message = err.Error()
@@ -355,16 +355,16 @@ func (controller *Controller) DeleteGongsimStatus(c *gin.Context) {
 
 	// with gorm.Model field, default delete is a soft delete. Unscoped() force delete
 	db.Unscoped()
-	db.Delete(&gongsimstatusDB)
+	db.Delete(&updatestateDB)
 
 	// get an instance (not staged) from DB instance, and call callback function
-	gongsimstatusDeleted := new(models.GongsimStatus)
-	gongsimstatusDB.CopyBasicFieldsToGongsimStatus(gongsimstatusDeleted)
+	updatestateDeleted := new(models.UpdateState)
+	updatestateDB.CopyBasicFieldsToUpdateState(updatestateDeleted)
 
 	// get stage instance from DB instance, and call callback function
-	gongsimstatusStaged := backRepo.BackRepoGongsimStatus.Map_GongsimStatusDBID_GongsimStatusPtr[gongsimstatusDB.ID]
-	if gongsimstatusStaged != nil {
-		models.AfterDeleteFromFront(backRepo.GetStage(), gongsimstatusStaged, gongsimstatusDeleted)
+	updatestateStaged := backRepo.BackRepoUpdateState.Map_UpdateStateDBID_UpdateStatePtr[updatestateDB.ID]
+	if updatestateStaged != nil {
+		models.AfterDeleteFromFront(backRepo.GetStage(), updatestateStaged, updatestateDeleted)
 	}
 
 	// a DELETE generates a back repo commit increase

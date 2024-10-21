@@ -82,6 +82,13 @@ func registerControllers(r *gin.Engine) {
 		v1.PUT("/v1/gongsimstatuss/:id", GetController().UpdateGongsimStatus)
 		v1.DELETE("/v1/gongsimstatuss/:id", GetController().DeleteGongsimStatus)
 
+		v1.GET("/v1/updatestates", GetController().GetUpdateStates)
+		v1.GET("/v1/updatestates/:id", GetController().GetUpdateState)
+		v1.POST("/v1/updatestates", GetController().PostUpdateState)
+		v1.PATCH("/v1/updatestates/:id", GetController().UpdateUpdateState)
+		v1.PUT("/v1/updatestates/:id", GetController().UpdateUpdateState)
+		v1.DELETE("/v1/updatestates/:id", GetController().DeleteUpdateState)
+
 		v1.GET("/v1/commitfrombacknb", GetController().GetLastCommitFromBackNb)
 		v1.GET("/v1/pushfromfrontnb", GetController().GetLastPushFromFrontNb)
 
@@ -96,7 +103,7 @@ func (controller *Controller) stacks(c *gin.Context) {
 
 	var res []string
 
-	for k, _ := range controller.Map_BackRepos {
+	for k := range controller.Map_BackRepos {
 		res = append(res, k)
 	}
 

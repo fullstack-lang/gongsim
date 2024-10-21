@@ -11,12 +11,9 @@ import (
 	"sync"
 
 	"github.com/fullstack-lang/gongsim/go/models"
+	"github.com/fullstack-lang/gongsim/go/orm/dbgorm"
 
 	"github.com/tealeg/xlsx/v3"
-
-	"github.com/glebarez/sqlite"
-	"gorm.io/gorm"
-	"gorm.io/gorm/schema"
 )
 
 // BackRepoStruct supports callback functions
@@ -32,6 +29,8 @@ type BackRepoStruct struct {
 
 	BackRepoGongsimStatus BackRepoGongsimStatusStruct
 
+	BackRepoUpdateState BackRepoUpdateStateStruct
+
 	CommitFromBackNb uint // records commit increments when performed by the back
 
 	PushFromFrontNb uint // records commit increments when performed by the front
@@ -45,44 +44,14 @@ type BackRepoStruct struct {
 
 func NewBackRepo(stage *models.StageStruct, filename string) (backRepo *BackRepoStruct) {
 
-	// adjust naming strategy to the stack
-	gormConfig := &gorm.Config{
-		NamingStrategy: schema.NamingStrategy{
-			TablePrefix: "github_com_fullstack_lang_gong_test_go_", // table name prefix
-		},
-	}
-	db, err := gorm.Open(sqlite.Open(filename), gormConfig)
-
-	// since testsim is a multi threaded application. It is important to set up
-	// only one open connexion at a time
-	dbDB_inMemory, err := db.DB()
-	if err != nil {
-		panic("cannot access DB of db" + err.Error())
-	}
-	// it is mandatory to allow parallel access, otherwise, bizarre errors occurs
-	dbDB_inMemory.SetMaxOpenConns(1)
-
-	if err != nil {
-		panic("Failed to connect to database!")
-	}
-
-	// adjust naming strategy to the stack
-	db.Config.NamingStrategy = &schema.NamingStrategy{
-		TablePrefix: "github_com_fullstack_lang_gong_test_go_", // table name prefix
-	}
-
-	err = db.AutoMigrate( // insertion point for reference to structs
+	dbWrapper := dbgorm.NewDBWrapper(filename, "github_com_fullstack_lang_gongsim_go",
 		&DummyAgentDB{},
 		&EngineDB{},
 		&EventDB{},
 		&GongsimCommandDB{},
 		&GongsimStatusDB{},
+		&UpdateStateDB{},
 	)
-
-	if err != nil {
-		msg := err.Error()
-		panic("problem with migration " + msg + " on package github.com/fullstack-lang/gong/test/go")
-	}
 
 	backRepo = new(BackRepoStruct)
 
@@ -92,7 +61,7 @@ func NewBackRepo(stage *models.StageStruct, filename string) (backRepo *BackRepo
 		Map_DummyAgentDBID_DummyAgentDB:  make(map[uint]*DummyAgentDB, 0),
 		Map_DummyAgentPtr_DummyAgentDBID: make(map[*models.DummyAgent]uint, 0),
 
-		db:    db,
+		db:    dbWrapper,
 		stage: stage,
 	}
 	backRepo.BackRepoEngine = BackRepoEngineStruct{
@@ -100,7 +69,7 @@ func NewBackRepo(stage *models.StageStruct, filename string) (backRepo *BackRepo
 		Map_EngineDBID_EngineDB:  make(map[uint]*EngineDB, 0),
 		Map_EnginePtr_EngineDBID: make(map[*models.Engine]uint, 0),
 
-		db:    db,
+		db:    dbWrapper,
 		stage: stage,
 	}
 	backRepo.BackRepoEvent = BackRepoEventStruct{
@@ -108,7 +77,7 @@ func NewBackRepo(stage *models.StageStruct, filename string) (backRepo *BackRepo
 		Map_EventDBID_EventDB:  make(map[uint]*EventDB, 0),
 		Map_EventPtr_EventDBID: make(map[*models.Event]uint, 0),
 
-		db:    db,
+		db:    dbWrapper,
 		stage: stage,
 	}
 	backRepo.BackRepoGongsimCommand = BackRepoGongsimCommandStruct{
@@ -116,7 +85,7 @@ func NewBackRepo(stage *models.StageStruct, filename string) (backRepo *BackRepo
 		Map_GongsimCommandDBID_GongsimCommandDB:  make(map[uint]*GongsimCommandDB, 0),
 		Map_GongsimCommandPtr_GongsimCommandDBID: make(map[*models.GongsimCommand]uint, 0),
 
-		db:    db,
+		db:    dbWrapper,
 		stage: stage,
 	}
 	backRepo.BackRepoGongsimStatus = BackRepoGongsimStatusStruct{
@@ -124,7 +93,15 @@ func NewBackRepo(stage *models.StageStruct, filename string) (backRepo *BackRepo
 		Map_GongsimStatusDBID_GongsimStatusDB:  make(map[uint]*GongsimStatusDB, 0),
 		Map_GongsimStatusPtr_GongsimStatusDBID: make(map[*models.GongsimStatus]uint, 0),
 
-		db:    db,
+		db:    dbWrapper,
+		stage: stage,
+	}
+	backRepo.BackRepoUpdateState = BackRepoUpdateStateStruct{
+		Map_UpdateStateDBID_UpdateStatePtr: make(map[uint]*models.UpdateState, 0),
+		Map_UpdateStateDBID_UpdateStateDB:  make(map[uint]*UpdateStateDB, 0),
+		Map_UpdateStatePtr_UpdateStateDBID: make(map[*models.UpdateState]uint, 0),
+
+		db:    dbWrapper,
 		stage: stage,
 	}
 
@@ -157,7 +134,7 @@ func (backRepo *BackRepoStruct) IncrementCommitFromBackNb() uint {
 	backRepo.CommitFromBackNb = backRepo.CommitFromBackNb + 1
 
 	backRepo.broadcastNbCommitToBack()
-	
+
 	return backRepo.CommitFromBackNb
 }
 
@@ -180,6 +157,7 @@ func (backRepo *BackRepoStruct) Commit(stage *models.StageStruct) {
 	backRepo.BackRepoEvent.CommitPhaseOne(stage)
 	backRepo.BackRepoGongsimCommand.CommitPhaseOne(stage)
 	backRepo.BackRepoGongsimStatus.CommitPhaseOne(stage)
+	backRepo.BackRepoUpdateState.CommitPhaseOne(stage)
 
 	// insertion point for per struct back repo phase two commit
 	backRepo.BackRepoDummyAgent.CommitPhaseTwo(backRepo)
@@ -187,6 +165,7 @@ func (backRepo *BackRepoStruct) Commit(stage *models.StageStruct) {
 	backRepo.BackRepoEvent.CommitPhaseTwo(backRepo)
 	backRepo.BackRepoGongsimCommand.CommitPhaseTwo(backRepo)
 	backRepo.BackRepoGongsimStatus.CommitPhaseTwo(backRepo)
+	backRepo.BackRepoUpdateState.CommitPhaseTwo(backRepo)
 
 	backRepo.IncrementCommitFromBackNb()
 }
@@ -199,6 +178,7 @@ func (backRepo *BackRepoStruct) Checkout(stage *models.StageStruct) {
 	backRepo.BackRepoEvent.CheckoutPhaseOne()
 	backRepo.BackRepoGongsimCommand.CheckoutPhaseOne()
 	backRepo.BackRepoGongsimStatus.CheckoutPhaseOne()
+	backRepo.BackRepoUpdateState.CheckoutPhaseOne()
 
 	// insertion point for per struct back repo phase two commit
 	backRepo.BackRepoDummyAgent.CheckoutPhaseTwo(backRepo)
@@ -206,6 +186,7 @@ func (backRepo *BackRepoStruct) Checkout(stage *models.StageStruct) {
 	backRepo.BackRepoEvent.CheckoutPhaseTwo(backRepo)
 	backRepo.BackRepoGongsimCommand.CheckoutPhaseTwo(backRepo)
 	backRepo.BackRepoGongsimStatus.CheckoutPhaseTwo(backRepo)
+	backRepo.BackRepoUpdateState.CheckoutPhaseTwo(backRepo)
 }
 
 // Backup the BackRepoStruct
@@ -218,6 +199,7 @@ func (backRepo *BackRepoStruct) Backup(stage *models.StageStruct, dirPath string
 	backRepo.BackRepoEvent.Backup(dirPath)
 	backRepo.BackRepoGongsimCommand.Backup(dirPath)
 	backRepo.BackRepoGongsimStatus.Backup(dirPath)
+	backRepo.BackRepoUpdateState.Backup(dirPath)
 }
 
 // Backup in XL the BackRepoStruct
@@ -233,6 +215,7 @@ func (backRepo *BackRepoStruct) BackupXL(stage *models.StageStruct, dirPath stri
 	backRepo.BackRepoEvent.BackupXL(file)
 	backRepo.BackRepoGongsimCommand.BackupXL(file)
 	backRepo.BackRepoGongsimStatus.BackupXL(file)
+	backRepo.BackRepoUpdateState.BackupXL(file)
 
 	var b bytes.Buffer
 	writer := bufio.NewWriter(&b)
@@ -262,6 +245,7 @@ func (backRepo *BackRepoStruct) Restore(stage *models.StageStruct, dirPath strin
 	backRepo.BackRepoEvent.RestorePhaseOne(dirPath)
 	backRepo.BackRepoGongsimCommand.RestorePhaseOne(dirPath)
 	backRepo.BackRepoGongsimStatus.RestorePhaseOne(dirPath)
+	backRepo.BackRepoUpdateState.RestorePhaseOne(dirPath)
 
 	//
 	// restauration second phase (reindex pointers with the new ID)
@@ -273,6 +257,7 @@ func (backRepo *BackRepoStruct) Restore(stage *models.StageStruct, dirPath strin
 	backRepo.BackRepoEvent.RestorePhaseTwo()
 	backRepo.BackRepoGongsimCommand.RestorePhaseTwo()
 	backRepo.BackRepoGongsimStatus.RestorePhaseTwo()
+	backRepo.BackRepoUpdateState.RestorePhaseTwo()
 
 	backRepo.stage.Checkout()
 }
@@ -305,6 +290,7 @@ func (backRepo *BackRepoStruct) RestoreXL(stage *models.StageStruct, dirPath str
 	backRepo.BackRepoEvent.RestoreXLPhaseOne(file)
 	backRepo.BackRepoGongsimCommand.RestoreXLPhaseOne(file)
 	backRepo.BackRepoGongsimStatus.RestoreXLPhaseOne(file)
+	backRepo.BackRepoUpdateState.RestoreXLPhaseOne(file)
 
 	// commit the restored stage
 	backRepo.stage.Commit()
