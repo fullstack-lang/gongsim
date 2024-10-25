@@ -280,7 +280,7 @@ func (controller *Controller) UpdateEngine(c *gin.Context) {
 	engineDB.EnginePointersEncoding = input.EnginePointersEncoding
 
 	db, _ = db.Model(&engineDB)
-	_, err = db.Updates(engineDB)
+	_, err = db.Updates(&engineDB)
 	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest

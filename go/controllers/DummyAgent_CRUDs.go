@@ -280,7 +280,7 @@ func (controller *Controller) UpdateDummyAgent(c *gin.Context) {
 	dummyagentDB.DummyAgentPointersEncoding = input.DummyAgentPointersEncoding
 
 	db, _ = db.Model(&dummyagentDB)
-	_, err = db.Updates(dummyagentDB)
+	_, err = db.Updates(&dummyagentDB)
 	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest

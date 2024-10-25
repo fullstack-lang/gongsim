@@ -280,7 +280,7 @@ func (controller *Controller) UpdateUpdateState(c *gin.Context) {
 	updatestateDB.UpdateStatePointersEncoding = input.UpdateStatePointersEncoding
 
 	db, _ = db.Model(&updatestateDB)
-	_, err = db.Updates(updatestateDB)
+	_, err = db.Updates(&updatestateDB)
 	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest

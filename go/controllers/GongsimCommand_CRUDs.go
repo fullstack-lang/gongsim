@@ -280,7 +280,7 @@ func (controller *Controller) UpdateGongsimCommand(c *gin.Context) {
 	gongsimcommandDB.GongsimCommandPointersEncoding = input.GongsimCommandPointersEncoding
 
 	db, _ = db.Model(&gongsimcommandDB)
-	_, err = db.Updates(gongsimcommandDB)
+	_, err = db.Updates(&gongsimcommandDB)
 	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest

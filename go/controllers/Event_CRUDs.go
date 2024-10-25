@@ -280,7 +280,7 @@ func (controller *Controller) UpdateEvent(c *gin.Context) {
 	eventDB.EventPointersEncoding = input.EventPointersEncoding
 
 	db, _ = db.Model(&eventDB)
-	_, err = db.Updates(eventDB)
+	_, err = db.Updates(&eventDB)
 	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
