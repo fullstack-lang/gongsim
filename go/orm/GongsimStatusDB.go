@@ -177,7 +177,7 @@ func (backRepoGongsimStatus *BackRepoGongsimStatusStruct) CommitDeleteInstance(i
 	// gongsimstatus is not staged anymore, remove gongsimstatusDB
 	gongsimstatusDB := backRepoGongsimStatus.Map_GongsimStatusDBID_GongsimStatusDB[id]
 	db, _ := backRepoGongsimStatus.db.Unscoped()
-	_, err := db.Delete(&gongsimstatusDB)
+	_, err := db.Delete(gongsimstatusDB)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -237,7 +237,7 @@ func (backRepoGongsimStatus *BackRepoGongsimStatusStruct) CommitPhaseTwoInstance
 		gongsimstatusDB.CopyBasicFieldsFromGongsimStatus(gongsimstatus)
 
 		// insertion point for translating pointers encodings into actual pointers
-		_, err := backRepoGongsimStatus.db.Save(&gongsimstatusDB)
+		_, err := backRepoGongsimStatus.db.Save(gongsimstatusDB)
 		if err != nil {
 			log.Fatal(err)
 		}

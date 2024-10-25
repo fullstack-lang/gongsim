@@ -181,7 +181,7 @@ func (backRepoGongsimCommand *BackRepoGongsimCommandStruct) CommitDeleteInstance
 	// gongsimcommand is not staged anymore, remove gongsimcommandDB
 	gongsimcommandDB := backRepoGongsimCommand.Map_GongsimCommandDBID_GongsimCommandDB[id]
 	db, _ := backRepoGongsimCommand.db.Unscoped()
-	_, err := db.Delete(&gongsimcommandDB)
+	_, err := db.Delete(gongsimcommandDB)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -253,7 +253,7 @@ func (backRepoGongsimCommand *BackRepoGongsimCommandStruct) CommitPhaseTwoInstan
 			gongsimcommandDB.EngineID.Valid = true
 		}
 
-		_, err := backRepoGongsimCommand.db.Save(&gongsimcommandDB)
+		_, err := backRepoGongsimCommand.db.Save(gongsimcommandDB)
 		if err != nil {
 			log.Fatal(err)
 		}

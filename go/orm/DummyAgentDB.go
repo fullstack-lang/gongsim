@@ -159,7 +159,7 @@ func (backRepoDummyAgent *BackRepoDummyAgentStruct) CommitDeleteInstance(id uint
 	// dummyagent is not staged anymore, remove dummyagentDB
 	dummyagentDB := backRepoDummyAgent.Map_DummyAgentDBID_DummyAgentDB[id]
 	db, _ := backRepoDummyAgent.db.Unscoped()
-	_, err := db.Delete(&dummyagentDB)
+	_, err := db.Delete(dummyagentDB)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -219,7 +219,7 @@ func (backRepoDummyAgent *BackRepoDummyAgentStruct) CommitPhaseTwoInstance(backR
 		dummyagentDB.CopyBasicFieldsFromDummyAgent(dummyagent)
 
 		// insertion point for translating pointers encodings into actual pointers
-		_, err := backRepoDummyAgent.db.Save(&dummyagentDB)
+		_, err := backRepoDummyAgent.db.Save(dummyagentDB)
 		if err != nil {
 			log.Fatal(err)
 		}

@@ -159,7 +159,7 @@ func (backRepoEvent *BackRepoEventStruct) CommitDeleteInstance(id uint) (Error e
 	// event is not staged anymore, remove eventDB
 	eventDB := backRepoEvent.Map_EventDBID_EventDB[id]
 	db, _ := backRepoEvent.db.Unscoped()
-	_, err := db.Delete(&eventDB)
+	_, err := db.Delete(eventDB)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -219,7 +219,7 @@ func (backRepoEvent *BackRepoEventStruct) CommitPhaseTwoInstance(backRepo *BackR
 		eventDB.CopyBasicFieldsFromEvent(event)
 
 		// insertion point for translating pointers encodings into actual pointers
-		_, err := backRepoEvent.db.Save(&eventDB)
+		_, err := backRepoEvent.db.Save(eventDB)
 		if err != nil {
 			log.Fatal(err)
 		}

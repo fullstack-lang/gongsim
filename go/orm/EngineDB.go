@@ -201,7 +201,7 @@ func (backRepoEngine *BackRepoEngineStruct) CommitDeleteInstance(id uint) (Error
 	// engine is not staged anymore, remove engineDB
 	engineDB := backRepoEngine.Map_EngineDBID_EngineDB[id]
 	db, _ := backRepoEngine.db.Unscoped()
-	_, err := db.Delete(&engineDB)
+	_, err := db.Delete(engineDB)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -261,7 +261,7 @@ func (backRepoEngine *BackRepoEngineStruct) CommitPhaseTwoInstance(backRepo *Bac
 		engineDB.CopyBasicFieldsFromEngine(engine)
 
 		// insertion point for translating pointers encodings into actual pointers
-		_, err := backRepoEngine.db.Save(&engineDB)
+		_, err := backRepoEngine.db.Save(engineDB)
 		if err != nil {
 			log.Fatal(err)
 		}

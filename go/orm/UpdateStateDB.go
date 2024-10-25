@@ -165,7 +165,7 @@ func (backRepoUpdateState *BackRepoUpdateStateStruct) CommitDeleteInstance(id ui
 	// updatestate is not staged anymore, remove updatestateDB
 	updatestateDB := backRepoUpdateState.Map_UpdateStateDBID_UpdateStateDB[id]
 	db, _ := backRepoUpdateState.db.Unscoped()
-	_, err := db.Delete(&updatestateDB)
+	_, err := db.Delete(updatestateDB)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -225,7 +225,7 @@ func (backRepoUpdateState *BackRepoUpdateStateStruct) CommitPhaseTwoInstance(bac
 		updatestateDB.CopyBasicFieldsFromUpdateState(updatestate)
 
 		// insertion point for translating pointers encodings into actual pointers
-		_, err := backRepoUpdateState.db.Save(&updatestateDB)
+		_, err := backRepoUpdateState.db.Save(updatestateDB)
 		if err != nil {
 			log.Fatal(err)
 		}

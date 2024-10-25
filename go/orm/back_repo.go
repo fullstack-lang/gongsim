@@ -10,8 +10,12 @@ import (
 	"path/filepath"
 	"sync"
 
+	"github.com/fullstack-lang/gongsim/go/db"
 	"github.com/fullstack-lang/gongsim/go/models"
+
+	/* THIS IS REMOVED BY GONG COMPILER IF TARGET IS gorm
 	"github.com/fullstack-lang/gongsim/go/orm/dbgorm"
+	THIS IS REMOVED BY GONG COMPILER IF TARGET IS gorm */
 
 	"github.com/tealeg/xlsx/v3"
 )
@@ -44,7 +48,12 @@ type BackRepoStruct struct {
 
 func NewBackRepo(stage *models.StageStruct, filename string) (backRepo *BackRepoStruct) {
 
-	dbWrapper := dbgorm.NewDBWrapper(filename, "github_com_fullstack_lang_gongsim_go",
+	var db db.DBInterface
+
+	db = NewDBLite()
+
+	/* THIS IS REMOVED BY GONG COMPILER IF TARGET IS gorm
+	db = dbgorm.NewDBWrapper(filename, "github_com_fullstack_lang_gongsim_go",
 		&DummyAgentDB{},
 		&EngineDB{},
 		&EventDB{},
@@ -52,6 +61,7 @@ func NewBackRepo(stage *models.StageStruct, filename string) (backRepo *BackRepo
 		&GongsimStatusDB{},
 		&UpdateStateDB{},
 	)
+	THIS IS REMOVED BY GONG COMPILER IF TARGET IS gorm */
 
 	backRepo = new(BackRepoStruct)
 
@@ -61,7 +71,7 @@ func NewBackRepo(stage *models.StageStruct, filename string) (backRepo *BackRepo
 		Map_DummyAgentDBID_DummyAgentDB:  make(map[uint]*DummyAgentDB, 0),
 		Map_DummyAgentPtr_DummyAgentDBID: make(map[*models.DummyAgent]uint, 0),
 
-		db:    dbWrapper,
+		db:    db,
 		stage: stage,
 	}
 	backRepo.BackRepoEngine = BackRepoEngineStruct{
@@ -69,7 +79,7 @@ func NewBackRepo(stage *models.StageStruct, filename string) (backRepo *BackRepo
 		Map_EngineDBID_EngineDB:  make(map[uint]*EngineDB, 0),
 		Map_EnginePtr_EngineDBID: make(map[*models.Engine]uint, 0),
 
-		db:    dbWrapper,
+		db:    db,
 		stage: stage,
 	}
 	backRepo.BackRepoEvent = BackRepoEventStruct{
@@ -77,7 +87,7 @@ func NewBackRepo(stage *models.StageStruct, filename string) (backRepo *BackRepo
 		Map_EventDBID_EventDB:  make(map[uint]*EventDB, 0),
 		Map_EventPtr_EventDBID: make(map[*models.Event]uint, 0),
 
-		db:    dbWrapper,
+		db:    db,
 		stage: stage,
 	}
 	backRepo.BackRepoGongsimCommand = BackRepoGongsimCommandStruct{
@@ -85,7 +95,7 @@ func NewBackRepo(stage *models.StageStruct, filename string) (backRepo *BackRepo
 		Map_GongsimCommandDBID_GongsimCommandDB:  make(map[uint]*GongsimCommandDB, 0),
 		Map_GongsimCommandPtr_GongsimCommandDBID: make(map[*models.GongsimCommand]uint, 0),
 
-		db:    dbWrapper,
+		db:    db,
 		stage: stage,
 	}
 	backRepo.BackRepoGongsimStatus = BackRepoGongsimStatusStruct{
@@ -93,7 +103,7 @@ func NewBackRepo(stage *models.StageStruct, filename string) (backRepo *BackRepo
 		Map_GongsimStatusDBID_GongsimStatusDB:  make(map[uint]*GongsimStatusDB, 0),
 		Map_GongsimStatusPtr_GongsimStatusDBID: make(map[*models.GongsimStatus]uint, 0),
 
-		db:    dbWrapper,
+		db:    db,
 		stage: stage,
 	}
 	backRepo.BackRepoUpdateState = BackRepoUpdateStateStruct{
@@ -101,7 +111,7 @@ func NewBackRepo(stage *models.StageStruct, filename string) (backRepo *BackRepo
 		Map_UpdateStateDBID_UpdateStateDB:  make(map[uint]*UpdateStateDB, 0),
 		Map_UpdateStatePtr_UpdateStateDBID: make(map[*models.UpdateState]uint, 0),
 
-		db:    dbWrapper,
+		db:    db,
 		stage: stage,
 	}
 
