@@ -195,37 +195,37 @@ func (db *DBLite) Updates(instanceDB any) (db.DBInterface, error) {
 		if existing, ok := db.dummyagentDBs[v.ID]; ok {
 			*existing = *v
 		} else {
-			return nil, errors.New("github.com/fullstack-lang/gongsim/go, record not found")
+			return nil, errors.New("db DummyAgent github.com/fullstack-lang/gongsim/go, record not found")
 		}
 	case *EngineDB:
 		if existing, ok := db.engineDBs[v.ID]; ok {
 			*existing = *v
 		} else {
-			return nil, errors.New("github.com/fullstack-lang/gongsim/go, record not found")
+			return nil, errors.New("db Engine github.com/fullstack-lang/gongsim/go, record not found")
 		}
 	case *EventDB:
 		if existing, ok := db.eventDBs[v.ID]; ok {
 			*existing = *v
 		} else {
-			return nil, errors.New("github.com/fullstack-lang/gongsim/go, record not found")
+			return nil, errors.New("db Event github.com/fullstack-lang/gongsim/go, record not found")
 		}
 	case *GongsimCommandDB:
 		if existing, ok := db.gongsimcommandDBs[v.ID]; ok {
 			*existing = *v
 		} else {
-			return nil, errors.New("github.com/fullstack-lang/gongsim/go, record not found")
+			return nil, errors.New("db GongsimCommand github.com/fullstack-lang/gongsim/go, record not found")
 		}
 	case *GongsimStatusDB:
 		if existing, ok := db.gongsimstatusDBs[v.ID]; ok {
 			*existing = *v
 		} else {
-			return nil, errors.New("github.com/fullstack-lang/gongsim/go, record not found")
+			return nil, errors.New("db GongsimStatus github.com/fullstack-lang/gongsim/go, record not found")
 		}
 	case *UpdateStateDB:
 		if existing, ok := db.updatestateDBs[v.ID]; ok {
 			*existing = *v
 		} else {
-			return nil, errors.New("github.com/fullstack-lang/gongsim/go, record not found")
+			return nil, errors.New("db UpdateState github.com/fullstack-lang/gongsim/go, record not found")
 		}
 	default:
 		return nil, errors.New("github.com/fullstack-lang/gongsim/go, unsupported type in Updates")
@@ -242,44 +242,44 @@ func (db *DBLite) Find(instanceDBs any) (db.DBInterface, error) {
 	switch ptr := instanceDBs.(type) {
 	// insertion point find
 	case *[]DummyAgentDB:
-        *ptr = make([]DummyAgentDB, 0, len(db.dummyagentDBs))
-        for _, v := range db.dummyagentDBs {
-            *ptr = append(*ptr, *v)
-        }
-        return db, nil
+		*ptr = make([]DummyAgentDB, 0, len(db.dummyagentDBs))
+		for _, v := range db.dummyagentDBs {
+			*ptr = append(*ptr, *v)
+		}
+		return db, nil
 	case *[]EngineDB:
-        *ptr = make([]EngineDB, 0, len(db.engineDBs))
-        for _, v := range db.engineDBs {
-            *ptr = append(*ptr, *v)
-        }
-        return db, nil
+		*ptr = make([]EngineDB, 0, len(db.engineDBs))
+		for _, v := range db.engineDBs {
+			*ptr = append(*ptr, *v)
+		}
+		return db, nil
 	case *[]EventDB:
-        *ptr = make([]EventDB, 0, len(db.eventDBs))
-        for _, v := range db.eventDBs {
-            *ptr = append(*ptr, *v)
-        }
-        return db, nil
+		*ptr = make([]EventDB, 0, len(db.eventDBs))
+		for _, v := range db.eventDBs {
+			*ptr = append(*ptr, *v)
+		}
+		return db, nil
 	case *[]GongsimCommandDB:
-        *ptr = make([]GongsimCommandDB, 0, len(db.gongsimcommandDBs))
-        for _, v := range db.gongsimcommandDBs {
-            *ptr = append(*ptr, *v)
-        }
-        return db, nil
+		*ptr = make([]GongsimCommandDB, 0, len(db.gongsimcommandDBs))
+		for _, v := range db.gongsimcommandDBs {
+			*ptr = append(*ptr, *v)
+		}
+		return db, nil
 	case *[]GongsimStatusDB:
-        *ptr = make([]GongsimStatusDB, 0, len(db.gongsimstatusDBs))
-        for _, v := range db.gongsimstatusDBs {
-            *ptr = append(*ptr, *v)
-        }
-        return db, nil
+		*ptr = make([]GongsimStatusDB, 0, len(db.gongsimstatusDBs))
+		for _, v := range db.gongsimstatusDBs {
+			*ptr = append(*ptr, *v)
+		}
+		return db, nil
 	case *[]UpdateStateDB:
-        *ptr = make([]UpdateStateDB, 0, len(db.updatestateDBs))
-        for _, v := range db.updatestateDBs {
-            *ptr = append(*ptr, *v)
-        }
-        return db, nil
-    default:
-        return nil, errors.New("github.com/fullstack-lang/gongsim/go, Find: unsupported type")
-    }
+		*ptr = make([]UpdateStateDB, 0, len(db.updatestateDBs))
+		for _, v := range db.updatestateDBs {
+			*ptr = append(*ptr, *v)
+		}
+		return db, nil
+	default:
+		return nil, errors.New("github.com/fullstack-lang/gongsim/go, Find: unsupported type")
+	}
 }
 
 // First retrieves the first record of a type from the database
@@ -307,51 +307,63 @@ func (db *DBLite) First(instanceDB any, conds ...any) (db.DBInterface, error) {
 	case *DummyAgentDB:
 		tmp, ok := db.dummyagentDBs[uint(i)]
 
+		if !ok {
+			return nil, errors.New(fmt.Sprintf("db.First DummyAgent Unkown entry %d", i))
+		}
+
 		dummyagentDB, _ := instanceDB.(*DummyAgentDB)
 		*dummyagentDB = *tmp
-		if !ok {
-			return nil, errors.New(fmt.Sprintf("Unkown entry %d", i))
-		}
+		
 	case *EngineDB:
 		tmp, ok := db.engineDBs[uint(i)]
 
+		if !ok {
+			return nil, errors.New(fmt.Sprintf("db.First Engine Unkown entry %d", i))
+		}
+
 		engineDB, _ := instanceDB.(*EngineDB)
 		*engineDB = *tmp
-		if !ok {
-			return nil, errors.New(fmt.Sprintf("Unkown entry %d", i))
-		}
+		
 	case *EventDB:
 		tmp, ok := db.eventDBs[uint(i)]
 
+		if !ok {
+			return nil, errors.New(fmt.Sprintf("db.First Event Unkown entry %d", i))
+		}
+
 		eventDB, _ := instanceDB.(*EventDB)
 		*eventDB = *tmp
-		if !ok {
-			return nil, errors.New(fmt.Sprintf("Unkown entry %d", i))
-		}
+		
 	case *GongsimCommandDB:
 		tmp, ok := db.gongsimcommandDBs[uint(i)]
 
+		if !ok {
+			return nil, errors.New(fmt.Sprintf("db.First GongsimCommand Unkown entry %d", i))
+		}
+
 		gongsimcommandDB, _ := instanceDB.(*GongsimCommandDB)
 		*gongsimcommandDB = *tmp
-		if !ok {
-			return nil, errors.New(fmt.Sprintf("Unkown entry %d", i))
-		}
+		
 	case *GongsimStatusDB:
 		tmp, ok := db.gongsimstatusDBs[uint(i)]
 
+		if !ok {
+			return nil, errors.New(fmt.Sprintf("db.First GongsimStatus Unkown entry %d", i))
+		}
+
 		gongsimstatusDB, _ := instanceDB.(*GongsimStatusDB)
 		*gongsimstatusDB = *tmp
-		if !ok {
-			return nil, errors.New(fmt.Sprintf("Unkown entry %d", i))
-		}
+		
 	case *UpdateStateDB:
 		tmp, ok := db.updatestateDBs[uint(i)]
 
+		if !ok {
+			return nil, errors.New(fmt.Sprintf("db.First UpdateState Unkown entry %d", i))
+		}
+
 		updatestateDB, _ := instanceDB.(*UpdateStateDB)
 		*updatestateDB = *tmp
-		if !ok {
-			return nil, errors.New(fmt.Sprintf("Unkown entry %d", i))
-		}
+		
 	default:
 		return nil, errors.New("github.com/fullstack-lang/gongsim/go, Unkown type")
 	}
