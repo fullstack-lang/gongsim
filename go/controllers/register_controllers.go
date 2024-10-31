@@ -169,7 +169,7 @@ func (controller *Controller) onWebSocketRequestForBackRepoContent(c *gin.Contex
 			// ReadMessage is used to detect client disconnection
 			_, _, err := wsConnection.ReadMessage()
 			if err != nil {
-				log.Println("github.com/fullstack-lang/gongsim/go", stackPath, "WebSocket read error (client disconnected):", err)
+				log.Println("github.com/fullstack-lang/gongsim/go", stackPath, "WS client disconnected:", err)
 				cancel() // Cancel the context
 				return
 			}
@@ -205,11 +205,13 @@ func (controller *Controller) onWebSocketRequestForBackRepoContent(c *gin.Contex
 				// Send backRepo data
 				err = wsConnection.WriteJSON(backRepoData)
 				if err != nil {
-					log.Println("github.com/fullstack-lang/gongsim/go:\n",
-						"client no longer receiver web socket message, assuming it is no longer alive, closing websocket handler")
+					log.Println("github.com/fullstack-lang/gongsim/go:\n", stackPath,
+						"client no longer receiver web socket message,closing websocket handler")
 					fmt.Println(err)
 					cancel() // Cancel the context
 					return
+				} else {
+					log.Println("github.com/fullstack-lang/gongsim/go:", stackPath, "sent backRepoData")
 				}
 			}
 		}
