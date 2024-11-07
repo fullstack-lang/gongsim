@@ -299,6 +299,8 @@ func (db *DBLite) First(instanceDB any, conds ...any) (db.DBInterface, error) {
 		}
 	case uint64:
 		i = cond
+	case uint:
+		i = uint64(cond)
 	default:
 		return nil, errors.New("github.com/fullstack-lang/gongsim/go, conds[0] is not a string or uint64")
 	}
