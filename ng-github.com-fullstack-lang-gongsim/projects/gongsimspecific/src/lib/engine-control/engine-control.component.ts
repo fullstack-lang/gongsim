@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, ChangeDetectorRef } from '@angular/core';
 
 import * as gongsim from '../../../../gongsim/src/public-api'
 
@@ -77,6 +77,7 @@ export class EngineControlComponent implements OnInit {
     private engineService: gongsim.EngineService,
     private gongsimCommandService: gongsim.GongsimCommandService,
     private commitNbFromBackService: gongsim.CommitNbFromBackService,
+    private changeDetectorRef: ChangeDetectorRef,
 
     private router: Router) {
   }
@@ -96,6 +97,7 @@ export class EngineControlComponent implements OnInit {
               // console.log("Nb of Engines is ", engines.length)
 
               this.engine = engines[0]
+              // console.log("date", this.engine.CurrentTime)
 
               let commands = this.frontRepo.getFrontArray<gongsim.GongsimCommand>(gongsim.GongsimCommand.GONGSTRUCT_NAME)
               // console.log("Nb of Commands is ", commands.length)
@@ -107,6 +109,9 @@ export class EngineControlComponent implements OnInit {
 
                 if (this.engine.State == gongsim.EngineState.RUNNING) {
                   this.UpdateDisplay = true
+
+                  // Force change detection
+                  this.changeDetectorRef.detectChanges();
                 }
                 this.engineUpdatedCallbackFunction(this.UpdateDisplay)
 
