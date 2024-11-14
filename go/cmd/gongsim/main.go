@@ -129,7 +129,7 @@ func main() {
 
 	engine := new(gongsim_models.Engine)
 	engine.Name = "Simulation Engine"
-	engine.DisplayFormat = "Jan 2006"
+	engine.DisplayFormat = "02 Jan 2006"
 	engine.Stage(stage)
 
 	// the gongsim command orchestrates the simulation engine regarding to the

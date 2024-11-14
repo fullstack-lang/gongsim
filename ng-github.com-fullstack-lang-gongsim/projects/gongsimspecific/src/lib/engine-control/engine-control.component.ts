@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Input, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 
 import * as gongsim from '../../../../gongsim/src/public-api'
 
@@ -28,6 +28,7 @@ import { AngularSplitModule } from 'angular-split';
 
     AngularSplitModule,
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EngineControlComponent implements OnInit {
 
@@ -76,51 +77,41 @@ export class EngineControlComponent implements OnInit {
     private frontRepoService: gongsim.FrontRepoService,
     private engineService: gongsim.EngineService,
     private gongsimCommandService: gongsim.GongsimCommandService,
-    private commitNbFromBackService: gongsim.CommitNbFromBackService,
     private changeDetectorRef: ChangeDetectorRef,
 
     private router: Router) {
   }
 
   ngOnInit(): void {
-    this.commitNbFromBackService.getCommitNbFromBack(500, this.GONG__StackPath).subscribe(
-      commiNbFromBagetCommitNbFromBack => {
-        if (this.lastCommitNbFromBack < commiNbFromBagetCommitNbFromBack) {
+    this.frontRepoService.connectToWebSocket(this.GONG__StackPath).subscribe(
+      frontRepo => {
+        this.frontRepo = frontRepo
+        let engines = this.frontRepo.getFrontArray<gongsim.Engine>(gongsim.Engine.GONGSTRUCT_NAME)
+        // console.log("Nb of Engines is ", engines.length)
 
-          // console.log("last commit nb " + this.lastCommitNbFromBack + " new: " + commiNbFromBagetCommitNbFromBack)
-          this.lastCommitNbFromBack = commiNbFromBagetCommitNbFromBack
+        this.engine = engines[0]
+        console.log("date", this.engine.CurrentTime)
 
-          this.frontRepoService.pull(this.GONG__StackPath).subscribe(
-            frontRepo => {
-              this.frontRepo = frontRepo
-              let engines = this.frontRepo.getFrontArray<gongsim.Engine>(gongsim.Engine.GONGSTRUCT_NAME)
-              // console.log("Nb of Engines is ", engines.length)
+        let commands = this.frontRepo.getFrontArray<gongsim.GongsimCommand>(gongsim.GongsimCommand.GONGSTRUCT_NAME)
+        // console.log("Nb of Commands is ", commands.length)
 
-              this.engine = engines[0]
-              // console.log("date", this.engine.CurrentTime)
+        this.gongsimCommandSingloton = commands[0]
 
-              let commands = this.frontRepo.getFrontArray<gongsim.GongsimCommand>(gongsim.GongsimCommand.GONGSTRUCT_NAME)
-              // console.log("Nb of Commands is ", commands.length)
+        // this is the callback function from the generic engine to the specific engine 
+        if (this.engineUpdatedCallbackFunction) {
 
-              this.gongsimCommandSingloton = commands[0]
+          if (this.engine.State == gongsim.EngineState.RUNNING) {
+            this.UpdateDisplay = true
+          }
+          this.engineUpdatedCallbackFunction(this.UpdateDisplay)
 
-              // this is the callback function from the generic engien to the specific engine 
-              if (this.engineUpdatedCallbackFunction) {
-
-                if (this.engine.State == gongsim.EngineState.RUNNING) {
-                  this.UpdateDisplay = true
-
-                  // Force change detection
-                  this.changeDetectorRef.detectChanges();
-                }
-                this.engineUpdatedCallbackFunction(this.UpdateDisplay)
-
-                // reset the need to display updates
-                this.UpdateDisplay = false
-              }
-            }
-          )
+          // reset the need to display updates
+          this.UpdateDisplay = false
         }
+
+        // Force change detection
+        this.changeDetectorRef.detectChanges();
+        console.log("change detection")
       }
     )
   }
