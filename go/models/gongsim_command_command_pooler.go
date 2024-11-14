@@ -26,7 +26,7 @@ func (gongsimCommand *GongsimCommand) commandPooler() {
 
 				gongsimCommand.gongsimStatus.CurrentCommand = gongsimCommand.Command
 				gongsimCommand.gongsimStatus.CompletionDate = gongsimCommand.CommandDate
-				gongsimCommand.gongsimStatus.Commit(gongsimCommand.stage)
+				gongsimCommand.stage.Commit()
 			}
 			if gongsimCommand.gongsimStatus.SpeedCommandCompletionDate != gongsimCommand.DateSpeedCommand {
 				log.Println("commandPooler reads new speed command ", gongsimCommand.SpeedCommandType, "  timestamp ", gongsimCommand.CommandDate, " at ", t)
@@ -34,15 +34,15 @@ func (gongsimCommand *GongsimCommand) commandPooler() {
 				switch gongsimCommand.SpeedCommandType {
 				case COMMAND_DECREASE_SPEED_50_PERCENTS:
 					gongsimCommand.Engine.Speed *= 0.5
-					gongsimCommand.Engine.Commit(gongsimCommand.stage)
+					gongsimCommand.stage.Commit()
 				case COMMAND_INCREASE_SPEED_100_PERCENTS:
 					gongsimCommand.Engine.Speed *= 2.0
-					gongsimCommand.Engine.Commit(gongsimCommand.stage)
+					gongsimCommand.stage.Commit()
 				}
 
 				gongsimCommand.gongsimStatus.CurrentSpeedCommand = gongsimCommand.SpeedCommandType
 				gongsimCommand.gongsimStatus.SpeedCommandCompletionDate = gongsimCommand.DateSpeedCommand
-				gongsimCommand.gongsimStatus.Commit(gongsimCommand.stage)
+				gongsimCommand.stage.Commit()
 			}
 		}
 	}

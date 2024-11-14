@@ -174,7 +174,7 @@ func (gongsimCommand *GongsimCommand) SetupGongsimThreads() *GongsimCommand {
 						gongsimCommand.Engine.Simulation.Reset(gongsimCommand.Engine)
 					}
 					// commit the engine state
-					gongsimCommand.Engine.Commit(gongsimCommand.stage)
+					gongsimCommand.stage.Commit()
 				case COMMIT_AGENT_STATES:
 					if gongsimCommand.Engine.Simulation != nil {
 						gongsimCommand.Engine.Simulation.CommitAgents(gongsimCommand.Engine)
@@ -191,7 +191,7 @@ func (gongsimCommand *GongsimCommand) SetupGongsimThreads() *GongsimCommand {
 				case FIRE_ONE_EVENT:
 					if gongsimCommand.Engine.State != RUNNING {
 						gongsimCommand.Engine.State = RUNNING
-						gongsimCommand.Engine.Commit(gongsimCommand.stage)
+						gongsimCommand.stage.Commit()
 					}
 
 					if nextMode == RELATIVE_SPEED {
@@ -215,9 +215,11 @@ func (gongsimCommand *GongsimCommand) SetupGongsimThreads() *GongsimCommand {
 						sleepTime := gongsimCommand.Engine.nextRealtimeHorizon.Sub(time.Now())
 						time.Sleep(sleepTime)
 
-						gongsimCommand.Engine.Commit(gongsimCommand.stage)
+						log.Println("gongsimcommand", gongsimCommand.Engine.currentTime)
 
-						// // log.Printf(lastSimTime.String() + " " + nextSimTime.String())
+						gongsimCommand.stage.Commit()
+
+						// log.Printf(lastSimTime.String() + " " + nextSimTime.String())
 						// if nextSimTime.Sub(gongsimCommand.Engine.GetCurrentTime()) > 0 {
 						// 	simTimeAdvance := nextSimTime.Sub(gongsimCommand.Engine.GetCurrentTime())
 
@@ -275,13 +277,13 @@ func (gongsimCommand *GongsimCommand) SetupGongsimThreads() *GongsimCommand {
 						}
 
 						// time has progressed, therefore an update is necessary
-						gongsimCommand.Engine.Commit(gongsimCommand.stage)
+						gongsimCommand.stage.Commit()
 					}
 
 				case SLEEP_100_MS:
 					if gongsimCommand.Engine.State != PAUSED {
 						gongsimCommand.Engine.State = PAUSED
-						gongsimCommand.Engine.Commit(gongsimCommand.stage)
+						gongsimCommand.stage.Commit()
 					}
 					time.Sleep(time.Duration(100 * time.Millisecond))
 				default:
