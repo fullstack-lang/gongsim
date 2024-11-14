@@ -366,11 +366,25 @@ func (backRepoGongsimCommand *BackRepoGongsimCommandStruct) CheckoutPhaseTwoInst
 func (gongsimcommandDB *GongsimCommandDB) DecodePointers(backRepo *BackRepoStruct, gongsimcommand *models.GongsimCommand) {
 
 	// insertion point for checkout of pointer encoding
-	// Engine field
-	gongsimcommand.Engine = nil
-	if gongsimcommandDB.EngineID.Int64 != 0 {
-		gongsimcommand.Engine = backRepo.BackRepoEngine.Map_EngineDBID_EnginePtr[uint(gongsimcommandDB.EngineID.Int64)]
+	// Engine field	
+	{
+		id := gongsimcommandDB.EngineID.Int64
+		if id != 0 {
+			tmp, ok := backRepo.BackRepoEngine.Map_EngineDBID_EnginePtr[uint(id)]
+
+			if !ok {
+				log.Fatalln("DecodePointers: gongsimcommand.Engine, unknown pointer id", id)
+			}
+
+			// updates only if field has changed
+			if gongsimcommand.Engine == nil || gongsimcommand.Engine != tmp {
+				gongsimcommand.Engine = tmp
+			}
+		} else {
+			gongsimcommand.Engine = nil
+		}
 	}
+	
 	return
 }
 
