@@ -142,7 +142,7 @@ func main() {
 	engine.SetStartTime(time.Date(1676, time.January, 1, 0, 0, 0, 0, time.UTC))
 	engine.SetCurrentTime(engine.GetStartTime())
 	engine.State = gongsim_models.PAUSED
-	engine.Speed = 0.5 * 24 * 3600.0 // days per second
+	engine.Speed = 30 * 0.5 * 24 * 3600.0 // days per second
 	log.Printf("Sim start \t\t\t%s\n", engine.GetStartTime())
 
 	// Three years
