@@ -99,7 +99,7 @@ type GongsimStatusWOP struct {
 
 	Name string `xlsx:"1"`
 
-	CurrentCommand models.GongsimCommandType `xlsx:"2"`
+	CurrentCommand models.CommandType `xlsx:"2"`
 
 	CompletionDate string `xlsx:"3"`
 

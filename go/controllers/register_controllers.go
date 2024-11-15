@@ -49,6 +49,13 @@ type ValidationError struct {
 func registerControllers(r *gin.Engine) {
 	v1 := r.Group("/api/github.com/fullstack-lang/gongsim/go")
 	{ // insertion point for registrations
+		v1.GET("/v1/commands", GetController().GetCommands)
+		v1.GET("/v1/commands/:id", GetController().GetCommand)
+		v1.POST("/v1/commands", GetController().PostCommand)
+		v1.PATCH("/v1/commands/:id", GetController().UpdateCommand)
+		v1.PUT("/v1/commands/:id", GetController().UpdateCommand)
+		v1.DELETE("/v1/commands/:id", GetController().DeleteCommand)
+
 		v1.GET("/v1/dummyagents", GetController().GetDummyAgents)
 		v1.GET("/v1/dummyagents/:id", GetController().GetDummyAgent)
 		v1.POST("/v1/dummyagents", GetController().PostDummyAgent)
@@ -69,13 +76,6 @@ func registerControllers(r *gin.Engine) {
 		v1.PATCH("/v1/events/:id", GetController().UpdateEvent)
 		v1.PUT("/v1/events/:id", GetController().UpdateEvent)
 		v1.DELETE("/v1/events/:id", GetController().DeleteEvent)
-
-		v1.GET("/v1/gongsimcommands", GetController().GetGongsimCommands)
-		v1.GET("/v1/gongsimcommands/:id", GetController().GetGongsimCommand)
-		v1.POST("/v1/gongsimcommands", GetController().PostGongsimCommand)
-		v1.PATCH("/v1/gongsimcommands/:id", GetController().UpdateGongsimCommand)
-		v1.PUT("/v1/gongsimcommands/:id", GetController().UpdateGongsimCommand)
-		v1.DELETE("/v1/gongsimcommands/:id", GetController().DeleteGongsimCommand)
 
 		v1.GET("/v1/gongsimstatuss", GetController().GetGongsimStatuss)
 		v1.GET("/v1/gongsimstatuss/:id", GetController().GetGongsimStatus)

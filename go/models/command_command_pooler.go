@@ -9,7 +9,7 @@ import (
 // of the current command from the back repo to the stage. If the front client writes a "PLAY" or "PAUSE"
 // command, it is written to the back repo and the command pooler retrieves this command to the stage where it
 // can be read by the "engine driver". The "command pooler" is a scheduled task
-func (gongsimCommand *GongsimCommand) commandPooler() {
+func (gongsimCommand *Command) commandPooler() {
 
 	// commandPoolerPeriod is the period of the "command pooler"
 	//

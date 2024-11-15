@@ -20,14 +20,14 @@ func fillUpTablePointerToGongstruct[T models.PointerToGongstruct](
 	var typedInstance T
 	switch any(typedInstance).(type) {
 	// insertion point
+	case *models.Command:
+		fillUpTable[models.Command](probe)
 	case *models.DummyAgent:
 		fillUpTable[models.DummyAgent](probe)
 	case *models.Engine:
 		fillUpTable[models.Engine](probe)
 	case *models.Event:
 		fillUpTable[models.Event](probe)
-	case *models.GongsimCommand:
-		fillUpTable[models.GongsimCommand](probe)
 	case *models.GongsimStatus:
 		fillUpTable[models.GongsimStatus](probe)
 	case *models.UpdateState:

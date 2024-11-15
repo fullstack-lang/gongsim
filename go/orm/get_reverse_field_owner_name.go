@@ -14,6 +14,11 @@ func GetReverseFieldOwnerName[T models.Gongstruct](
 	res = ""
 	switch inst := any(instance).(type) {
 	// insertion point
+	case *models.Command:
+		switch reverseField.GongstructName {
+		// insertion point
+		}
+
 	case *models.DummyAgent:
 		switch reverseField.GongstructName {
 		// insertion point
@@ -25,11 +30,6 @@ func GetReverseFieldOwnerName[T models.Gongstruct](
 		}
 
 	case *models.Event:
-		switch reverseField.GongstructName {
-		// insertion point
-		}
-
-	case *models.GongsimCommand:
 		switch reverseField.GongstructName {
 		// insertion point
 		}
@@ -59,6 +59,11 @@ func GetReverseFieldOwner[T models.Gongstruct](
 	res = nil
 	switch inst := any(instance).(type) {
 	// insertion point
+	case *models.Command:
+		switch reverseField.GongstructName {
+		// insertion point
+		}
+
 	case *models.DummyAgent:
 		switch reverseField.GongstructName {
 		// insertion point
@@ -70,11 +75,6 @@ func GetReverseFieldOwner[T models.Gongstruct](
 		}
 
 	case *models.Event:
-		switch reverseField.GongstructName {
-		// insertion point
-		}
-
-	case *models.GongsimCommand:
 		switch reverseField.GongstructName {
 		// insertion point
 		}

@@ -5,6 +5,9 @@ func IsStaged[Type Gongstruct](stage *StageStruct, instance *Type) (ok bool) {
 
 	switch target := any(instance).(type) {
 	// insertion point for stage
+	case *Command:
+		ok = stage.IsStagedCommand(target)
+
 	case *DummyAgent:
 		ok = stage.IsStagedDummyAgent(target)
 
@@ -13,9 +16,6 @@ func IsStaged[Type Gongstruct](stage *StageStruct, instance *Type) (ok bool) {
 
 	case *Event:
 		ok = stage.IsStagedEvent(target)
-
-	case *GongsimCommand:
-		ok = stage.IsStagedGongsimCommand(target)
 
 	case *GongsimStatus:
 		ok = stage.IsStagedGongsimStatus(target)
@@ -30,6 +30,13 @@ func IsStaged[Type Gongstruct](stage *StageStruct, instance *Type) (ok bool) {
 }
 
 // insertion point for stage per struct
+func (stage *StageStruct) IsStagedCommand(command *Command) (ok bool) {
+
+	_, ok = stage.Commands[command]
+
+	return
+}
+
 func (stage *StageStruct) IsStagedDummyAgent(dummyagent *DummyAgent) (ok bool) {
 
 	_, ok = stage.DummyAgents[dummyagent]
@@ -47,13 +54,6 @@ func (stage *StageStruct) IsStagedEngine(engine *Engine) (ok bool) {
 func (stage *StageStruct) IsStagedEvent(event *Event) (ok bool) {
 
 	_, ok = stage.Events[event]
-
-	return
-}
-
-func (stage *StageStruct) IsStagedGongsimCommand(gongsimcommand *GongsimCommand) (ok bool) {
-
-	_, ok = stage.GongsimCommands[gongsimcommand]
 
 	return
 }
@@ -80,6 +80,9 @@ func StageBranch[Type Gongstruct](stage *StageStruct, instance *Type) {
 
 	switch target := any(instance).(type) {
 	// insertion point for stage branch
+	case *Command:
+		stage.StageBranchCommand(target)
+
 	case *DummyAgent:
 		stage.StageBranchDummyAgent(target)
 
@@ -88,9 +91,6 @@ func StageBranch[Type Gongstruct](stage *StageStruct, instance *Type) {
 
 	case *Event:
 		stage.StageBranchEvent(target)
-
-	case *GongsimCommand:
-		stage.StageBranchGongsimCommand(target)
 
 	case *GongsimStatus:
 		stage.StageBranchGongsimStatus(target)
@@ -104,6 +104,24 @@ func StageBranch[Type Gongstruct](stage *StageStruct, instance *Type) {
 }
 
 // insertion point for stage branch per struct
+func (stage *StageStruct) StageBranchCommand(command *Command) {
+
+	// check if instance is already staged
+	if IsStaged(stage, command) {
+		return
+	}
+
+	command.Stage(stage)
+
+	//insertion point for the staging of instances referenced by pointers
+	if command.Engine != nil {
+		StageBranch(stage, command.Engine)
+	}
+
+	//insertion point for the staging of instances referenced by slice of pointers
+
+}
+
 func (stage *StageStruct) StageBranchDummyAgent(dummyagent *DummyAgent) {
 
 	// check if instance is already staged
@@ -144,24 +162,6 @@ func (stage *StageStruct) StageBranchEvent(event *Event) {
 	event.Stage(stage)
 
 	//insertion point for the staging of instances referenced by pointers
-
-	//insertion point for the staging of instances referenced by slice of pointers
-
-}
-
-func (stage *StageStruct) StageBranchGongsimCommand(gongsimcommand *GongsimCommand) {
-
-	// check if instance is already staged
-	if IsStaged(stage, gongsimcommand) {
-		return
-	}
-
-	gongsimcommand.Stage(stage)
-
-	//insertion point for the staging of instances referenced by pointers
-	if gongsimcommand.Engine != nil {
-		StageBranch(stage, gongsimcommand.Engine)
-	}
 
 	//insertion point for the staging of instances referenced by slice of pointers
 
@@ -208,6 +208,10 @@ func CopyBranch[Type Gongstruct](from *Type) (to *Type) {
 
 	switch fromT := any(from).(type) {
 	// insertion point for stage branch
+	case *Command:
+		toT := CopyBranchCommand(mapOrigCopy, fromT)
+		return any(toT).(*Type)
+
 	case *DummyAgent:
 		toT := CopyBranchDummyAgent(mapOrigCopy, fromT)
 		return any(toT).(*Type)
@@ -218,10 +222,6 @@ func CopyBranch[Type Gongstruct](from *Type) (to *Type) {
 
 	case *Event:
 		toT := CopyBranchEvent(mapOrigCopy, fromT)
-		return any(toT).(*Type)
-
-	case *GongsimCommand:
-		toT := CopyBranchGongsimCommand(mapOrigCopy, fromT)
 		return any(toT).(*Type)
 
 	case *GongsimStatus:
@@ -239,6 +239,28 @@ func CopyBranch[Type Gongstruct](from *Type) (to *Type) {
 }
 
 // insertion point for stage branch per struct
+func CopyBranchCommand(mapOrigCopy map[any]any, commandFrom *Command) (commandTo *Command) {
+
+	// commandFrom has already been copied
+	if _commandTo, ok := mapOrigCopy[commandFrom]; ok {
+		commandTo = _commandTo.(*Command)
+		return
+	}
+
+	commandTo = new(Command)
+	mapOrigCopy[commandFrom] = commandTo
+	commandFrom.CopyBasicFields(commandTo)
+
+	//insertion point for the staging of instances referenced by pointers
+	if commandFrom.Engine != nil {
+		commandTo.Engine = CopyBranchEngine(mapOrigCopy, commandFrom.Engine)
+	}
+
+	//insertion point for the staging of instances referenced by slice of pointers
+
+	return
+}
+
 func CopyBranchDummyAgent(mapOrigCopy map[any]any, dummyagentFrom *DummyAgent) (dummyagentTo *DummyAgent) {
 
 	// dummyagentFrom has already been copied
@@ -296,28 +318,6 @@ func CopyBranchEvent(mapOrigCopy map[any]any, eventFrom *Event) (eventTo *Event)
 	return
 }
 
-func CopyBranchGongsimCommand(mapOrigCopy map[any]any, gongsimcommandFrom *GongsimCommand) (gongsimcommandTo *GongsimCommand) {
-
-	// gongsimcommandFrom has already been copied
-	if _gongsimcommandTo, ok := mapOrigCopy[gongsimcommandFrom]; ok {
-		gongsimcommandTo = _gongsimcommandTo.(*GongsimCommand)
-		return
-	}
-
-	gongsimcommandTo = new(GongsimCommand)
-	mapOrigCopy[gongsimcommandFrom] = gongsimcommandTo
-	gongsimcommandFrom.CopyBasicFields(gongsimcommandTo)
-
-	//insertion point for the staging of instances referenced by pointers
-	if gongsimcommandFrom.Engine != nil {
-		gongsimcommandTo.Engine = CopyBranchEngine(mapOrigCopy, gongsimcommandFrom.Engine)
-	}
-
-	//insertion point for the staging of instances referenced by slice of pointers
-
-	return
-}
-
 func CopyBranchGongsimStatus(mapOrigCopy map[any]any, gongsimstatusFrom *GongsimStatus) (gongsimstatusTo *GongsimStatus) {
 
 	// gongsimstatusFrom has already been copied
@@ -364,6 +364,9 @@ func UnstageBranch[Type Gongstruct](stage *StageStruct, instance *Type) {
 
 	switch target := any(instance).(type) {
 	// insertion point for unstage branch
+	case *Command:
+		stage.UnstageBranchCommand(target)
+
 	case *DummyAgent:
 		stage.UnstageBranchDummyAgent(target)
 
@@ -372,9 +375,6 @@ func UnstageBranch[Type Gongstruct](stage *StageStruct, instance *Type) {
 
 	case *Event:
 		stage.UnstageBranchEvent(target)
-
-	case *GongsimCommand:
-		stage.UnstageBranchGongsimCommand(target)
 
 	case *GongsimStatus:
 		stage.UnstageBranchGongsimStatus(target)
@@ -388,6 +388,24 @@ func UnstageBranch[Type Gongstruct](stage *StageStruct, instance *Type) {
 }
 
 // insertion point for unstage branch per struct
+func (stage *StageStruct) UnstageBranchCommand(command *Command) {
+
+	// check if instance is already staged
+	if !IsStaged(stage, command) {
+		return
+	}
+
+	command.Unstage(stage)
+
+	//insertion point for the staging of instances referenced by pointers
+	if command.Engine != nil {
+		UnstageBranch(stage, command.Engine)
+	}
+
+	//insertion point for the staging of instances referenced by slice of pointers
+
+}
+
 func (stage *StageStruct) UnstageBranchDummyAgent(dummyagent *DummyAgent) {
 
 	// check if instance is already staged
@@ -428,24 +446,6 @@ func (stage *StageStruct) UnstageBranchEvent(event *Event) {
 	event.Unstage(stage)
 
 	//insertion point for the staging of instances referenced by pointers
-
-	//insertion point for the staging of instances referenced by slice of pointers
-
-}
-
-func (stage *StageStruct) UnstageBranchGongsimCommand(gongsimcommand *GongsimCommand) {
-
-	// check if instance is already staged
-	if !IsStaged(stage, gongsimcommand) {
-		return
-	}
-
-	gongsimcommand.Unstage(stage)
-
-	//insertion point for the staging of instances referenced by pointers
-	if gongsimcommand.Engine != nil {
-		UnstageBranch(stage, gongsimcommand.Engine)
-	}
 
 	//insertion point for the staging of instances referenced by slice of pointers
 

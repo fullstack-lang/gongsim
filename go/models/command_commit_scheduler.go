@@ -10,7 +10,7 @@ var simulationEventForLastEngineCommit int
 // The commit is performed only if the event number of the engine has increased. Since the commit
 // have to happend when the simulation is not advancing, the "commit scheduler" only schedule the "engine driver"
 // to commit the simlation stage when it will be ready.
-func (gongsimCommand *GongsimCommand) commitScheduler() {
+func (gongsimCommand *Command) commitScheduler() {
 
 	// The period shall not too short for performance sake but not too long because the end user needs a responsive application
 	//

@@ -6,6 +6,10 @@ func AfterCreateFromFront[Type Gongstruct](stage *StageStruct, instance *Type) {
 
 	switch target := any(instance).(type) {
 	// insertion point
+	case *Command:
+		if stage.OnAfterCommandCreateCallback != nil {
+			stage.OnAfterCommandCreateCallback.OnAfterCreate(stage, target)
+		}
 	case *DummyAgent:
 		if stage.OnAfterDummyAgentCreateCallback != nil {
 			stage.OnAfterDummyAgentCreateCallback.OnAfterCreate(stage, target)
@@ -17,10 +21,6 @@ func AfterCreateFromFront[Type Gongstruct](stage *StageStruct, instance *Type) {
 	case *Event:
 		if stage.OnAfterEventCreateCallback != nil {
 			stage.OnAfterEventCreateCallback.OnAfterCreate(stage, target)
-		}
-	case *GongsimCommand:
-		if stage.OnAfterGongsimCommandCreateCallback != nil {
-			stage.OnAfterGongsimCommandCreateCallback.OnAfterCreate(stage, target)
 		}
 	case *GongsimStatus:
 		if stage.OnAfterGongsimStatusCreateCallback != nil {
@@ -40,6 +40,11 @@ func AfterUpdateFromFront[Type Gongstruct](stage *StageStruct, old, new *Type) {
 
 	switch oldTarget := any(old).(type) {
 	// insertion point
+	case *Command:
+		newTarget := any(new).(*Command)
+		if stage.OnAfterCommandUpdateCallback != nil {
+			stage.OnAfterCommandUpdateCallback.OnAfterUpdate(stage, oldTarget, newTarget)
+		}
 	case *DummyAgent:
 		newTarget := any(new).(*DummyAgent)
 		if stage.OnAfterDummyAgentUpdateCallback != nil {
@@ -54,11 +59,6 @@ func AfterUpdateFromFront[Type Gongstruct](stage *StageStruct, old, new *Type) {
 		newTarget := any(new).(*Event)
 		if stage.OnAfterEventUpdateCallback != nil {
 			stage.OnAfterEventUpdateCallback.OnAfterUpdate(stage, oldTarget, newTarget)
-		}
-	case *GongsimCommand:
-		newTarget := any(new).(*GongsimCommand)
-		if stage.OnAfterGongsimCommandUpdateCallback != nil {
-			stage.OnAfterGongsimCommandUpdateCallback.OnAfterUpdate(stage, oldTarget, newTarget)
 		}
 	case *GongsimStatus:
 		newTarget := any(new).(*GongsimStatus)
@@ -80,6 +80,11 @@ func AfterDeleteFromFront[Type Gongstruct](stage *StageStruct, staged, front *Ty
 
 	switch front := any(front).(type) {
 	// insertion point
+	case *Command:
+		if stage.OnAfterCommandDeleteCallback != nil {
+			staged := any(staged).(*Command)
+			stage.OnAfterCommandDeleteCallback.OnAfterDelete(stage, staged, front)
+		}
 	case *DummyAgent:
 		if stage.OnAfterDummyAgentDeleteCallback != nil {
 			staged := any(staged).(*DummyAgent)
@@ -94,11 +99,6 @@ func AfterDeleteFromFront[Type Gongstruct](stage *StageStruct, staged, front *Ty
 		if stage.OnAfterEventDeleteCallback != nil {
 			staged := any(staged).(*Event)
 			stage.OnAfterEventDeleteCallback.OnAfterDelete(stage, staged, front)
-		}
-	case *GongsimCommand:
-		if stage.OnAfterGongsimCommandDeleteCallback != nil {
-			staged := any(staged).(*GongsimCommand)
-			stage.OnAfterGongsimCommandDeleteCallback.OnAfterDelete(stage, staged, front)
 		}
 	case *GongsimStatus:
 		if stage.OnAfterGongsimStatusDeleteCallback != nil {
@@ -120,6 +120,10 @@ func AfterReadFromFront[Type Gongstruct](stage *StageStruct, instance *Type) {
 
 	switch target := any(instance).(type) {
 	// insertion point
+	case *Command:
+		if stage.OnAfterCommandReadCallback != nil {
+			stage.OnAfterCommandReadCallback.OnAfterRead(stage, target)
+		}
 	case *DummyAgent:
 		if stage.OnAfterDummyAgentReadCallback != nil {
 			stage.OnAfterDummyAgentReadCallback.OnAfterRead(stage, target)
@@ -131,10 +135,6 @@ func AfterReadFromFront[Type Gongstruct](stage *StageStruct, instance *Type) {
 	case *Event:
 		if stage.OnAfterEventReadCallback != nil {
 			stage.OnAfterEventReadCallback.OnAfterRead(stage, target)
-		}
-	case *GongsimCommand:
-		if stage.OnAfterGongsimCommandReadCallback != nil {
-			stage.OnAfterGongsimCommandReadCallback.OnAfterRead(stage, target)
 		}
 	case *GongsimStatus:
 		if stage.OnAfterGongsimStatusReadCallback != nil {
@@ -155,6 +155,9 @@ func SetCallbackAfterUpdateFromFront[Type Gongstruct](stage *StageStruct, callba
 	var instance Type
 	switch any(instance).(type) {
 		// insertion point
+	case *Command:
+		stage.OnAfterCommandUpdateCallback = any(callback).(OnAfterUpdateInterface[Command])
+	
 	case *DummyAgent:
 		stage.OnAfterDummyAgentUpdateCallback = any(callback).(OnAfterUpdateInterface[DummyAgent])
 	
@@ -163,9 +166,6 @@ func SetCallbackAfterUpdateFromFront[Type Gongstruct](stage *StageStruct, callba
 	
 	case *Event:
 		stage.OnAfterEventUpdateCallback = any(callback).(OnAfterUpdateInterface[Event])
-	
-	case *GongsimCommand:
-		stage.OnAfterGongsimCommandUpdateCallback = any(callback).(OnAfterUpdateInterface[GongsimCommand])
 	
 	case *GongsimStatus:
 		stage.OnAfterGongsimStatusUpdateCallback = any(callback).(OnAfterUpdateInterface[GongsimStatus])
@@ -180,6 +180,9 @@ func SetCallbackAfterCreateFromFront[Type Gongstruct](stage *StageStruct, callba
 	var instance Type
 	switch any(instance).(type) {
 		// insertion point
+	case *Command:
+		stage.OnAfterCommandCreateCallback = any(callback).(OnAfterCreateInterface[Command])
+	
 	case *DummyAgent:
 		stage.OnAfterDummyAgentCreateCallback = any(callback).(OnAfterCreateInterface[DummyAgent])
 	
@@ -188,9 +191,6 @@ func SetCallbackAfterCreateFromFront[Type Gongstruct](stage *StageStruct, callba
 	
 	case *Event:
 		stage.OnAfterEventCreateCallback = any(callback).(OnAfterCreateInterface[Event])
-	
-	case *GongsimCommand:
-		stage.OnAfterGongsimCommandCreateCallback = any(callback).(OnAfterCreateInterface[GongsimCommand])
 	
 	case *GongsimStatus:
 		stage.OnAfterGongsimStatusCreateCallback = any(callback).(OnAfterCreateInterface[GongsimStatus])
@@ -205,6 +205,9 @@ func SetCallbackAfterDeleteFromFront[Type Gongstruct](stage *StageStruct, callba
 	var instance Type
 	switch any(instance).(type) {
 		// insertion point
+	case *Command:
+		stage.OnAfterCommandDeleteCallback = any(callback).(OnAfterDeleteInterface[Command])
+	
 	case *DummyAgent:
 		stage.OnAfterDummyAgentDeleteCallback = any(callback).(OnAfterDeleteInterface[DummyAgent])
 	
@@ -213,9 +216,6 @@ func SetCallbackAfterDeleteFromFront[Type Gongstruct](stage *StageStruct, callba
 	
 	case *Event:
 		stage.OnAfterEventDeleteCallback = any(callback).(OnAfterDeleteInterface[Event])
-	
-	case *GongsimCommand:
-		stage.OnAfterGongsimCommandDeleteCallback = any(callback).(OnAfterDeleteInterface[GongsimCommand])
 	
 	case *GongsimStatus:
 		stage.OnAfterGongsimStatusDeleteCallback = any(callback).(OnAfterDeleteInterface[GongsimStatus])
@@ -230,6 +230,9 @@ func SetCallbackAfterReadFromFront[Type Gongstruct](stage *StageStruct, callback
 	var instance Type
 	switch any(instance).(type) {
 		// insertion point
+	case *Command:
+		stage.OnAfterCommandReadCallback = any(callback).(OnAfterReadInterface[Command])
+	
 	case *DummyAgent:
 		stage.OnAfterDummyAgentReadCallback = any(callback).(OnAfterReadInterface[DummyAgent])
 	
@@ -238,9 +241,6 @@ func SetCallbackAfterReadFromFront[Type Gongstruct](stage *StageStruct, callback
 	
 	case *Event:
 		stage.OnAfterEventReadCallback = any(callback).(OnAfterReadInterface[Event])
-	
-	case *GongsimCommand:
-		stage.OnAfterGongsimCommandReadCallback = any(callback).(OnAfterReadInterface[GongsimCommand])
 	
 	case *GongsimStatus:
 		stage.OnAfterGongsimStatusReadCallback = any(callback).(OnAfterReadInterface[GongsimStatus])

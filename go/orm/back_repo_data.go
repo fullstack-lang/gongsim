@@ -4,13 +4,13 @@ package orm
 type BackRepoData struct {
 	// insertion point for slices
 
+	CommandAPIs []*CommandAPI
+
 	DummyAgentAPIs []*DummyAgentAPI
 
 	EngineAPIs []*EngineAPI
 
 	EventAPIs []*EventAPI
-
-	GongsimCommandAPIs []*GongsimCommandAPI
 
 	GongsimStatusAPIs []*GongsimStatusAPI
 
@@ -24,6 +24,16 @@ func CopyBackRepoToBackRepoData(backRepo *BackRepoStruct, backRepoData *BackRepo
 	defer backRepo.rwMutex.RUnlock()
 
 	// insertion point for slices copies
+	for _, commandDB := range backRepo.BackRepoCommand.Map_CommandDBID_CommandDB {
+
+		var commandAPI CommandAPI
+		commandAPI.ID = commandDB.ID
+		commandAPI.CommandPointersEncoding = commandDB.CommandPointersEncoding
+		commandDB.CopyBasicFieldsToCommand_WOP(&commandAPI.Command_WOP)
+
+		backRepoData.CommandAPIs = append(backRepoData.CommandAPIs, &commandAPI)
+	}
+
 	for _, dummyagentDB := range backRepo.BackRepoDummyAgent.Map_DummyAgentDBID_DummyAgentDB {
 
 		var dummyagentAPI DummyAgentAPI
@@ -52,16 +62,6 @@ func CopyBackRepoToBackRepoData(backRepo *BackRepoStruct, backRepoData *BackRepo
 		eventDB.CopyBasicFieldsToEvent_WOP(&eventAPI.Event_WOP)
 
 		backRepoData.EventAPIs = append(backRepoData.EventAPIs, &eventAPI)
-	}
-
-	for _, gongsimcommandDB := range backRepo.BackRepoGongsimCommand.Map_GongsimCommandDBID_GongsimCommandDB {
-
-		var gongsimcommandAPI GongsimCommandAPI
-		gongsimcommandAPI.ID = gongsimcommandDB.ID
-		gongsimcommandAPI.GongsimCommandPointersEncoding = gongsimcommandDB.GongsimCommandPointersEncoding
-		gongsimcommandDB.CopyBasicFieldsToGongsimCommand_WOP(&gongsimcommandAPI.GongsimCommand_WOP)
-
-		backRepoData.GongsimCommandAPIs = append(backRepoData.GongsimCommandAPIs, &gongsimcommandAPI)
 	}
 
 	for _, gongsimstatusDB := range backRepo.BackRepoGongsimStatus.Map_GongsimStatusDBID_GongsimStatusDB {

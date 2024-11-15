@@ -10,7 +10,7 @@ var DisplayWatch bool
 var CpuProfile bool
 
 // the watcher thread inspects the status of the simulation
-func (gongsimCommand *GongsimCommand) watcher() {
+func (gongsimCommand *Command) watcher() {
 
 	var lastSimTime = gongsimCommand.Engine.currentTime
 

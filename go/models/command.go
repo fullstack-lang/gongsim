@@ -5,11 +5,11 @@ import (
 	"time"
 )
 
-// GongsimCommand is the struct of the instance that is updated by the front for issuing commands
-// swagger:model GongsimCommand
-type GongsimCommand struct {
+// Command is the struct of the instance that is updated by the front for issuing commands
+// swagger:model Command
+type Command struct {
 	Name             string
-	Command          GongsimCommandType
+	Command          CommandType
 	CommandDate      string
 	SpeedCommandType SpeedCommandType
 	DateSpeedCommand string
@@ -19,8 +19,8 @@ type GongsimCommand struct {
 	gongsimStatus *GongsimStatus
 }
 
-func NewGongSimCommand(stage *StageStruct, engine *Engine) (gongsimCommand *GongsimCommand) {
-	gongsimCommand = &(GongsimCommand{
+func NewGongSimCommand(stage *StageStruct, engine *Engine) (gongsimCommand *Command) {
+	gongsimCommand = &(Command{
 		Name:        "Gongsim Command Singloton",
 		Command:     COMMAND_PAUSE,
 		CommandDate: "",
@@ -51,14 +51,14 @@ func NewGongSimCommand(stage *StageStruct, engine *Engine) (gongsimCommand *Gong
 var Quit chan bool
 
 // SetupGongsimThreads schedules gongsim threads
-func (gongsimCommand *GongsimCommand) SetupGongsimThreads() *GongsimCommand {
+func (command *Command) SetupGongsimThreads() *Command {
 
 	Quit = make(chan bool)
 
-	go gongsimCommand.commandPooler()
-	go gongsimCommand.commitScheduler()
-	go gongsimCommand.checkoutScheduler()
-	go gongsimCommand.watcher()
+	go command.commandPooler()
+	go command.commitScheduler()
+	go command.checkoutScheduler()
+	go command.watcher()
 
 	go func() {
 
@@ -93,48 +93,48 @@ func (gongsimCommand *GongsimCommand) SetupGongsimThreads() *GongsimCommand {
 				return
 			default:
 				nextState = UNKOWN
-				_, nextSimTime, _ := gongsimCommand.Engine.GetNextEvent()
+				_, nextSimTime, _ := command.Engine.GetNextEvent()
 				var currentTimePlus10Minute time.Time
 
-				if gongsimCommand.Engine.nextCommitDate.After(gongsimCommand.Engine.lastCommitDate) {
+				if command.Engine.nextCommitDate.After(command.Engine.lastCommitDate) {
 					// log.Printf("Commit agent states scheduled at event # %d and commit nb # %d",
 					// 	gongsimCommand.Engine.Fired,
 					// 	gongsimCommand.Engine.GetLastCommitNb())
 					nextState = COMMIT_AGENT_STATES
 				} else {
-					if gongsimCommand.Engine.nextCheckoutDate.After(gongsimCommand.Engine.lastCheckoutDate) {
+					if command.Engine.nextCheckoutDate.After(command.Engine.lastCheckoutDate) {
 						// log.Printf("Checkout agent states scheduled at event # %d and commit nb # %d",
 						// 	gongsimCommand.Engine.Fired,
 						// 	gongsimCommand.Engine.GetLastCommitNb())
 						nextState = CHECKOUT_AGENT_STATES
-					} else if nextSimTime.Before(gongsimCommand.Engine.GetEndTime()) {
-						switch gongsimCommand.Command {
+					} else if nextSimTime.Before(command.Engine.GetEndTime()) {
+						switch command.Command {
 						case COMMAND_PLAY:
 							nextState = FIRE_ONE_EVENT
 							nextMode = RELATIVE_SPEED
 						case COMMAND_ADVANCE_10_MIN:
-							if commandCompletionDate != gongsimCommand.CommandDate {
+							if commandCompletionDate != command.CommandDate {
 								nextState = FIRE_ONE_EVENT
 								nextMode = FULL_SPEED
 								engineStopMode = TEN_MINUTES
 								currentTimePlus10Minute = nextSimTime.Add(time.Minute * 10)
-								commandCompletionDate = gongsimCommand.CommandDate
+								commandCompletionDate = command.CommandDate
 							} else {
 								nextState = SLEEP_100_MS
 							}
 						case COMMAND_FIRE_EVENT_TILL_STATES_CHANGE:
-							if commandCompletionDate != gongsimCommand.CommandDate {
+							if commandCompletionDate != command.CommandDate {
 								nextState = FIRE_ONE_EVENT
 								nextMode = FULL_SPEED
 								engineStopMode = STATE_CHANGED
-								commandCompletionDate = gongsimCommand.CommandDate
+								commandCompletionDate = command.CommandDate
 							} else {
 								nextState = SLEEP_100_MS
 							}
 						case COMMAND_RESET:
-							if commandCompletionDate != gongsimCommand.CommandDate {
+							if commandCompletionDate != command.CommandDate {
 								nextState = RESET_SIMULATION
-								commandCompletionDate = gongsimCommand.CommandDate
+								commandCompletionDate = command.CommandDate
 							} else {
 								nextState = SLEEP_100_MS
 							}
@@ -142,11 +142,11 @@ func (gongsimCommand *GongsimCommand) SetupGongsimThreads() *GongsimCommand {
 							nextState = SLEEP_100_MS
 						}
 					} else {
-						switch gongsimCommand.Command {
+						switch command.Command {
 						case COMMAND_RESET:
-							if commandCompletionDate != gongsimCommand.CommandDate {
+							if commandCompletionDate != command.CommandDate {
 								nextState = RESET_SIMULATION
-								commandCompletionDate = gongsimCommand.CommandDate
+								commandCompletionDate = command.CommandDate
 							} else {
 								nextState = SLEEP_100_MS
 							}
@@ -165,59 +165,59 @@ func (gongsimCommand *GongsimCommand) SetupGongsimThreads() *GongsimCommand {
 				switch nextState {
 				case RESET_SIMULATION:
 					// reset all agents
-					for _, agent := range gongsimCommand.Engine.Agents() {
+					for _, agent := range command.Engine.Agents() {
 						agent.Reset()
 					}
 
 					// call specific Reset function
-					if gongsimCommand.Engine.Simulation != nil {
-						gongsimCommand.Engine.Simulation.Reset(gongsimCommand.Engine)
+					if command.Engine.Simulation != nil {
+						command.Engine.Simulation.Reset(command.Engine)
 					}
 					// commit the engine state
-					gongsimCommand.stage.Commit()
+					command.stage.Commit()
 				case COMMIT_AGENT_STATES:
-					if gongsimCommand.Engine.Simulation != nil {
-						gongsimCommand.Engine.Simulation.CommitAgents(gongsimCommand.Engine)
-						gongsimCommand.Engine.lastCommitDate = gongsimCommand.Engine.nextCommitDate
-						simulationEventForLastEngineCommit = gongsimCommand.Engine.Fired
-						commitFromFrontNbAfterLastEngineCommitOrCheckout = gongsimCommand.Engine.GetLastCommitNbFromFront()
+					if command.Engine.Simulation != nil {
+						command.Engine.Simulation.CommitAgents(command.Engine)
+						command.Engine.lastCommitDate = command.Engine.nextCommitDate
+						simulationEventForLastEngineCommit = command.Engine.Fired
+						commitFromFrontNbAfterLastEngineCommitOrCheckout = command.Engine.GetLastCommitNbFromFront()
 					}
 				case CHECKOUT_AGENT_STATES:
-					if gongsimCommand.Engine.Simulation != nil {
-						gongsimCommand.Engine.Simulation.CheckoutAgents(gongsimCommand.Engine)
-						gongsimCommand.Engine.lastCheckoutDate = gongsimCommand.Engine.nextCheckoutDate
-						commitFromFrontNbAfterLastEngineCommitOrCheckout = gongsimCommand.Engine.GetLastCommitNbFromFront()
+					if command.Engine.Simulation != nil {
+						command.Engine.Simulation.CheckoutAgents(command.Engine)
+						command.Engine.lastCheckoutDate = command.Engine.nextCheckoutDate
+						commitFromFrontNbAfterLastEngineCommitOrCheckout = command.Engine.GetLastCommitNbFromFront()
 					}
 				case FIRE_ONE_EVENT:
-					if gongsimCommand.Engine.State != RUNNING {
-						gongsimCommand.Engine.State = RUNNING
-						gongsimCommand.stage.Commit()
+					if command.Engine.State != RUNNING {
+						command.Engine.State = RUNNING
+						command.stage.Commit()
 					}
 
 					if nextMode == RELATIVE_SPEED {
 
 						realtimeDurationBetweenHorizons := 500 * time.Millisecond
 
-						gongsimCommand.Engine.nextRealtimeHorizon = time.Now().Add(realtimeDurationBetweenHorizons)
-						gongsimCommand.Engine.nextSimulatedTimeHorizon =
-							gongsimCommand.Engine.currentTime.Add(time.Duration(int64(gongsimCommand.Engine.Speed * float64(realtimeDurationBetweenHorizons))))
+						command.Engine.nextRealtimeHorizon = time.Now().Add(realtimeDurationBetweenHorizons)
+						command.Engine.nextSimulatedTimeHorizon =
+							command.Engine.currentTime.Add(time.Duration(int64(command.Engine.Speed * float64(realtimeDurationBetweenHorizons))))
 
-						for nextSimTime.Before(gongsimCommand.Engine.nextSimulatedTimeHorizon) {
+						for nextSimTime.Before(command.Engine.nextSimulatedTimeHorizon) {
 							var agent AgentInterface
-							agent, nextSimTime, _ = gongsimCommand.Engine.FireNextEvent()
+							agent, nextSimTime, _ = command.Engine.FireNextEvent()
 
 							if agent == nil {
 								return
 							}
 						}
-						gongsimCommand.Engine.currentTime = gongsimCommand.Engine.nextSimulatedTimeHorizon
+						command.Engine.currentTime = command.Engine.nextSimulatedTimeHorizon
 
-						sleepTime := gongsimCommand.Engine.nextRealtimeHorizon.Sub(time.Now())
+						sleepTime := command.Engine.nextRealtimeHorizon.Sub(time.Now())
 						time.Sleep(sleepTime)
 
-						log.Println("gongsimcommand", gongsimCommand.Engine.currentTime)
+						log.Println("gongsimcommand", command.Engine.currentTime)
 
-						gongsimCommand.stage.Commit()
+						command.stage.Commit()
 
 						// log.Printf(lastSimTime.String() + " " + nextSimTime.String())
 						// if nextSimTime.Sub(gongsimCommand.Engine.GetCurrentTime()) > 0 {
@@ -251,7 +251,7 @@ func (gongsimCommand *GongsimCommand) SetupGongsimThreads() *GongsimCommand {
 						if engineStopMode == TEN_MINUTES {
 							for nextSimTime.Before(currentTimePlus10Minute) {
 								var agent AgentInterface
-								agent, nextSimTime, _ = gongsimCommand.Engine.FireNextEvent()
+								agent, nextSimTime, _ = command.Engine.FireNextEvent()
 
 								if agent == nil {
 									return
@@ -259,17 +259,17 @@ func (gongsimCommand *GongsimCommand) SetupGongsimThreads() *GongsimCommand {
 							}
 						} else if engineStopMode == STATE_CHANGED {
 							hasAnyStateHasChanged := false
-							for nextSimTime.Before(gongsimCommand.Engine.GetEndTime()) && !hasAnyStateHasChanged {
+							for nextSimTime.Before(command.Engine.GetEndTime()) && !hasAnyStateHasChanged {
 
 								var agent AgentInterface
-								agent, nextSimTime, _ = gongsimCommand.Engine.FireNextEvent()
+								agent, nextSimTime, _ = command.Engine.FireNextEvent()
 
 								if agent == nil {
 									return
 								}
 
-								if gongsimCommand.Engine.Simulation != nil {
-									hasAnyStateHasChanged = gongsimCommand.Engine.Simulation.HasAnyStateChanged(gongsimCommand.Engine)
+								if command.Engine.Simulation != nil {
+									hasAnyStateHasChanged = command.Engine.Simulation.HasAnyStateChanged(command.Engine)
 								}
 							}
 						} else {
@@ -277,13 +277,13 @@ func (gongsimCommand *GongsimCommand) SetupGongsimThreads() *GongsimCommand {
 						}
 
 						// time has progressed, therefore an update is necessary
-						gongsimCommand.stage.Commit()
+						command.stage.Commit()
 					}
 
 				case SLEEP_100_MS:
-					if gongsimCommand.Engine.State != PAUSED {
-						gongsimCommand.Engine.State = PAUSED
-						gongsimCommand.stage.Commit()
+					if command.Engine.State != PAUSED {
+						command.Engine.State = PAUSED
+						command.stage.Commit()
 					}
 					time.Sleep(time.Duration(100 * time.Millisecond))
 				default:
@@ -292,7 +292,7 @@ func (gongsimCommand *GongsimCommand) SetupGongsimThreads() *GongsimCommand {
 		}
 	}()
 
-	return gongsimCommand
+	return command
 }
 
 // Min returns the larger of x or y.

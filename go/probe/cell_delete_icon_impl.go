@@ -30,13 +30,13 @@ func (cellDeleteIconImpl *CellDeleteIconImpl[T]) CellIconUpdated(stage *gongtabl
 
 	switch instancesTyped := any(cellDeleteIconImpl.Instance).(type) {
 	// insertion point
+	case *models.Command:
+		instancesTyped.Unstage(cellDeleteIconImpl.probe.stageOfInterest)
 	case *models.DummyAgent:
 		instancesTyped.Unstage(cellDeleteIconImpl.probe.stageOfInterest)
 	case *models.Engine:
 		instancesTyped.Unstage(cellDeleteIconImpl.probe.stageOfInterest)
 	case *models.Event:
-		instancesTyped.Unstage(cellDeleteIconImpl.probe.stageOfInterest)
-	case *models.GongsimCommand:
 		instancesTyped.Unstage(cellDeleteIconImpl.probe.stageOfInterest)
 	case *models.GongsimStatus:
 		instancesTyped.Unstage(cellDeleteIconImpl.probe.stageOfInterest)

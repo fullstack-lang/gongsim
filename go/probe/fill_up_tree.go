@@ -62,6 +62,16 @@ func fillUpTree(
 
 		switch gongStruct.Name {
 		// insertion point
+		case "Command":
+			nodeGongstruct.Name = name
+			set := *models.GetGongstructInstancesSet[models.Command](probe.stageOfInterest)
+			for _command := range set {
+				nodeInstance := (&tree.Node{Name: _command.GetName()}).Stage(probe.treeStage)
+				nodeInstance.IsNodeClickable = true
+				nodeInstance.Impl = NewInstanceNodeCallback(_command, "Command", probe)
+
+				nodeGongstruct.Children = append(nodeGongstruct.Children, nodeInstance)
+			}
 		case "DummyAgent":
 			nodeGongstruct.Name = name
 			set := *models.GetGongstructInstancesSet[models.DummyAgent](probe.stageOfInterest)
@@ -89,16 +99,6 @@ func fillUpTree(
 				nodeInstance := (&tree.Node{Name: _event.GetName()}).Stage(probe.treeStage)
 				nodeInstance.IsNodeClickable = true
 				nodeInstance.Impl = NewInstanceNodeCallback(_event, "Event", probe)
-
-				nodeGongstruct.Children = append(nodeGongstruct.Children, nodeInstance)
-			}
-		case "GongsimCommand":
-			nodeGongstruct.Name = name
-			set := *models.GetGongstructInstancesSet[models.GongsimCommand](probe.stageOfInterest)
-			for _gongsimcommand := range set {
-				nodeInstance := (&tree.Node{Name: _gongsimcommand.GetName()}).Stage(probe.treeStage)
-				nodeInstance.IsNodeClickable = true
-				nodeInstance.Impl = NewInstanceNodeCallback(_gongsimcommand, "GongsimCommand", probe)
 
 				nodeGongstruct.Children = append(nodeGongstruct.Children, nodeInstance)
 			}

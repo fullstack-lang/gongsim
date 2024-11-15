@@ -20,6 +20,18 @@ func FillUpNamedFormFromGongstruct[T models.Gongstruct](instance *T, probe *Prob
 
 	switch instancesTyped := any(instance).(type) {
 	// insertion point
+	case *models.Command:
+		formGroup := (&gongtable.FormGroup{
+			Name:  formName,
+			Label: "Command Form",
+		}).Stage(formStage)
+		formGroup.OnSave = __gong__New__CommandFormCallback(
+			instancesTyped,
+			probe,
+			formGroup,
+		)
+		formGroup.HasSuppressButton = true
+		FillUpForm(instancesTyped, formGroup, probe)
 	case *models.DummyAgent:
 		formGroup := (&gongtable.FormGroup{
 			Name:  formName,
@@ -50,18 +62,6 @@ func FillUpNamedFormFromGongstruct[T models.Gongstruct](instance *T, probe *Prob
 			Label: "Event Form",
 		}).Stage(formStage)
 		formGroup.OnSave = __gong__New__EventFormCallback(
-			instancesTyped,
-			probe,
-			formGroup,
-		)
-		formGroup.HasSuppressButton = true
-		FillUpForm(instancesTyped, formGroup, probe)
-	case *models.GongsimCommand:
-		formGroup := (&gongtable.FormGroup{
-			Name:  formName,
-			Label: "GongsimCommand Form",
-		}).Stage(formStage)
-		formGroup.OnSave = __gong__New__GongsimCommandFormCallback(
 			instancesTyped,
 			probe,
 			formGroup,

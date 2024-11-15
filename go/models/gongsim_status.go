@@ -4,7 +4,7 @@ package models
 // swagger:model GongsimStatus
 type GongsimStatus struct {
 	Name                       string
-	CurrentCommand             GongsimCommandType
+	CurrentCommand             CommandType
 	CompletionDate             string
 	CurrentSpeedCommand        SpeedCommandType
 	SpeedCommandCompletionDate string
