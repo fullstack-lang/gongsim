@@ -25,9 +25,6 @@ func FillUpForm[T models.Gongstruct](
 		EnumTypeStringToForm("Command", instanceWithInferedType.Command, instanceWithInferedType, probe.formStage, formGroup)
 		BasicFieldtoForm("CommandDate", instanceWithInferedType.CommandDate, instanceWithInferedType, probe.formStage, formGroup,
 			false, false, 0, false, 0)
-		EnumTypeStringToForm("SpeedCommandType", instanceWithInferedType.SpeedCommandType, instanceWithInferedType, probe.formStage, formGroup)
-		BasicFieldtoForm("DateSpeedCommand", instanceWithInferedType.DateSpeedCommand, instanceWithInferedType, probe.formStage, formGroup,
-			false, false, 0, false, 0)
 		AssociationFieldToForm("Engine", instanceWithInferedType.Engine, formGroup, probe)
 
 	case *models.DummyAgent:

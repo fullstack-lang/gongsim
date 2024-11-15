@@ -697,10 +697,6 @@ func UnmarshallGongstructStaging(stage *StageStruct, cmap *ast.CommentMap, assig
 					// remove first and last char
 					fielValue := basicLit.Value[1 : len(basicLit.Value)-1]
 					__gong__map_Command[identifier].CommandDate = fielValue
-				case "DateSpeedCommand":
-					// remove first and last char
-					fielValue := basicLit.Value[1 : len(basicLit.Value)-1]
-					__gong__map_Command[identifier].DateSpeedCommand = fielValue
 				}
 			case "DummyAgent":
 				switch fieldName {
@@ -887,13 +883,6 @@ func UnmarshallGongstructStaging(stage *StageStruct, cmap *ast.CommentMap, assig
 							log.Fatalln(err)
 						}
 						__gong__map_Command[identifier].Command = CommandType(val)
-					case "SpeedCommandType":
-						var val SpeedCommandType
-						err := (&val).FromCodeString(enumValue)
-						if err != nil {
-							log.Fatalln(err)
-						}
-						__gong__map_Command[identifier].SpeedCommandType = SpeedCommandType(val)
 					}
 				case "DummyAgent":
 					switch fieldName {

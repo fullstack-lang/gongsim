@@ -172,11 +172,11 @@ export class EngineControlComponent implements OnInit {
   }
 
   increaseSpeed100percent(): void {
-    this.commandSingloton.SpeedCommandType = gongsim.SpeedCommandType.COMMAND_INCREASE_SPEED_100_PERCENTS
-    this.commandSingloton.DateSpeedCommand = Date.now().toString()
+    this.commandSingloton.Command = gongsim.SpeedCommandType.COMMAND_INCREASE_SPEED_100_PERCENTS
+    this.commandSingloton.CommandDate = Date.now().toString()
     this.commandService.updateFront(this.commandSingloton, this.GONG__StackPath).subscribe(
       command => {
-        console.log("INCCOMMAND_INCREASE_SPEED_100_PERCENTS sent to the backRepo")
+        console.log(gongsim.SpeedCommandType.COMMAND_INCREASE_SPEED_100_PERCENTS, "sent")
       }
     )
 
@@ -184,11 +184,11 @@ export class EngineControlComponent implements OnInit {
   }
 
   decreaseSpeed50percent(): void {
-    this.commandSingloton.SpeedCommandType = gongsim.SpeedCommandType.COMMAND_DECREASE_SPEED_50_PERCENTS
-    this.commandSingloton.DateSpeedCommand = Date.now().toString()
+    this.commandSingloton.Command = gongsim.SpeedCommandType.COMMAND_DECREASE_SPEED_50_PERCENTS
+    this.commandSingloton.CommandDate = Date.now().toString()
     this.commandService.updateFront(this.commandSingloton, this.GONG__StackPath).subscribe(
       command => {
-        console.log("DECCOMMAND_DECREASE_SPEED_50_PERCENTS sent to the backRepo")
+        console.log(gongsim.SpeedCommandType.COMMAND_DECREASE_SPEED_50_PERCENTS, "sent")
       }
     )
     this.UpdateDisplay = true

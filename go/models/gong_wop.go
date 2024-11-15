@@ -12,8 +12,6 @@ type Command_WOP struct {
 	Name string
 	Command CommandType
 	CommandDate string
-	SpeedCommandType SpeedCommandType
-	DateSpeedCommand string
 }
 
 func (from *Command) CopyBasicFields(to *Command) {
@@ -21,8 +19,6 @@ func (from *Command) CopyBasicFields(to *Command) {
 	to.Name = from.Name
 	to.Command = from.Command
 	to.CommandDate = from.CommandDate
-	to.SpeedCommandType = from.SpeedCommandType
-	to.DateSpeedCommand = from.DateSpeedCommand
 }
 
 type DummyAgent_WOP struct {

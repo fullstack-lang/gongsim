@@ -1059,7 +1059,7 @@ func GetFields[Type Gongstruct]() (res []string) {
 	switch any(ret).(type) {
 	// insertion point for generic get gongstruct name
 	case Command:
-		res = []string{"Name", "Command", "CommandDate", "SpeedCommandType", "DateSpeedCommand", "Engine"}
+		res = []string{"Name", "Command", "CommandDate", "Engine"}
 	case DummyAgent:
 		res = []string{"TechName", "Name"}
 	case Engine:
@@ -1118,7 +1118,7 @@ func GetFieldsFromPointer[Type PointerToGongstruct]() (res []string) {
 	switch any(ret).(type) {
 	// insertion point for generic get gongstruct name
 	case *Command:
-		res = []string{"Name", "Command", "CommandDate", "SpeedCommandType", "DateSpeedCommand", "Engine"}
+		res = []string{"Name", "Command", "CommandDate", "Engine"}
 	case *DummyAgent:
 		res = []string{"TechName", "Name"}
 	case *Engine:
@@ -1147,11 +1147,6 @@ func GetFieldStringValueFromPointer[Type PointerToGongstruct](instance Type, fie
 			res = enum.ToCodeString()
 		case "CommandDate":
 			res = inferedInstance.CommandDate
-		case "SpeedCommandType":
-			enum := inferedInstance.SpeedCommandType
-			res = enum.ToCodeString()
-		case "DateSpeedCommand":
-			res = inferedInstance.DateSpeedCommand
 		case "Engine":
 			if inferedInstance.Engine != nil {
 				res = inferedInstance.Engine.Name
@@ -1360,11 +1355,6 @@ func GetFieldStringValue[Type Gongstruct](instance Type, fieldName string) (res 
 			res = enum.ToCodeString()
 		case "CommandDate":
 			res = inferedInstance.CommandDate
-		case "SpeedCommandType":
-			enum := inferedInstance.SpeedCommandType
-			res = enum.ToCodeString()
-		case "DateSpeedCommand":
-			res = inferedInstance.DateSpeedCommand
 		case "Engine":
 			if inferedInstance.Engine != nil {
 				res = inferedInstance.Engine.Name

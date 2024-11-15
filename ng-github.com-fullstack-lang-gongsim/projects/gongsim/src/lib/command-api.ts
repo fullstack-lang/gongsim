@@ -16,8 +16,6 @@ export class CommandAPI {
 	Name: string = ""
 	Command: string = ""
 	CommandDate: string = ""
-	SpeedCommandType: string = ""
-	DateSpeedCommand: string = ""
 
 	// insertion point for other decls
 

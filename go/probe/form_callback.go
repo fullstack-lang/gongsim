@@ -67,10 +67,6 @@ func (commandFormCallback *CommandFormCallback) OnSave() {
 			FormDivEnumStringFieldToField(&(command_.Command), formDiv)
 		case "CommandDate":
 			FormDivBasicFieldToField(&(command_.CommandDate), formDiv)
-		case "SpeedCommandType":
-			FormDivEnumStringFieldToField(&(command_.SpeedCommandType), formDiv)
-		case "DateSpeedCommand":
-			FormDivBasicFieldToField(&(command_.DateSpeedCommand), formDiv)
 		case "Engine":
 			FormDivSelectFieldToField(&(command_.Engine), commandFormCallback.probe.stageOfInterest, formDiv)
 		}

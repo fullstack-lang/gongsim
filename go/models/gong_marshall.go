@@ -140,20 +140,6 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", string(command.CommandDate))
 		initializerStatements += setValueField
 
-		if command.SpeedCommandType != "" {
-			setValueField = StringEnumInitStatement
-			setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
-			setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "SpeedCommandType")
-			setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", "models."+command.SpeedCommandType.ToCodeString())
-			initializerStatements += setValueField
-		}
-
-		setValueField = StringInitStatement
-		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
-		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "DateSpeedCommand")
-		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", string(command.DateSpeedCommand))
-		initializerStatements += setValueField
-
 	}
 
 	map_DummyAgent_Identifiers := make(map[*DummyAgent]string)

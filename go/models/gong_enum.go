@@ -22,6 +22,10 @@ func (commandtype CommandType) ToString() (res string) {
 		res = "RESET"
 	case COMMAND_ADVANCE_10_MIN:
 		res = "ADVANCE_10_MIN"
+	case INCREASE_SPEED_100_PERCENTS:
+		res = "INCREASE_SPEED_100_PERCENTS"
+	case DECREASE_SPEED_50_PERCENTS:
+		res = "DECREASE_SPEED_50_PERCENTS"
 	}
 	return
 }
@@ -48,6 +52,12 @@ func (commandtype *CommandType) FromString(input string) (err error) {
 	case "ADVANCE_10_MIN":
 		*commandtype = COMMAND_ADVANCE_10_MIN
 		return
+	case "INCREASE_SPEED_100_PERCENTS":
+		*commandtype = INCREASE_SPEED_100_PERCENTS
+		return
+	case "DECREASE_SPEED_50_PERCENTS":
+		*commandtype = DECREASE_SPEED_50_PERCENTS
+		return
 	default:
 		return errUnkownEnum
 	}
@@ -69,6 +79,10 @@ func (commandtype *CommandType) FromCodeString(input string) (err error) {
 		*commandtype = COMMAND_RESET
 	case "COMMAND_ADVANCE_10_MIN":
 		*commandtype = COMMAND_ADVANCE_10_MIN
+	case "INCREASE_SPEED_100_PERCENTS":
+		*commandtype = INCREASE_SPEED_100_PERCENTS
+	case "DECREASE_SPEED_50_PERCENTS":
+		*commandtype = DECREASE_SPEED_50_PERCENTS
 	default:
 		return errUnkownEnum
 	}
@@ -91,6 +105,10 @@ func (commandtype *CommandType) ToCodeString() (res string) {
 		res = "COMMAND_RESET"
 	case COMMAND_ADVANCE_10_MIN:
 		res = "COMMAND_ADVANCE_10_MIN"
+	case INCREASE_SPEED_100_PERCENTS:
+		res = "INCREASE_SPEED_100_PERCENTS"
+	case DECREASE_SPEED_50_PERCENTS:
+		res = "DECREASE_SPEED_50_PERCENTS"
 	}
 	return
 }
@@ -106,6 +124,8 @@ func (commandtype CommandType) Codes() (res []string) {
 	res = append(res, "COMMAND_FIRE_EVENT_TILL_STATES_CHANGE")
 	res = append(res, "COMMAND_RESET")
 	res = append(res, "COMMAND_ADVANCE_10_MIN")
+	res = append(res, "INCREASE_SPEED_100_PERCENTS")
+	res = append(res, "DECREASE_SPEED_50_PERCENTS")
 
 	return
 }
@@ -121,6 +141,8 @@ func (commandtype CommandType) CodeValues() (res []string) {
 	res = append(res, "FIRE_EVENT_TILL_STATES_CHANGE")
 	res = append(res, "RESET")
 	res = append(res, "ADVANCE_10_MIN")
+	res = append(res, "INCREASE_SPEED_100_PERCENTS")
+	res = append(res, "DECREASE_SPEED_50_PERCENTS")
 
 	return
 }

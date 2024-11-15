@@ -13,14 +13,10 @@ func (command *Command) OnAfterUpdate(stage *StageStruct, stagedCommand, frontCo
 	// force the command on the stage
 	stagedCommand.Command = frontCommand.Command
 
-	switch command.SpeedCommandType {
-	case COMMAND_DECREASE_SPEED_50_PERCENTS:
+	switch command.Command {
+	case DECREASE_SPEED_50_PERCENTS:
 		command.Engine.Speed *= 0.5
-	case COMMAND_INCREASE_SPEED_100_PERCENTS:
+	case INCREASE_SPEED_100_PERCENTS:
 		command.Engine.Speed *= 2.0
 	}
-
-	command.status.CurrentSpeedCommand = command.SpeedCommandType
-	command.status.SpeedCommandCompletionDate = command.DateSpeedCommand
-
 }

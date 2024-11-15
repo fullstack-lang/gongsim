@@ -8,12 +8,10 @@ import (
 // Command is the struct of the instance that is updated by the front for issuing commands
 // swagger:model Command
 type Command struct {
-	Name             string
-	Command          CommandType
-	CommandDate      string
-	SpeedCommandType SpeedCommandType
-	DateSpeedCommand string
-	Engine           *Engine
+	Name        string
+	Command     CommandType
+	CommandDate string
+	Engine      *Engine
 
 	stage  *StageStruct
 	status *Status

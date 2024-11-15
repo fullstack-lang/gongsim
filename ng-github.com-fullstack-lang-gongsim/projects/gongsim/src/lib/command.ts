@@ -21,8 +21,6 @@ export class Command {
 	Name: string = ""
 	Command: string = ""
 	CommandDate: string = ""
-	SpeedCommandType: string = ""
-	DateSpeedCommand: string = ""
 
 	// insertion point for pointers and slices of pointers declarations
 	Engine?: Engine
@@ -39,8 +37,6 @@ export function CopyCommandToCommandAPI(command: Command, commandAPI: CommandAPI
 	commandAPI.Name = command.Name
 	commandAPI.Command = command.Command
 	commandAPI.CommandDate = command.CommandDate
-	commandAPI.SpeedCommandType = command.SpeedCommandType
-	commandAPI.DateSpeedCommand = command.DateSpeedCommand
 
 	// insertion point for pointer fields encoding
 	commandAPI.CommandPointersEncoding.EngineID.Valid = true
@@ -68,8 +64,6 @@ export function CopyCommandAPIToCommand(commandAPI: CommandAPI, command: Command
 	command.Name = commandAPI.Name
 	command.Command = commandAPI.Command
 	command.CommandDate = commandAPI.CommandDate
-	command.SpeedCommandType = commandAPI.SpeedCommandType
-	command.DateSpeedCommand = commandAPI.DateSpeedCommand
 
 	// insertion point for pointer fields encoding
 	command.Engine = frontRepo.map_ID_Engine.get(commandAPI.CommandPointersEncoding.EngineID.Int64)

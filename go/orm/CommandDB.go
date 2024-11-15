@@ -73,12 +73,6 @@ type CommandDB struct {
 	// Declation for basic field commandDB.CommandDate
 	CommandDate_Data sql.NullString
 
-	// Declation for basic field commandDB.SpeedCommandType
-	SpeedCommandType_Data sql.NullString
-
-	// Declation for basic field commandDB.DateSpeedCommand
-	DateSpeedCommand_Data sql.NullString
-
 	// encoding of pointers
 	// for GORM serialization, it is necessary to embed to Pointer Encoding declaration
 	CommandPointersEncoding
@@ -106,10 +100,6 @@ type CommandWOP struct {
 	Command models.CommandType `xlsx:"2"`
 
 	CommandDate string `xlsx:"3"`
-
-	SpeedCommandType models.SpeedCommandType `xlsx:"4"`
-
-	DateSpeedCommand string `xlsx:"5"`
 	// insertion for WOP pointer fields
 }
 
@@ -119,8 +109,6 @@ var Command_Fields = []string{
 	"Name",
 	"Command",
 	"CommandDate",
-	"SpeedCommandType",
-	"DateSpeedCommand",
 }
 
 type BackRepoCommandStruct struct {
@@ -427,12 +415,6 @@ func (commandDB *CommandDB) CopyBasicFieldsFromCommand(command *models.Command) 
 
 	commandDB.CommandDate_Data.String = command.CommandDate
 	commandDB.CommandDate_Data.Valid = true
-
-	commandDB.SpeedCommandType_Data.String = command.SpeedCommandType.ToString()
-	commandDB.SpeedCommandType_Data.Valid = true
-
-	commandDB.DateSpeedCommand_Data.String = command.DateSpeedCommand
-	commandDB.DateSpeedCommand_Data.Valid = true
 }
 
 // CopyBasicFieldsFromCommand_WOP
@@ -447,12 +429,6 @@ func (commandDB *CommandDB) CopyBasicFieldsFromCommand_WOP(command *models.Comma
 
 	commandDB.CommandDate_Data.String = command.CommandDate
 	commandDB.CommandDate_Data.Valid = true
-
-	commandDB.SpeedCommandType_Data.String = command.SpeedCommandType.ToString()
-	commandDB.SpeedCommandType_Data.Valid = true
-
-	commandDB.DateSpeedCommand_Data.String = command.DateSpeedCommand
-	commandDB.DateSpeedCommand_Data.Valid = true
 }
 
 // CopyBasicFieldsFromCommandWOP
@@ -467,12 +443,6 @@ func (commandDB *CommandDB) CopyBasicFieldsFromCommandWOP(command *CommandWOP) {
 
 	commandDB.CommandDate_Data.String = command.CommandDate
 	commandDB.CommandDate_Data.Valid = true
-
-	commandDB.SpeedCommandType_Data.String = command.SpeedCommandType.ToString()
-	commandDB.SpeedCommandType_Data.Valid = true
-
-	commandDB.DateSpeedCommand_Data.String = command.DateSpeedCommand
-	commandDB.DateSpeedCommand_Data.Valid = true
 }
 
 // CopyBasicFieldsToCommand
@@ -481,8 +451,6 @@ func (commandDB *CommandDB) CopyBasicFieldsToCommand(command *models.Command) {
 	command.Name = commandDB.Name_Data.String
 	command.Command.FromString(commandDB.Command_Data.String)
 	command.CommandDate = commandDB.CommandDate_Data.String
-	command.SpeedCommandType.FromString(commandDB.SpeedCommandType_Data.String)
-	command.DateSpeedCommand = commandDB.DateSpeedCommand_Data.String
 }
 
 // CopyBasicFieldsToCommand_WOP
@@ -491,8 +459,6 @@ func (commandDB *CommandDB) CopyBasicFieldsToCommand_WOP(command *models.Command
 	command.Name = commandDB.Name_Data.String
 	command.Command.FromString(commandDB.Command_Data.String)
 	command.CommandDate = commandDB.CommandDate_Data.String
-	command.SpeedCommandType.FromString(commandDB.SpeedCommandType_Data.String)
-	command.DateSpeedCommand = commandDB.DateSpeedCommand_Data.String
 }
 
 // CopyBasicFieldsToCommandWOP
@@ -502,8 +468,6 @@ func (commandDB *CommandDB) CopyBasicFieldsToCommandWOP(command *CommandWOP) {
 	command.Name = commandDB.Name_Data.String
 	command.Command.FromString(commandDB.Command_Data.String)
 	command.CommandDate = commandDB.CommandDate_Data.String
-	command.SpeedCommandType.FromString(commandDB.SpeedCommandType_Data.String)
-	command.DateSpeedCommand = commandDB.DateSpeedCommand_Data.String
 }
 
 // Backup generates a json file from a slice of all CommandDB instances in the backrepo

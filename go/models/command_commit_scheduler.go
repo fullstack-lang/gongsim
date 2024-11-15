@@ -15,7 +15,7 @@ func (command *Command) commitScheduler() {
 	// The period shall not too short for performance sake but not too long because the end user needs a responsive application
 	//
 	// commitSchedulerPeriod is the period of the "commit scheduler"
-	var CommitSchedulerPeriod = time.NewTicker(500 * time.Millisecond)
+	var CommitSchedulerPeriod = time.NewTicker(100 * time.Millisecond)
 	simulationEventForLastEngineCommit = command.Engine.Fired
 	for {
 		select {
