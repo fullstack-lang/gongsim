@@ -75,7 +75,7 @@ func (from *Event) CopyBasicFields(to *Event) {
 	to.Duration = from.Duration
 }
 
-type GongsimStatus_WOP struct {
+type Status_WOP struct {
 	// insertion point
 	Name string
 	CurrentCommand CommandType
@@ -84,7 +84,7 @@ type GongsimStatus_WOP struct {
 	SpeedCommandCompletionDate string
 }
 
-func (from *GongsimStatus) CopyBasicFields(to *GongsimStatus) {
+func (from *Status) CopyBasicFields(to *Status) {
 	// insertion point
 	to.Name = from.Name
 	to.CurrentCommand = from.CurrentCommand

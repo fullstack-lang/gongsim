@@ -63,7 +63,7 @@ func FillUpForm[T models.Gongstruct](
 		BasicFieldtoForm("Duration", instanceWithInferedType.Duration, instanceWithInferedType, probe.formStage, formGroup,
 			false, false, 0, false, 0)
 
-	case *models.GongsimStatus:
+	case *models.Status:
 		// insertion point
 		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, probe.formStage, formGroup,
 			false, false, 0, false, 0)

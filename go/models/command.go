@@ -15,8 +15,8 @@ type Command struct {
 	DateSpeedCommand string
 	Engine           *Engine
 
-	stage         *StageStruct
-	gongsimStatus *GongsimStatus
+	stage  *StageStruct
+	status *Status
 }
 
 func NewGongSimCommand(stage *StageStruct, engine *Engine) (command *Command) {
@@ -28,7 +28,7 @@ func NewGongSimCommand(stage *StageStruct, engine *Engine) (command *Command) {
 		stage:       stage,
 	})
 
-	command.gongsimStatus = (&GongsimStatus{
+	command.status = (&Status{
 		Name:                       "Gongsim Status Singloton",
 		CurrentCommand:             COMMAND_PAUSE,
 		CurrentSpeedCommand:        COMMAND_SPEED_STEADY,
@@ -74,19 +74,6 @@ func (command *Command) SetupGongsimThreads() *Command {
 
 			//
 			// compute engine driver next state
-			//
-			// next state is either
-			/*
-
-				RESET_SIMULATION
-				COMMIT_AGENT_STATES
-				CHECKOUT_AGENT_STATES
-				FIRE_ONE_EVENT
-				SLEEP_100_MS
-
-
-			*/
-			//
 			//
 			select {
 			case <-Quit:

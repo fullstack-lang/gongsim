@@ -28,8 +28,8 @@ func fillUpTablePointerToGongstruct[T models.PointerToGongstruct](
 		fillUpTable[models.Engine](probe)
 	case *models.Event:
 		fillUpTable[models.Event](probe)
-	case *models.GongsimStatus:
-		fillUpTable[models.GongsimStatus](probe)
+	case *models.Status:
+		fillUpTable[models.Status](probe)
 	case *models.UpdateState:
 		fillUpTable[models.UpdateState](probe)
 	default:

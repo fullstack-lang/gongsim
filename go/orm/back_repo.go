@@ -32,7 +32,7 @@ type BackRepoStruct struct {
 
 	BackRepoEvent BackRepoEventStruct
 
-	BackRepoGongsimStatus BackRepoGongsimStatusStruct
+	BackRepoStatus BackRepoStatusStruct
 
 	BackRepoUpdateState BackRepoUpdateStateStruct
 
@@ -61,7 +61,7 @@ func NewBackRepo(stage *models.StageStruct, filename string) (backRepo *BackRepo
 		&DummyAgentDB{},
 		&EngineDB{},
 		&EventDB{},
-		&GongsimStatusDB{},
+		&StatusDB{},
 		&UpdateStateDB{},
 	)
 	THIS IS REMOVED BY GONG COMPILER IF TARGET IS gorm */
@@ -101,10 +101,10 @@ func NewBackRepo(stage *models.StageStruct, filename string) (backRepo *BackRepo
 		db:    db,
 		stage: stage,
 	}
-	backRepo.BackRepoGongsimStatus = BackRepoGongsimStatusStruct{
-		Map_GongsimStatusDBID_GongsimStatusPtr: make(map[uint]*models.GongsimStatus, 0),
-		Map_GongsimStatusDBID_GongsimStatusDB:  make(map[uint]*GongsimStatusDB, 0),
-		Map_GongsimStatusPtr_GongsimStatusDBID: make(map[*models.GongsimStatus]uint, 0),
+	backRepo.BackRepoStatus = BackRepoStatusStruct{
+		Map_StatusDBID_StatusPtr: make(map[uint]*models.Status, 0),
+		Map_StatusDBID_StatusDB:  make(map[uint]*StatusDB, 0),
+		Map_StatusPtr_StatusDBID: make(map[*models.Status]uint, 0),
 
 		db:    db,
 		stage: stage,
@@ -174,7 +174,7 @@ func (backRepo *BackRepoStruct) Commit(stage *models.StageStruct) {
 	backRepo.BackRepoDummyAgent.CommitPhaseOne(stage)
 	backRepo.BackRepoEngine.CommitPhaseOne(stage)
 	backRepo.BackRepoEvent.CommitPhaseOne(stage)
-	backRepo.BackRepoGongsimStatus.CommitPhaseOne(stage)
+	backRepo.BackRepoStatus.CommitPhaseOne(stage)
 	backRepo.BackRepoUpdateState.CommitPhaseOne(stage)
 
 	// insertion point for per struct back repo phase two commit
@@ -182,7 +182,7 @@ func (backRepo *BackRepoStruct) Commit(stage *models.StageStruct) {
 	backRepo.BackRepoDummyAgent.CommitPhaseTwo(backRepo)
 	backRepo.BackRepoEngine.CommitPhaseTwo(backRepo)
 	backRepo.BackRepoEvent.CommitPhaseTwo(backRepo)
-	backRepo.BackRepoGongsimStatus.CommitPhaseTwo(backRepo)
+	backRepo.BackRepoStatus.CommitPhaseTwo(backRepo)
 	backRepo.BackRepoUpdateState.CommitPhaseTwo(backRepo)
 
 	backRepo.IncrementCommitFromBackNb()
@@ -195,7 +195,7 @@ func (backRepo *BackRepoStruct) Checkout(stage *models.StageStruct) {
 	backRepo.BackRepoDummyAgent.CheckoutPhaseOne()
 	backRepo.BackRepoEngine.CheckoutPhaseOne()
 	backRepo.BackRepoEvent.CheckoutPhaseOne()
-	backRepo.BackRepoGongsimStatus.CheckoutPhaseOne()
+	backRepo.BackRepoStatus.CheckoutPhaseOne()
 	backRepo.BackRepoUpdateState.CheckoutPhaseOne()
 
 	// insertion point for per struct back repo phase two commit
@@ -203,7 +203,7 @@ func (backRepo *BackRepoStruct) Checkout(stage *models.StageStruct) {
 	backRepo.BackRepoDummyAgent.CheckoutPhaseTwo(backRepo)
 	backRepo.BackRepoEngine.CheckoutPhaseTwo(backRepo)
 	backRepo.BackRepoEvent.CheckoutPhaseTwo(backRepo)
-	backRepo.BackRepoGongsimStatus.CheckoutPhaseTwo(backRepo)
+	backRepo.BackRepoStatus.CheckoutPhaseTwo(backRepo)
 	backRepo.BackRepoUpdateState.CheckoutPhaseTwo(backRepo)
 }
 
@@ -216,7 +216,7 @@ func (backRepo *BackRepoStruct) Backup(stage *models.StageStruct, dirPath string
 	backRepo.BackRepoDummyAgent.Backup(dirPath)
 	backRepo.BackRepoEngine.Backup(dirPath)
 	backRepo.BackRepoEvent.Backup(dirPath)
-	backRepo.BackRepoGongsimStatus.Backup(dirPath)
+	backRepo.BackRepoStatus.Backup(dirPath)
 	backRepo.BackRepoUpdateState.Backup(dirPath)
 }
 
@@ -232,7 +232,7 @@ func (backRepo *BackRepoStruct) BackupXL(stage *models.StageStruct, dirPath stri
 	backRepo.BackRepoDummyAgent.BackupXL(file)
 	backRepo.BackRepoEngine.BackupXL(file)
 	backRepo.BackRepoEvent.BackupXL(file)
-	backRepo.BackRepoGongsimStatus.BackupXL(file)
+	backRepo.BackRepoStatus.BackupXL(file)
 	backRepo.BackRepoUpdateState.BackupXL(file)
 
 	var b bytes.Buffer
@@ -262,7 +262,7 @@ func (backRepo *BackRepoStruct) Restore(stage *models.StageStruct, dirPath strin
 	backRepo.BackRepoDummyAgent.RestorePhaseOne(dirPath)
 	backRepo.BackRepoEngine.RestorePhaseOne(dirPath)
 	backRepo.BackRepoEvent.RestorePhaseOne(dirPath)
-	backRepo.BackRepoGongsimStatus.RestorePhaseOne(dirPath)
+	backRepo.BackRepoStatus.RestorePhaseOne(dirPath)
 	backRepo.BackRepoUpdateState.RestorePhaseOne(dirPath)
 
 	//
@@ -274,7 +274,7 @@ func (backRepo *BackRepoStruct) Restore(stage *models.StageStruct, dirPath strin
 	backRepo.BackRepoDummyAgent.RestorePhaseTwo()
 	backRepo.BackRepoEngine.RestorePhaseTwo()
 	backRepo.BackRepoEvent.RestorePhaseTwo()
-	backRepo.BackRepoGongsimStatus.RestorePhaseTwo()
+	backRepo.BackRepoStatus.RestorePhaseTwo()
 	backRepo.BackRepoUpdateState.RestorePhaseTwo()
 
 	backRepo.stage.Checkout()
@@ -307,7 +307,7 @@ func (backRepo *BackRepoStruct) RestoreXL(stage *models.StageStruct, dirPath str
 	backRepo.BackRepoDummyAgent.RestoreXLPhaseOne(file)
 	backRepo.BackRepoEngine.RestoreXLPhaseOne(file)
 	backRepo.BackRepoEvent.RestoreXLPhaseOne(file)
-	backRepo.BackRepoGongsimStatus.RestoreXLPhaseOne(file)
+	backRepo.BackRepoStatus.RestoreXLPhaseOne(file)
 	backRepo.BackRepoUpdateState.RestoreXLPhaseOne(file)
 
 	// commit the restored stage

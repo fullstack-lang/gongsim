@@ -31,9 +31,9 @@ func GetInstanceDBFromInstance[T models.Gongstruct, T2 GongstructDB](
 		eventInstance := any(concreteInstance).(*models.Event)
 		ret2 := backRepo.BackRepoEvent.GetEventDBFromEventPtr(eventInstance)
 		ret = any(ret2).(*T2)
-	case *models.GongsimStatus:
-		gongsimstatusInstance := any(concreteInstance).(*models.GongsimStatus)
-		ret2 := backRepo.BackRepoGongsimStatus.GetGongsimStatusDBFromGongsimStatusPtr(gongsimstatusInstance)
+	case *models.Status:
+		statusInstance := any(concreteInstance).(*models.Status)
+		ret2 := backRepo.BackRepoStatus.GetStatusDBFromStatusPtr(statusInstance)
 		ret = any(ret2).(*T2)
 	case *models.UpdateState:
 		updatestateInstance := any(concreteInstance).(*models.UpdateState)
@@ -72,8 +72,8 @@ func GetID[T models.Gongstruct](
 			stage, backRepo, inst,
 		)
 		id = int(tmp.ID)
-	case *models.GongsimStatus:
-		tmp := GetInstanceDBFromInstance[models.GongsimStatus, GongsimStatusDB](
+	case *models.Status:
+		tmp := GetInstanceDBFromInstance[models.Status, StatusDB](
 			stage, backRepo, inst,
 		)
 		id = int(tmp.ID)
@@ -115,8 +115,8 @@ func GetIDPointer[T models.PointerToGongstruct](
 			stage, backRepo, inst,
 		)
 		id = int(tmp.ID)
-	case *models.GongsimStatus:
-		tmp := GetInstanceDBFromInstance[models.GongsimStatus, GongsimStatusDB](
+	case *models.Status:
+		tmp := GetInstanceDBFromInstance[models.Status, StatusDB](
 			stage, backRepo, inst,
 		)
 		id = int(tmp.ID)

@@ -64,8 +64,8 @@ func (nodeImplGongstruct *TreeNodeImplGongstruct) OnAfterUpdate(
 	if nodeImplGongstruct.gongStruct.GetName() == "Event" {
 		fillUpTable[models.Event](nodeImplGongstruct.probe)
 	}
-	if nodeImplGongstruct.gongStruct.GetName() == "GongsimStatus" {
-		fillUpTable[models.GongsimStatus](nodeImplGongstruct.probe)
+	if nodeImplGongstruct.gongStruct.GetName() == "Status" {
+		fillUpTable[models.Status](nodeImplGongstruct.probe)
 	}
 	if nodeImplGongstruct.gongStruct.GetName() == "UpdateState" {
 		fillUpTable[models.UpdateState](nodeImplGongstruct.probe)

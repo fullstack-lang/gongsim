@@ -22,9 +22,9 @@ func AfterCreateFromFront[Type Gongstruct](stage *StageStruct, instance *Type) {
 		if stage.OnAfterEventCreateCallback != nil {
 			stage.OnAfterEventCreateCallback.OnAfterCreate(stage, target)
 		}
-	case *GongsimStatus:
-		if stage.OnAfterGongsimStatusCreateCallback != nil {
-			stage.OnAfterGongsimStatusCreateCallback.OnAfterCreate(stage, target)
+	case *Status:
+		if stage.OnAfterStatusCreateCallback != nil {
+			stage.OnAfterStatusCreateCallback.OnAfterCreate(stage, target)
 		}
 	case *UpdateState:
 		if stage.OnAfterUpdateStateCreateCallback != nil {
@@ -60,10 +60,10 @@ func AfterUpdateFromFront[Type Gongstruct](stage *StageStruct, old, new *Type) {
 		if stage.OnAfterEventUpdateCallback != nil {
 			stage.OnAfterEventUpdateCallback.OnAfterUpdate(stage, oldTarget, newTarget)
 		}
-	case *GongsimStatus:
-		newTarget := any(new).(*GongsimStatus)
-		if stage.OnAfterGongsimStatusUpdateCallback != nil {
-			stage.OnAfterGongsimStatusUpdateCallback.OnAfterUpdate(stage, oldTarget, newTarget)
+	case *Status:
+		newTarget := any(new).(*Status)
+		if stage.OnAfterStatusUpdateCallback != nil {
+			stage.OnAfterStatusUpdateCallback.OnAfterUpdate(stage, oldTarget, newTarget)
 		}
 	case *UpdateState:
 		newTarget := any(new).(*UpdateState)
@@ -100,10 +100,10 @@ func AfterDeleteFromFront[Type Gongstruct](stage *StageStruct, staged, front *Ty
 			staged := any(staged).(*Event)
 			stage.OnAfterEventDeleteCallback.OnAfterDelete(stage, staged, front)
 		}
-	case *GongsimStatus:
-		if stage.OnAfterGongsimStatusDeleteCallback != nil {
-			staged := any(staged).(*GongsimStatus)
-			stage.OnAfterGongsimStatusDeleteCallback.OnAfterDelete(stage, staged, front)
+	case *Status:
+		if stage.OnAfterStatusDeleteCallback != nil {
+			staged := any(staged).(*Status)
+			stage.OnAfterStatusDeleteCallback.OnAfterDelete(stage, staged, front)
 		}
 	case *UpdateState:
 		if stage.OnAfterUpdateStateDeleteCallback != nil {
@@ -136,9 +136,9 @@ func AfterReadFromFront[Type Gongstruct](stage *StageStruct, instance *Type) {
 		if stage.OnAfterEventReadCallback != nil {
 			stage.OnAfterEventReadCallback.OnAfterRead(stage, target)
 		}
-	case *GongsimStatus:
-		if stage.OnAfterGongsimStatusReadCallback != nil {
-			stage.OnAfterGongsimStatusReadCallback.OnAfterRead(stage, target)
+	case *Status:
+		if stage.OnAfterStatusReadCallback != nil {
+			stage.OnAfterStatusReadCallback.OnAfterRead(stage, target)
 		}
 	case *UpdateState:
 		if stage.OnAfterUpdateStateReadCallback != nil {
@@ -167,8 +167,8 @@ func SetCallbackAfterUpdateFromFront[Type Gongstruct](stage *StageStruct, callba
 	case *Event:
 		stage.OnAfterEventUpdateCallback = any(callback).(OnAfterUpdateInterface[Event])
 	
-	case *GongsimStatus:
-		stage.OnAfterGongsimStatusUpdateCallback = any(callback).(OnAfterUpdateInterface[GongsimStatus])
+	case *Status:
+		stage.OnAfterStatusUpdateCallback = any(callback).(OnAfterUpdateInterface[Status])
 	
 	case *UpdateState:
 		stage.OnAfterUpdateStateUpdateCallback = any(callback).(OnAfterUpdateInterface[UpdateState])
@@ -192,8 +192,8 @@ func SetCallbackAfterCreateFromFront[Type Gongstruct](stage *StageStruct, callba
 	case *Event:
 		stage.OnAfterEventCreateCallback = any(callback).(OnAfterCreateInterface[Event])
 	
-	case *GongsimStatus:
-		stage.OnAfterGongsimStatusCreateCallback = any(callback).(OnAfterCreateInterface[GongsimStatus])
+	case *Status:
+		stage.OnAfterStatusCreateCallback = any(callback).(OnAfterCreateInterface[Status])
 	
 	case *UpdateState:
 		stage.OnAfterUpdateStateCreateCallback = any(callback).(OnAfterCreateInterface[UpdateState])
@@ -217,8 +217,8 @@ func SetCallbackAfterDeleteFromFront[Type Gongstruct](stage *StageStruct, callba
 	case *Event:
 		stage.OnAfterEventDeleteCallback = any(callback).(OnAfterDeleteInterface[Event])
 	
-	case *GongsimStatus:
-		stage.OnAfterGongsimStatusDeleteCallback = any(callback).(OnAfterDeleteInterface[GongsimStatus])
+	case *Status:
+		stage.OnAfterStatusDeleteCallback = any(callback).(OnAfterDeleteInterface[Status])
 	
 	case *UpdateState:
 		stage.OnAfterUpdateStateDeleteCallback = any(callback).(OnAfterDeleteInterface[UpdateState])
@@ -242,8 +242,8 @@ func SetCallbackAfterReadFromFront[Type Gongstruct](stage *StageStruct, callback
 	case *Event:
 		stage.OnAfterEventReadCallback = any(callback).(OnAfterReadInterface[Event])
 	
-	case *GongsimStatus:
-		stage.OnAfterGongsimStatusReadCallback = any(callback).(OnAfterReadInterface[GongsimStatus])
+	case *Status:
+		stage.OnAfterStatusReadCallback = any(callback).(OnAfterReadInterface[Status])
 	
 	case *UpdateState:
 		stage.OnAfterUpdateStateReadCallback = any(callback).(OnAfterReadInterface[UpdateState])

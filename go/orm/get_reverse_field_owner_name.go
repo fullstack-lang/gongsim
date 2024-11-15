@@ -34,7 +34,7 @@ func GetReverseFieldOwnerName[T models.Gongstruct](
 		// insertion point
 		}
 
-	case *models.GongsimStatus:
+	case *models.Status:
 		switch reverseField.GongstructName {
 		// insertion point
 		}
@@ -79,7 +79,7 @@ func GetReverseFieldOwner[T models.Gongstruct](
 		// insertion point
 		}
 
-	case *models.GongsimStatus:
+	case *models.Status:
 		switch reverseField.GongstructName {
 		// insertion point
 		}

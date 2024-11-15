@@ -45,7 +45,7 @@ func EvictInOtherSlices[OwningType PointerToGongstruct, FieldType PointerToGongs
 	case *Event:
 		// insertion point per field
 
-	case *GongsimStatus:
+	case *Status:
 		// insertion point per field
 
 	case *UpdateState:
@@ -72,7 +72,7 @@ func (stage *StageStruct) ComputeReverseMaps() {
 	// Compute reverse map for named struct Event
 	// insertion point per field
 
-	// Compute reverse map for named struct GongsimStatus
+	// Compute reverse map for named struct Status
 	// insertion point per field
 
 	// Compute reverse map for named struct UpdateState

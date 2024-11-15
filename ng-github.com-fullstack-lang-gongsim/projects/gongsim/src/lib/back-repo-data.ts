@@ -9,7 +9,7 @@ import { EngineAPI } from './engine-api'
 
 import { EventAPI } from './event-api'
 
-import { GongsimStatusAPI } from './gongsimstatus-api'
+import { StatusAPI } from './status-api'
 
 import { UpdateStateAPI } from './updatestate-api'
 
@@ -24,7 +24,7 @@ export class BackRepoData {
 
 	EventAPIs = new Array<EventAPI>()
 
-	GongsimStatusAPIs = new Array<GongsimStatusAPI>()
+	StatusAPIs = new Array<StatusAPI>()
 
 	UpdateStateAPIs = new Array<UpdateStateAPI>()
 
@@ -40,7 +40,7 @@ export class BackRepoData {
 
 		this.EventAPIs = data?.EventAPIs || [];
 
-		this.GongsimStatusAPIs = data?.GongsimStatusAPIs || [];
+		this.StatusAPIs = data?.StatusAPIs || [];
 
 		this.UpdateStateAPIs = data?.UpdateStateAPIs || [];
 

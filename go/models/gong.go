@@ -83,14 +83,14 @@ type StageStruct struct {
 	OnAfterEventDeleteCallback OnAfterDeleteInterface[Event]
 	OnAfterEventReadCallback   OnAfterReadInterface[Event]
 
-	GongsimStatuss           map[*GongsimStatus]any
-	GongsimStatuss_mapString map[string]*GongsimStatus
+	Statuss           map[*Status]any
+	Statuss_mapString map[string]*Status
 
 	// insertion point for slice of pointers maps
-	OnAfterGongsimStatusCreateCallback OnAfterCreateInterface[GongsimStatus]
-	OnAfterGongsimStatusUpdateCallback OnAfterUpdateInterface[GongsimStatus]
-	OnAfterGongsimStatusDeleteCallback OnAfterDeleteInterface[GongsimStatus]
-	OnAfterGongsimStatusReadCallback   OnAfterReadInterface[GongsimStatus]
+	OnAfterStatusCreateCallback OnAfterCreateInterface[Status]
+	OnAfterStatusUpdateCallback OnAfterUpdateInterface[Status]
+	OnAfterStatusDeleteCallback OnAfterDeleteInterface[Status]
+	OnAfterStatusReadCallback   OnAfterReadInterface[Status]
 
 	UpdateStates           map[*UpdateState]any
 	UpdateStates_mapString map[string]*UpdateState
@@ -177,8 +177,8 @@ type BackRepoInterface interface {
 	CheckoutEngine(engine *Engine)
 	CommitEvent(event *Event)
 	CheckoutEvent(event *Event)
-	CommitGongsimStatus(gongsimstatus *GongsimStatus)
-	CheckoutGongsimStatus(gongsimstatus *GongsimStatus)
+	CommitStatus(status *Status)
+	CheckoutStatus(status *Status)
 	CommitUpdateState(updatestate *UpdateState)
 	CheckoutUpdateState(updatestate *UpdateState)
 	GetLastCommitFromBackNb() uint
@@ -200,8 +200,8 @@ func NewStage(path string) (stage *StageStruct) {
 		Events:           make(map[*Event]any),
 		Events_mapString: make(map[string]*Event),
 
-		GongsimStatuss:           make(map[*GongsimStatus]any),
-		GongsimStatuss_mapString: make(map[string]*GongsimStatus),
+		Statuss:           make(map[*Status]any),
+		Statuss_mapString: make(map[string]*Status),
 
 		UpdateStates:           make(map[*UpdateState]any),
 		UpdateStates_mapString: make(map[string]*UpdateState),
@@ -243,7 +243,7 @@ func (stage *StageStruct) Commit() {
 	stage.Map_GongStructName_InstancesNb["DummyAgent"] = len(stage.DummyAgents)
 	stage.Map_GongStructName_InstancesNb["Engine"] = len(stage.Engines)
 	stage.Map_GongStructName_InstancesNb["Event"] = len(stage.Events)
-	stage.Map_GongStructName_InstancesNb["GongsimStatus"] = len(stage.GongsimStatuss)
+	stage.Map_GongStructName_InstancesNb["Status"] = len(stage.Statuss)
 	stage.Map_GongStructName_InstancesNb["UpdateState"] = len(stage.UpdateStates)
 
 }
@@ -259,7 +259,7 @@ func (stage *StageStruct) Checkout() {
 	stage.Map_GongStructName_InstancesNb["DummyAgent"] = len(stage.DummyAgents)
 	stage.Map_GongStructName_InstancesNb["Engine"] = len(stage.Engines)
 	stage.Map_GongStructName_InstancesNb["Event"] = len(stage.Events)
-	stage.Map_GongStructName_InstancesNb["GongsimStatus"] = len(stage.GongsimStatuss)
+	stage.Map_GongStructName_InstancesNb["Status"] = len(stage.Statuss)
 	stage.Map_GongStructName_InstancesNb["UpdateState"] = len(stage.UpdateStates)
 
 }
@@ -493,54 +493,54 @@ func (event *Event) GetName() (res string) {
 	return event.Name
 }
 
-// Stage puts gongsimstatus to the model stage
-func (gongsimstatus *GongsimStatus) Stage(stage *StageStruct) *GongsimStatus {
-	stage.GongsimStatuss[gongsimstatus] = __member
-	stage.GongsimStatuss_mapString[gongsimstatus.Name] = gongsimstatus
+// Stage puts status to the model stage
+func (status *Status) Stage(stage *StageStruct) *Status {
+	stage.Statuss[status] = __member
+	stage.Statuss_mapString[status.Name] = status
 
-	return gongsimstatus
+	return status
 }
 
-// Unstage removes gongsimstatus off the model stage
-func (gongsimstatus *GongsimStatus) Unstage(stage *StageStruct) *GongsimStatus {
-	delete(stage.GongsimStatuss, gongsimstatus)
-	delete(stage.GongsimStatuss_mapString, gongsimstatus.Name)
-	return gongsimstatus
+// Unstage removes status off the model stage
+func (status *Status) Unstage(stage *StageStruct) *Status {
+	delete(stage.Statuss, status)
+	delete(stage.Statuss_mapString, status.Name)
+	return status
 }
 
-// UnstageVoid removes gongsimstatus off the model stage
-func (gongsimstatus *GongsimStatus) UnstageVoid(stage *StageStruct) {
-	delete(stage.GongsimStatuss, gongsimstatus)
-	delete(stage.GongsimStatuss_mapString, gongsimstatus.Name)
+// UnstageVoid removes status off the model stage
+func (status *Status) UnstageVoid(stage *StageStruct) {
+	delete(stage.Statuss, status)
+	delete(stage.Statuss_mapString, status.Name)
 }
 
-// commit gongsimstatus to the back repo (if it is already staged)
-func (gongsimstatus *GongsimStatus) Commit(stage *StageStruct) *GongsimStatus {
-	if _, ok := stage.GongsimStatuss[gongsimstatus]; ok {
+// commit status to the back repo (if it is already staged)
+func (status *Status) Commit(stage *StageStruct) *Status {
+	if _, ok := stage.Statuss[status]; ok {
 		if stage.BackRepo != nil {
-			stage.BackRepo.CommitGongsimStatus(gongsimstatus)
+			stage.BackRepo.CommitStatus(status)
 		}
 	}
-	return gongsimstatus
+	return status
 }
 
-func (gongsimstatus *GongsimStatus) CommitVoid(stage *StageStruct) {
-	gongsimstatus.Commit(stage)
+func (status *Status) CommitVoid(stage *StageStruct) {
+	status.Commit(stage)
 }
 
-// Checkout gongsimstatus to the back repo (if it is already staged)
-func (gongsimstatus *GongsimStatus) Checkout(stage *StageStruct) *GongsimStatus {
-	if _, ok := stage.GongsimStatuss[gongsimstatus]; ok {
+// Checkout status to the back repo (if it is already staged)
+func (status *Status) Checkout(stage *StageStruct) *Status {
+	if _, ok := stage.Statuss[status]; ok {
 		if stage.BackRepo != nil {
-			stage.BackRepo.CheckoutGongsimStatus(gongsimstatus)
+			stage.BackRepo.CheckoutStatus(status)
 		}
 	}
-	return gongsimstatus
+	return status
 }
 
 // for satisfaction of GongStruct interface
-func (gongsimstatus *GongsimStatus) GetName() (res string) {
-	return gongsimstatus.Name
+func (status *Status) GetName() (res string) {
+	return status.Name
 }
 
 // Stage puts updatestate to the model stage
@@ -599,7 +599,7 @@ type AllModelsStructCreateInterface interface { // insertion point for Callbacks
 	CreateORMDummyAgent(DummyAgent *DummyAgent)
 	CreateORMEngine(Engine *Engine)
 	CreateORMEvent(Event *Event)
-	CreateORMGongsimStatus(GongsimStatus *GongsimStatus)
+	CreateORMStatus(Status *Status)
 	CreateORMUpdateState(UpdateState *UpdateState)
 }
 
@@ -608,7 +608,7 @@ type AllModelsStructDeleteInterface interface { // insertion point for Callbacks
 	DeleteORMDummyAgent(DummyAgent *DummyAgent)
 	DeleteORMEngine(Engine *Engine)
 	DeleteORMEvent(Event *Event)
-	DeleteORMGongsimStatus(GongsimStatus *GongsimStatus)
+	DeleteORMStatus(Status *Status)
 	DeleteORMUpdateState(UpdateState *UpdateState)
 }
 
@@ -625,8 +625,8 @@ func (stage *StageStruct) Reset() { // insertion point for array reset
 	stage.Events = make(map[*Event]any)
 	stage.Events_mapString = make(map[string]*Event)
 
-	stage.GongsimStatuss = make(map[*GongsimStatus]any)
-	stage.GongsimStatuss_mapString = make(map[string]*GongsimStatus)
+	stage.Statuss = make(map[*Status]any)
+	stage.Statuss_mapString = make(map[string]*Status)
 
 	stage.UpdateStates = make(map[*UpdateState]any)
 	stage.UpdateStates_mapString = make(map[string]*UpdateState)
@@ -646,8 +646,8 @@ func (stage *StageStruct) Nil() { // insertion point for array nil
 	stage.Events = nil
 	stage.Events_mapString = nil
 
-	stage.GongsimStatuss = nil
-	stage.GongsimStatuss_mapString = nil
+	stage.Statuss = nil
+	stage.Statuss_mapString = nil
 
 	stage.UpdateStates = nil
 	stage.UpdateStates_mapString = nil
@@ -671,8 +671,8 @@ func (stage *StageStruct) Unstage() { // insertion point for array nil
 		event.Unstage(stage)
 	}
 
-	for gongsimstatus := range stage.GongsimStatuss {
-		gongsimstatus.Unstage(stage)
+	for status := range stage.Statuss {
+		status.Unstage(stage)
 	}
 
 	for updatestate := range stage.UpdateStates {
@@ -748,8 +748,8 @@ func GongGetSet[Type GongstructSet](stage *StageStruct) *Type {
 		return any(&stage.Engines).(*Type)
 	case map[*Event]any:
 		return any(&stage.Events).(*Type)
-	case map[*GongsimStatus]any:
-		return any(&stage.GongsimStatuss).(*Type)
+	case map[*Status]any:
+		return any(&stage.Statuss).(*Type)
 	case map[*UpdateState]any:
 		return any(&stage.UpdateStates).(*Type)
 	default:
@@ -772,8 +772,8 @@ func GongGetMap[Type GongstructMapString](stage *StageStruct) *Type {
 		return any(&stage.Engines_mapString).(*Type)
 	case map[string]*Event:
 		return any(&stage.Events_mapString).(*Type)
-	case map[string]*GongsimStatus:
-		return any(&stage.GongsimStatuss_mapString).(*Type)
+	case map[string]*Status:
+		return any(&stage.Statuss_mapString).(*Type)
 	case map[string]*UpdateState:
 		return any(&stage.UpdateStates_mapString).(*Type)
 	default:
@@ -796,8 +796,8 @@ func GetGongstructInstancesSet[Type Gongstruct](stage *StageStruct) *map[*Type]a
 		return any(&stage.Engines).(*map[*Type]any)
 	case Event:
 		return any(&stage.Events).(*map[*Type]any)
-	case GongsimStatus:
-		return any(&stage.GongsimStatuss).(*map[*Type]any)
+	case Status:
+		return any(&stage.Statuss).(*map[*Type]any)
 	case UpdateState:
 		return any(&stage.UpdateStates).(*map[*Type]any)
 	default:
@@ -820,8 +820,8 @@ func GetGongstructInstancesSetFromPointerType[Type PointerToGongstruct](stage *S
 		return any(&stage.Engines).(*map[Type]any)
 	case *Event:
 		return any(&stage.Events).(*map[Type]any)
-	case *GongsimStatus:
-		return any(&stage.GongsimStatuss).(*map[Type]any)
+	case *Status:
+		return any(&stage.Statuss).(*map[Type]any)
 	case *UpdateState:
 		return any(&stage.UpdateStates).(*map[Type]any)
 	default:
@@ -844,8 +844,8 @@ func GetGongstructInstancesMap[Type Gongstruct](stage *StageStruct) *map[string]
 		return any(&stage.Engines_mapString).(*map[string]*Type)
 	case Event:
 		return any(&stage.Events_mapString).(*map[string]*Type)
-	case GongsimStatus:
-		return any(&stage.GongsimStatuss_mapString).(*map[string]*Type)
+	case Status:
+		return any(&stage.Statuss_mapString).(*map[string]*Type)
 	case UpdateState:
 		return any(&stage.UpdateStates_mapString).(*map[string]*Type)
 	default:
@@ -880,8 +880,8 @@ func GetAssociationName[Type Gongstruct]() *Type {
 		return any(&Event{
 			// Initialisation of associations
 		}).(*Type)
-	case GongsimStatus:
-		return any(&GongsimStatus{
+	case Status:
+		return any(&Status{
 			// Initialisation of associations
 		}).(*Type)
 	case UpdateState:
@@ -943,8 +943,8 @@ func GetPointerReverseMap[Start, End Gongstruct](fieldname string, stage *StageS
 		switch fieldname {
 		// insertion point for per direct association field
 		}
-	// reverse maps of direct associations of GongsimStatus
-	case GongsimStatus:
+	// reverse maps of direct associations of Status
+	case Status:
 		switch fieldname {
 		// insertion point for per direct association field
 		}
@@ -989,8 +989,8 @@ func GetSliceOfPointersReverseMap[Start, End Gongstruct](fieldname string, stage
 		switch fieldname {
 		// insertion point for per direct association field
 		}
-	// reverse maps of direct associations of GongsimStatus
-	case GongsimStatus:
+	// reverse maps of direct associations of Status
+	case Status:
 		switch fieldname {
 		// insertion point for per direct association field
 		}
@@ -1019,8 +1019,8 @@ func GetGongstructName[Type Gongstruct]() (res string) {
 		res = "Engine"
 	case Event:
 		res = "Event"
-	case GongsimStatus:
-		res = "GongsimStatus"
+	case Status:
+		res = "Status"
 	case UpdateState:
 		res = "UpdateState"
 	}
@@ -1043,8 +1043,8 @@ func GetPointerToGongstructName[Type PointerToGongstruct]() (res string) {
 		res = "Engine"
 	case *Event:
 		res = "Event"
-	case *GongsimStatus:
-		res = "GongsimStatus"
+	case *Status:
+		res = "Status"
 	case *UpdateState:
 		res = "UpdateState"
 	}
@@ -1066,7 +1066,7 @@ func GetFields[Type Gongstruct]() (res []string) {
 		res = []string{"Name", "EndTime", "CurrentTime", "DisplayFormat", "SecondsSinceStart", "Fired", "ControlMode", "State", "Speed"}
 	case Event:
 		res = []string{"Name", "Duration"}
-	case GongsimStatus:
+	case Status:
 		res = []string{"Name", "CurrentCommand", "CompletionDate", "CurrentSpeedCommand", "SpeedCommandCompletionDate"}
 	case UpdateState:
 		res = []string{"Name", "Duration", "Period"}
@@ -1100,7 +1100,7 @@ func GetReverseFields[Type Gongstruct]() (res []ReverseField) {
 	case Event:
 		var rf ReverseField
 		_ = rf
-	case GongsimStatus:
+	case Status:
 		var rf ReverseField
 		_ = rf
 	case UpdateState:
@@ -1125,7 +1125,7 @@ func GetFieldsFromPointer[Type PointerToGongstruct]() (res []string) {
 		res = []string{"Name", "EndTime", "CurrentTime", "DisplayFormat", "SecondsSinceStart", "Fired", "ControlMode", "State", "Speed"}
 	case *Event:
 		res = []string{"Name", "Duration"}
-	case *GongsimStatus:
+	case *Status:
 		res = []string{"Name", "CurrentCommand", "CompletionDate", "CurrentSpeedCommand", "SpeedCommandCompletionDate"}
 	case *UpdateState:
 		res = []string{"Name", "Duration", "Period"}
@@ -1236,7 +1236,7 @@ func GetFieldStringValueFromPointer[Type PointerToGongstruct](instance Type, fie
 				res = fmt.Sprintf("%s\n", inferedInstance.Duration.String())
 			}
 		}
-	case *GongsimStatus:
+	case *Status:
 		switch fieldName {
 		// string value of fields
 		case "Name":
@@ -1449,7 +1449,7 @@ func GetFieldStringValue[Type Gongstruct](instance Type, fieldName string) (res 
 				res = fmt.Sprintf("%s\n", inferedInstance.Duration.String())
 			}
 		}
-	case GongsimStatus:
+	case Status:
 		switch fieldName {
 		// string value of fields
 		case "Name":

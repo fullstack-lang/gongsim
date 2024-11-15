@@ -38,7 +38,7 @@ func (cellDeleteIconImpl *CellDeleteIconImpl[T]) CellIconUpdated(stage *gongtabl
 		instancesTyped.Unstage(cellDeleteIconImpl.probe.stageOfInterest)
 	case *models.Event:
 		instancesTyped.Unstage(cellDeleteIconImpl.probe.stageOfInterest)
-	case *models.GongsimStatus:
+	case *models.Status:
 		instancesTyped.Unstage(cellDeleteIconImpl.probe.stageOfInterest)
 	case *models.UpdateState:
 		instancesTyped.Unstage(cellDeleteIconImpl.probe.stageOfInterest)

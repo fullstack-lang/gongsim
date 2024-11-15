@@ -18,7 +18,7 @@ func SerializeStage(stage *StageStruct, filename string) {
 		SerializeExcelize[DummyAgent](stage, f)
 		SerializeExcelize[Engine](stage, f)
 		SerializeExcelize[Event](stage, f)
-		SerializeExcelize[GongsimStatus](stage, f)
+		SerializeExcelize[Status](stage, f)
 		SerializeExcelize[UpdateState](stage, f)
 	}
 

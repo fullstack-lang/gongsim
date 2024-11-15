@@ -20,9 +20,9 @@ import { EventAPI } from './event-api'
 import { Event, CopyEventAPIToEvent } from './event'
 import { EventService } from './event.service'
 
-import { GongsimStatusAPI } from './gongsimstatus-api'
-import { GongsimStatus, CopyGongsimStatusAPIToGongsimStatus } from './gongsimstatus'
-import { GongsimStatusService } from './gongsimstatus.service'
+import { StatusAPI } from './status-api'
+import { Status, CopyStatusAPIToStatus } from './status'
+import { StatusService } from './status.service'
 
 import { UpdateStateAPI } from './updatestate-api'
 import { UpdateState, CopyUpdateStateAPIToUpdateState } from './updatestate'
@@ -47,8 +47,8 @@ export class FrontRepo { // insertion point sub template
 	array_Events = new Array<Event>() // array of front instances
 	map_ID_Event = new Map<number, Event>() // map of front instances
 
-	array_GongsimStatuss = new Array<GongsimStatus>() // array of front instances
-	map_ID_GongsimStatus = new Map<number, GongsimStatus>() // map of front instances
+	array_Statuss = new Array<Status>() // array of front instances
+	map_ID_Status = new Map<number, Status>() // map of front instances
 
 	array_UpdateStates = new Array<UpdateState>() // array of front instances
 	map_ID_UpdateState = new Map<number, UpdateState>() // map of front instances
@@ -68,8 +68,8 @@ export class FrontRepo { // insertion point sub template
 				return this.array_Engines as unknown as Array<Type>
 			case 'Event':
 				return this.array_Events as unknown as Array<Type>
-			case 'GongsimStatus':
-				return this.array_GongsimStatuss as unknown as Array<Type>
+			case 'Status':
+				return this.array_Statuss as unknown as Array<Type>
 			case 'UpdateState':
 				return this.array_UpdateStates as unknown as Array<Type>
 			default:
@@ -88,8 +88,8 @@ export class FrontRepo { // insertion point sub template
 				return this.map_ID_Engine as unknown as Map<number, Type>
 			case 'Event':
 				return this.map_ID_Event as unknown as Map<number, Type>
-			case 'GongsimStatus':
-				return this.map_ID_GongsimStatus as unknown as Map<number, Type>
+			case 'Status':
+				return this.map_ID_Status as unknown as Map<number, Type>
 			case 'UpdateState':
 				return this.map_ID_UpdateState as unknown as Map<number, Type>
 			default:
@@ -163,7 +163,7 @@ export class FrontRepoService {
 		private dummyagentService: DummyAgentService,
 		private engineService: EngineService,
 		private eventService: EventService,
-		private gongsimstatusService: GongsimStatusService,
+		private statusService: StatusService,
 		private updatestateService: UpdateStateService,
 	) { }
 
@@ -201,7 +201,7 @@ export class FrontRepoService {
 		Observable<DummyAgentAPI[]>,
 		Observable<EngineAPI[]>,
 		Observable<EventAPI[]>,
-		Observable<GongsimStatusAPI[]>,
+		Observable<StatusAPI[]>,
 		Observable<UpdateStateAPI[]>,
 	] = [
 			// Using "combineLatest" with a placeholder observable.
@@ -217,7 +217,7 @@ export class FrontRepoService {
 			this.dummyagentService.getDummyAgents(this.GONG__StackPath, this.frontRepo),
 			this.engineService.getEngines(this.GONG__StackPath, this.frontRepo),
 			this.eventService.getEvents(this.GONG__StackPath, this.frontRepo),
-			this.gongsimstatusService.getGongsimStatuss(this.GONG__StackPath, this.frontRepo),
+			this.statusService.getStatuss(this.GONG__StackPath, this.frontRepo),
 			this.updatestateService.getUpdateStates(this.GONG__StackPath, this.frontRepo),
 		];
 
@@ -238,7 +238,7 @@ export class FrontRepoService {
 			this.dummyagentService.getDummyAgents(this.GONG__StackPath, this.frontRepo),
 			this.engineService.getEngines(this.GONG__StackPath, this.frontRepo),
 			this.eventService.getEvents(this.GONG__StackPath, this.frontRepo),
-			this.gongsimstatusService.getGongsimStatuss(this.GONG__StackPath, this.frontRepo),
+			this.statusService.getStatuss(this.GONG__StackPath, this.frontRepo),
 			this.updatestateService.getUpdateStates(this.GONG__StackPath, this.frontRepo),
 		]
 
@@ -254,7 +254,7 @@ export class FrontRepoService {
 						dummyagents_,
 						engines_,
 						events_,
-						gongsimstatuss_,
+						statuss_,
 						updatestates_,
 					]) => {
 						let _this = this
@@ -268,8 +268,8 @@ export class FrontRepoService {
 						engines = engines_ as EngineAPI[]
 						var events: EventAPI[]
 						events = events_ as EventAPI[]
-						var gongsimstatuss: GongsimStatusAPI[]
-						gongsimstatuss = gongsimstatuss_ as GongsimStatusAPI[]
+						var statuss: StatusAPI[]
+						statuss = statuss_ as StatusAPI[]
 						var updatestates: UpdateStateAPI[]
 						updatestates = updatestates_ as UpdateStateAPI[]
 
@@ -325,14 +325,14 @@ export class FrontRepoService {
 						)
 
 						// init the arrays
-						this.frontRepo.array_GongsimStatuss = []
-						this.frontRepo.map_ID_GongsimStatus.clear()
+						this.frontRepo.array_Statuss = []
+						this.frontRepo.map_ID_Status.clear()
 
-						gongsimstatuss.forEach(
-							gongsimstatusAPI => {
-								let gongsimstatus = new GongsimStatus
-								this.frontRepo.array_GongsimStatuss.push(gongsimstatus)
-								this.frontRepo.map_ID_GongsimStatus.set(gongsimstatusAPI.ID, gongsimstatus)
+						statuss.forEach(
+							statusAPI => {
+								let status = new Status
+								this.frontRepo.array_Statuss.push(status)
+								this.frontRepo.map_ID_Status.set(statusAPI.ID, status)
 							}
 						)
 
@@ -385,10 +385,10 @@ export class FrontRepoService {
 						)
 
 						// fill up front objects
-						gongsimstatuss.forEach(
-							gongsimstatusAPI => {
-								let gongsimstatus = this.frontRepo.map_ID_GongsimStatus.get(gongsimstatusAPI.ID)
-								CopyGongsimStatusAPIToGongsimStatus(gongsimstatusAPI, gongsimstatus!, this.frontRepo)
+						statuss.forEach(
+							statusAPI => {
+								let status = this.frontRepo.map_ID_Status.get(statusAPI.ID)
+								CopyStatusAPIToStatus(statusAPI, status!, this.frontRepo)
 							}
 						)
 
@@ -482,14 +482,14 @@ export class FrontRepoService {
 				)
 
 				// init the arrays
-				frontRepo.array_GongsimStatuss = []
-				frontRepo.map_ID_GongsimStatus.clear()
+				frontRepo.array_Statuss = []
+				frontRepo.map_ID_Status.clear()
 
-				backRepoData.GongsimStatusAPIs.forEach(
-					gongsimstatusAPI => {
-						let gongsimstatus = new GongsimStatus
-						frontRepo.array_GongsimStatuss.push(gongsimstatus)
-						frontRepo.map_ID_GongsimStatus.set(gongsimstatusAPI.ID, gongsimstatus)
+				backRepoData.StatusAPIs.forEach(
+					statusAPI => {
+						let status = new Status
+						frontRepo.array_Statuss.push(status)
+						frontRepo.map_ID_Status.set(statusAPI.ID, status)
 					}
 				)
 
@@ -544,10 +544,10 @@ export class FrontRepoService {
 				)
 
 				// fill up front objects
-				backRepoData.GongsimStatusAPIs.forEach(
-					gongsimstatusAPI => {
-						let gongsimstatus = frontRepo.map_ID_GongsimStatus.get(gongsimstatusAPI.ID)
-						CopyGongsimStatusAPIToGongsimStatus(gongsimstatusAPI, gongsimstatus!, frontRepo)
+				backRepoData.StatusAPIs.forEach(
+					statusAPI => {
+						let status = frontRepo.map_ID_Status.get(statusAPI.ID)
+						CopyStatusAPIToStatus(statusAPI, status!, frontRepo)
 					}
 				)
 
@@ -590,7 +590,7 @@ export function getEngineUniqueID(id: number): number {
 export function getEventUniqueID(id: number): number {
 	return 43 * id
 }
-export function getGongsimStatusUniqueID(id: number): number {
+export function getStatusUniqueID(id: number): number {
 	return 47 * id
 }
 export function getUpdateStateUniqueID(id: number): number {

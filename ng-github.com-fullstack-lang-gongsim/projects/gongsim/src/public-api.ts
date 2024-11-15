@@ -29,9 +29,9 @@ export * from './lib/event-api'
 export * from './lib/event'
 export * from './lib/event.service'
 
-export * from './lib/gongsimstatus-api'
-export * from './lib/gongsimstatus'
-export * from './lib/gongsimstatus.service'
+export * from './lib/status-api'
+export * from './lib/status'
+export * from './lib/status.service'
 
 export * from './lib/updatestate-api'
 export * from './lib/updatestate'

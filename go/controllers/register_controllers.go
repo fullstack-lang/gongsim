@@ -77,12 +77,12 @@ func registerControllers(r *gin.Engine) {
 		v1.PUT("/v1/events/:id", GetController().UpdateEvent)
 		v1.DELETE("/v1/events/:id", GetController().DeleteEvent)
 
-		v1.GET("/v1/gongsimstatuss", GetController().GetGongsimStatuss)
-		v1.GET("/v1/gongsimstatuss/:id", GetController().GetGongsimStatus)
-		v1.POST("/v1/gongsimstatuss", GetController().PostGongsimStatus)
-		v1.PATCH("/v1/gongsimstatuss/:id", GetController().UpdateGongsimStatus)
-		v1.PUT("/v1/gongsimstatuss/:id", GetController().UpdateGongsimStatus)
-		v1.DELETE("/v1/gongsimstatuss/:id", GetController().DeleteGongsimStatus)
+		v1.GET("/v1/statuss", GetController().GetStatuss)
+		v1.GET("/v1/statuss/:id", GetController().GetStatus)
+		v1.POST("/v1/statuss", GetController().PostStatus)
+		v1.PATCH("/v1/statuss/:id", GetController().UpdateStatus)
+		v1.PUT("/v1/statuss/:id", GetController().UpdateStatus)
+		v1.DELETE("/v1/statuss/:id", GetController().DeleteStatus)
 
 		v1.GET("/v1/updatestates", GetController().GetUpdateStates)
 		v1.GET("/v1/updatestates/:id", GetController().GetUpdateState)

@@ -48,7 +48,7 @@ func NewStackInstance(
 	models.SetOrchestratorOnAfterUpdate[models.DummyAgent](stage)
 	models.SetOrchestratorOnAfterUpdate[models.Engine](stage)
 	models.SetOrchestratorOnAfterUpdate[models.Event](stage)
-	models.SetOrchestratorOnAfterUpdate[models.GongsimStatus](stage)
+	models.SetOrchestratorOnAfterUpdate[models.Status](stage)
 	models.SetOrchestratorOnAfterUpdate[models.UpdateState](stage)
 
 	return

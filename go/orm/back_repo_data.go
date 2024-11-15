@@ -12,7 +12,7 @@ type BackRepoData struct {
 
 	EventAPIs []*EventAPI
 
-	GongsimStatusAPIs []*GongsimStatusAPI
+	StatusAPIs []*StatusAPI
 
 	UpdateStateAPIs []*UpdateStateAPI
 }
@@ -64,14 +64,14 @@ func CopyBackRepoToBackRepoData(backRepo *BackRepoStruct, backRepoData *BackRepo
 		backRepoData.EventAPIs = append(backRepoData.EventAPIs, &eventAPI)
 	}
 
-	for _, gongsimstatusDB := range backRepo.BackRepoGongsimStatus.Map_GongsimStatusDBID_GongsimStatusDB {
+	for _, statusDB := range backRepo.BackRepoStatus.Map_StatusDBID_StatusDB {
 
-		var gongsimstatusAPI GongsimStatusAPI
-		gongsimstatusAPI.ID = gongsimstatusDB.ID
-		gongsimstatusAPI.GongsimStatusPointersEncoding = gongsimstatusDB.GongsimStatusPointersEncoding
-		gongsimstatusDB.CopyBasicFieldsToGongsimStatus_WOP(&gongsimstatusAPI.GongsimStatus_WOP)
+		var statusAPI StatusAPI
+		statusAPI.ID = statusDB.ID
+		statusAPI.StatusPointersEncoding = statusDB.StatusPointersEncoding
+		statusDB.CopyBasicFieldsToStatus_WOP(&statusAPI.Status_WOP)
 
-		backRepoData.GongsimStatusAPIs = append(backRepoData.GongsimStatusAPIs, &gongsimstatusAPI)
+		backRepoData.StatusAPIs = append(backRepoData.StatusAPIs, &statusAPI)
 	}
 
 	for _, updatestateDB := range backRepo.BackRepoUpdateState.Map_UpdateStateDBID_UpdateStateDB {

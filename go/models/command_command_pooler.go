@@ -21,14 +21,14 @@ func (command *Command) commandPooler() {
 		case t := <-CommandPoolerPeriod.C:
 
 			command.Checkout(command.stage)
-			if command.gongsimStatus.CompletionDate != command.CommandDate {
+			if command.status.CompletionDate != command.CommandDate {
 				log.Println("commandPooler reads new command ", command.Command, "  timestamp ", command.CommandDate, " at ", t)
 
-				command.gongsimStatus.CurrentCommand = command.Command
-				command.gongsimStatus.CompletionDate = command.CommandDate
+				command.status.CurrentCommand = command.Command
+				command.status.CompletionDate = command.CommandDate
 				command.stage.Commit()
 			}
-			if command.gongsimStatus.SpeedCommandCompletionDate != command.DateSpeedCommand {
+			if command.status.SpeedCommandCompletionDate != command.DateSpeedCommand {
 				log.Println("commandPooler reads new speed command ", command.SpeedCommandType, "  timestamp ", command.CommandDate, " at ", t)
 
 				switch command.SpeedCommandType {
@@ -40,8 +40,8 @@ func (command *Command) commandPooler() {
 					command.stage.Commit()
 				}
 
-				command.gongsimStatus.CurrentSpeedCommand = command.SpeedCommandType
-				command.gongsimStatus.SpeedCommandCompletionDate = command.DateSpeedCommand
+				command.status.CurrentSpeedCommand = command.SpeedCommandType
+				command.status.SpeedCommandCompletionDate = command.DateSpeedCommand
 				command.stage.Commit()
 			}
 		}
