@@ -135,7 +135,7 @@ func main() {
 	// the gongsim command orchestrates the simulation engine regarding to the
 	// the rest of the stack. It manages when the stage has to be commited to the
 	// back repo or when the back repo has to be checked out to the stage
-	command := gongsim_models.NewGongSimCommand(stage, engine)
+	command := gongsim_models.NewCommand(stage, engine)
 	_ = command
 
 	// seven days of simulation

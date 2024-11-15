@@ -19,7 +19,7 @@ type Command struct {
 	status *Status
 }
 
-func NewGongSimCommand(stage *StageStruct, engine *Engine) (command *Command) {
+func NewCommand(stage *StageStruct, engine *Engine) (command *Command) {
 	command = &(Command{
 		Name:        "Gongsim Command Singloton",
 		Command:     COMMAND_PAUSE,
@@ -55,7 +55,6 @@ func (command *Command) SetupGongsimThreads() *Command {
 
 	Quit = make(chan bool)
 
-	go command.commandPooler()
 	go command.commitScheduler()
 	go command.checkoutScheduler()
 	go command.watcher()
@@ -201,8 +200,6 @@ func (command *Command) SetupGongsimThreads() *Command {
 
 						sleepTime := command.Engine.nextRealtimeHorizon.Sub(time.Now())
 						time.Sleep(sleepTime)
-
-						log.Println("gongsimcommand", command.Engine.currentTime)
 
 						command.stage.Commit()
 

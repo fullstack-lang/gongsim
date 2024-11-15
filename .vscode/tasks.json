@@ -48,6 +48,19 @@
 			"group": "build"
 		},
 		{
+			"label": "01 - gongc -skipNg -skipGoModCommands",
+			"type": "shell",
+			"options": {
+				"cwd": "go/models"
+			},
+			"command": "gongc",
+			"args": [
+				"-skipNg",
+				"-skipGoModCommands"
+			],
+			"group": "build"
+		},
+		{
 			"label": "01 - kill 4200",
 			"group": "build",
 			"command": "lsof -ti :4200 | xargs kill",
