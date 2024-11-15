@@ -173,7 +173,7 @@ func TestLadybugSim(t *testing.T) {
 	engine := new(gongsim_models.Engine)
 	engine.Name = "Simulation Engine"
 	engine.Stage(gongsim_stage)
-	gongsim_models.NewGongSimCommand(gongsim_stage, engine)
+	gongsim_models.NewCommand(gongsim_stage, engine)
 
 	// Kills Engine Simulation goroutine
 	gongsim_models.Quit <- true

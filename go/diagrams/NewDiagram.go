@@ -88,7 +88,7 @@ func _(stage *models.StageStruct) {
 	__GongStructShape__000001_NewDiagram_Engine := (&models.GongStructShape{}).Stage(stage)
 	__GongStructShape__000002_NewDiagram_Event := (&models.GongStructShape{}).Stage(stage)
 	__GongStructShape__000003_NewDiagram_GongsimCommand := (&models.GongStructShape{}).Stage(stage)
-	__GongStructShape__000004_NewDiagram_GongsimStatus := (&models.GongStructShape{}).Stage(stage)
+	__GongStructShape__000004_NewDiagram_Status := (&models.GongStructShape{}).Stage(stage)
 
 	__Link__000000_Engine := (&models.Link{}).Stage(stage)
 
@@ -102,7 +102,7 @@ func _(stage *models.StageStruct) {
 	__Position__000007_Pos_NewDiagram_Event := (&models.Position{}).Stage(stage)
 	__Position__000008_Pos_NewDiagram_GongsimCommand := (&models.Position{}).Stage(stage)
 	__Position__000009_Pos_NewDiagram_GongsimCommandType := (&models.Position{}).Stage(stage)
-	__Position__000010_Pos_NewDiagram_GongsimStatus := (&models.Position{}).Stage(stage)
+	__Position__000010_Pos_NewDiagram_Status := (&models.Position{}).Stage(stage)
 	__Position__000011_Pos_NewDiagram_SpeedCommandType := (&models.Position{}).Stage(stage)
 
 	__Vertice__000000_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_GongsimCommand_and_NewDiagram_Engine := (&models.Vertice{}).Stage(stage)
@@ -114,26 +114,26 @@ func _(stage *models.StageStruct) {
 
 	__Field__000000_Command.Name = `Command`
 
-	//gong:ident [ref_models.GongsimCommand.Command] comment added to overcome the problem with the comment map association
-	__Field__000000_Command.Identifier = `ref_models.GongsimCommand.Command`
+	//gong:ident [ref_models.Command.Command] comment added to overcome the problem with the comment map association
+	__Field__000000_Command.Identifier = `ref_models.Command.Command`
 	__Field__000000_Command.FieldTypeAsString = ``
-	__Field__000000_Command.Structname = `GongsimCommand`
+	__Field__000000_Command.Structname = `Command`
 	__Field__000000_Command.Fieldtypename = `GongsimCommandType`
 
 	__Field__000001_CommandDate.Name = `CommandDate`
 
-	//gong:ident [ref_models.GongsimCommand.CommandDate] comment added to overcome the problem with the comment map association
-	__Field__000001_CommandDate.Identifier = `ref_models.GongsimCommand.CommandDate`
+	//gong:ident [ref_models.Command.CommandDate] comment added to overcome the problem with the comment map association
+	__Field__000001_CommandDate.Identifier = `ref_models.Command.CommandDate`
 	__Field__000001_CommandDate.FieldTypeAsString = ``
-	__Field__000001_CommandDate.Structname = `GongsimCommand`
+	__Field__000001_CommandDate.Structname = `Command`
 	__Field__000001_CommandDate.Fieldtypename = `string`
 
 	__Field__000002_CompletionDate.Name = `CompletionDate`
 
-	//gong:ident [ref_models.GongsimStatus.CompletionDate] comment added to overcome the problem with the comment map association
-	__Field__000002_CompletionDate.Identifier = `ref_models.GongsimStatus.CompletionDate`
+	//gong:ident [ref_models.Status.CompletionDate] comment added to overcome the problem with the comment map association
+	__Field__000002_CompletionDate.Identifier = `ref_models.Status.CompletionDate`
 	__Field__000002_CompletionDate.FieldTypeAsString = ``
-	__Field__000002_CompletionDate.Structname = `GongsimStatus`
+	__Field__000002_CompletionDate.Structname = `Status`
 	__Field__000002_CompletionDate.Fieldtypename = `string`
 
 	__Field__000003_ControlMode.Name = `ControlMode`
@@ -146,18 +146,18 @@ func _(stage *models.StageStruct) {
 
 	__Field__000004_CurrentCommand.Name = `CurrentCommand`
 
-	//gong:ident [ref_models.GongsimStatus.CurrentCommand] comment added to overcome the problem with the comment map association
-	__Field__000004_CurrentCommand.Identifier = `ref_models.GongsimStatus.CurrentCommand`
+	//gong:ident [ref_models.Status.CurrentCommand] comment added to overcome the problem with the comment map association
+	__Field__000004_CurrentCommand.Identifier = `ref_models.Status.CurrentCommand`
 	__Field__000004_CurrentCommand.FieldTypeAsString = ``
-	__Field__000004_CurrentCommand.Structname = `GongsimStatus`
+	__Field__000004_CurrentCommand.Structname = `Status`
 	__Field__000004_CurrentCommand.Fieldtypename = `GongsimCommandType`
 
 	__Field__000005_CurrentSpeedCommand.Name = `CurrentSpeedCommand`
 
-	//gong:ident [ref_models.GongsimStatus.CurrentSpeedCommand] comment added to overcome the problem with the comment map association
-	__Field__000005_CurrentSpeedCommand.Identifier = `ref_models.GongsimStatus.CurrentSpeedCommand`
+	//gong:ident [ref_models.Status.CurrentSpeedCommand] comment added to overcome the problem with the comment map association
+	__Field__000005_CurrentSpeedCommand.Identifier = `ref_models.Status.CurrentSpeedCommand`
 	__Field__000005_CurrentSpeedCommand.FieldTypeAsString = ``
-	__Field__000005_CurrentSpeedCommand.Structname = `GongsimStatus`
+	__Field__000005_CurrentSpeedCommand.Structname = `Status`
 	__Field__000005_CurrentSpeedCommand.Fieldtypename = `SpeedCommandType`
 
 	__Field__000006_CurrentTime.Name = `CurrentTime`
@@ -170,10 +170,10 @@ func _(stage *models.StageStruct) {
 
 	__Field__000007_DateSpeedCommand.Name = `DateSpeedCommand`
 
-	//gong:ident [ref_models.GongsimCommand.DateSpeedCommand] comment added to overcome the problem with the comment map association
-	__Field__000007_DateSpeedCommand.Identifier = `ref_models.GongsimCommand.DateSpeedCommand`
+	//gong:ident [ref_models.Command.DateSpeedCommand] comment added to overcome the problem with the comment map association
+	__Field__000007_DateSpeedCommand.Identifier = `ref_models.Command.DateSpeedCommand`
 	__Field__000007_DateSpeedCommand.FieldTypeAsString = ``
-	__Field__000007_DateSpeedCommand.Structname = `GongsimCommand`
+	__Field__000007_DateSpeedCommand.Structname = `Command`
 	__Field__000007_DateSpeedCommand.Fieldtypename = `string`
 
 	__Field__000008_Duration.Name = `Duration`
@@ -218,10 +218,10 @@ func _(stage *models.StageStruct) {
 
 	__Field__000013_Name.Name = `Name`
 
-	//gong:ident [ref_models.GongsimStatus.Name] comment added to overcome the problem with the comment map association
-	__Field__000013_Name.Identifier = `ref_models.GongsimStatus.Name`
+	//gong:ident [ref_models.Status.Name] comment added to overcome the problem with the comment map association
+	__Field__000013_Name.Identifier = `ref_models.Status.Name`
 	__Field__000013_Name.FieldTypeAsString = ``
-	__Field__000013_Name.Structname = `GongsimStatus`
+	__Field__000013_Name.Structname = `Status`
 	__Field__000013_Name.Fieldtypename = `string`
 
 	__Field__000014_Name.Name = `Name`
@@ -234,10 +234,10 @@ func _(stage *models.StageStruct) {
 
 	__Field__000015_Name.Name = `Name`
 
-	//gong:ident [ref_models.GongsimCommand.Name] comment added to overcome the problem with the comment map association
-	__Field__000015_Name.Identifier = `ref_models.GongsimCommand.Name`
+	//gong:ident [ref_models.Command.Name] comment added to overcome the problem with the comment map association
+	__Field__000015_Name.Identifier = `ref_models.Command.Name`
 	__Field__000015_Name.FieldTypeAsString = ``
-	__Field__000015_Name.Structname = `GongsimCommand`
+	__Field__000015_Name.Structname = `Command`
 	__Field__000015_Name.Fieldtypename = `string`
 
 	__Field__000016_SecondsSinceStart.Name = `SecondsSinceStart`
@@ -258,18 +258,18 @@ func _(stage *models.StageStruct) {
 
 	__Field__000018_SpeedCommandCompletionDate.Name = `SpeedCommandCompletionDate`
 
-	//gong:ident [ref_models.GongsimStatus.SpeedCommandCompletionDate] comment added to overcome the problem with the comment map association
-	__Field__000018_SpeedCommandCompletionDate.Identifier = `ref_models.GongsimStatus.SpeedCommandCompletionDate`
+	//gong:ident [ref_models.Status.SpeedCommandCompletionDate] comment added to overcome the problem with the comment map association
+	__Field__000018_SpeedCommandCompletionDate.Identifier = `ref_models.Status.SpeedCommandCompletionDate`
 	__Field__000018_SpeedCommandCompletionDate.FieldTypeAsString = ``
-	__Field__000018_SpeedCommandCompletionDate.Structname = `GongsimStatus`
+	__Field__000018_SpeedCommandCompletionDate.Structname = `Status`
 	__Field__000018_SpeedCommandCompletionDate.Fieldtypename = `string`
 
 	__Field__000019_SpeedCommandType.Name = `SpeedCommandType`
 
-	//gong:ident [ref_models.GongsimCommand.SpeedCommandType] comment added to overcome the problem with the comment map association
-	__Field__000019_SpeedCommandType.Identifier = `ref_models.GongsimCommand.SpeedCommandType`
+	//gong:ident [ref_models.Command.SpeedCommandType] comment added to overcome the problem with the comment map association
+	__Field__000019_SpeedCommandType.Identifier = `ref_models.Command.SpeedCommandType`
 	__Field__000019_SpeedCommandType.FieldTypeAsString = ``
-	__Field__000019_SpeedCommandType.Structname = `GongsimCommand`
+	__Field__000019_SpeedCommandType.Structname = `Command`
 	__Field__000019_SpeedCommandType.Fieldtypename = `SpeedCommandType`
 
 	__Field__000020_State.Name = `State`
@@ -325,8 +325,8 @@ func _(stage *models.StageStruct) {
 
 	__GongEnumShape__000005_NewDiagram_GongsimCommandType.Name = `NewDiagram-GongsimCommandType`
 
-	//gong:ident [ref_models.GongsimCommandType] comment added to overcome the problem with the comment map association
-	__GongEnumShape__000005_NewDiagram_GongsimCommandType.Identifier = `ref_models.GongsimCommandType`
+	//gong:ident [ref_models.CommandType] comment added to overcome the problem with the comment map association
+	__GongEnumShape__000005_NewDiagram_GongsimCommandType.Identifier = `ref_models.CommandType`
 	__GongEnumShape__000005_NewDiagram_GongsimCommandType.Width = 450.999939
 	__GongEnumShape__000005_NewDiagram_GongsimCommandType.Height = 153.000000
 
@@ -354,8 +354,8 @@ func _(stage *models.StageStruct) {
 
 	__GongEnumValueEntry__000003_COMMAND_ADVANCE_10_MIN.Name = `COMMAND_ADVANCE_10_MIN`
 
-	//gong:ident [ref_models.GongsimCommandType.COMMAND_ADVANCE_10_MIN] comment added to overcome the problem with the comment map association
-	__GongEnumValueEntry__000003_COMMAND_ADVANCE_10_MIN.Identifier = `ref_models.GongsimCommandType.COMMAND_ADVANCE_10_MIN`
+	//gong:ident [ref_models.CommandType.COMMAND_ADVANCE_10_MIN] comment added to overcome the problem with the comment map association
+	__GongEnumValueEntry__000003_COMMAND_ADVANCE_10_MIN.Identifier = `ref_models.CommandType.COMMAND_ADVANCE_10_MIN`
 
 	__GongEnumValueEntry__000004_COMMAND_DECREASE_SPEED_50_PERCENTS.Name = `COMMAND_DECREASE_SPEED_50_PERCENTS`
 
@@ -364,13 +364,13 @@ func _(stage *models.StageStruct) {
 
 	__GongEnumValueEntry__000005_COMMAND_FIRE_EVENT_TILL_STATES_CHANGE.Name = `COMMAND_FIRE_EVENT_TILL_STATES_CHANGE`
 
-	//gong:ident [ref_models.GongsimCommandType.COMMAND_FIRE_EVENT_TILL_STATES_CHANGE] comment added to overcome the problem with the comment map association
-	__GongEnumValueEntry__000005_COMMAND_FIRE_EVENT_TILL_STATES_CHANGE.Identifier = `ref_models.GongsimCommandType.COMMAND_FIRE_EVENT_TILL_STATES_CHANGE`
+	//gong:ident [ref_models.CommandType.COMMAND_FIRE_EVENT_TILL_STATES_CHANGE] comment added to overcome the problem with the comment map association
+	__GongEnumValueEntry__000005_COMMAND_FIRE_EVENT_TILL_STATES_CHANGE.Identifier = `ref_models.CommandType.COMMAND_FIRE_EVENT_TILL_STATES_CHANGE`
 
 	__GongEnumValueEntry__000006_COMMAND_FIRE_NEXT_EVENT.Name = `COMMAND_FIRE_NEXT_EVENT`
 
-	//gong:ident [ref_models.GongsimCommandType.COMMAND_FIRE_NEXT_EVENT] comment added to overcome the problem with the comment map association
-	__GongEnumValueEntry__000006_COMMAND_FIRE_NEXT_EVENT.Identifier = `ref_models.GongsimCommandType.COMMAND_FIRE_NEXT_EVENT`
+	//gong:ident [ref_models.CommandType.COMMAND_FIRE_NEXT_EVENT] comment added to overcome the problem with the comment map association
+	__GongEnumValueEntry__000006_COMMAND_FIRE_NEXT_EVENT.Identifier = `ref_models.CommandType.COMMAND_FIRE_NEXT_EVENT`
 
 	__GongEnumValueEntry__000007_COMMAND_INCREASE_SPEED_100_PERCENTS.Name = `COMMAND_INCREASE_SPEED_100_PERCENTS`
 
@@ -379,18 +379,18 @@ func _(stage *models.StageStruct) {
 
 	__GongEnumValueEntry__000008_COMMAND_PAUSE.Name = `COMMAND_PAUSE`
 
-	//gong:ident [ref_models.GongsimCommandType.COMMAND_PAUSE] comment added to overcome the problem with the comment map association
-	__GongEnumValueEntry__000008_COMMAND_PAUSE.Identifier = `ref_models.GongsimCommandType.COMMAND_PAUSE`
+	//gong:ident [ref_models.CommandType.COMMAND_PAUSE] comment added to overcome the problem with the comment map association
+	__GongEnumValueEntry__000008_COMMAND_PAUSE.Identifier = `ref_models.CommandType.COMMAND_PAUSE`
 
 	__GongEnumValueEntry__000009_COMMAND_PLAY.Name = `COMMAND_PLAY`
 
-	//gong:ident [ref_models.GongsimCommandType.COMMAND_PLAY] comment added to overcome the problem with the comment map association
-	__GongEnumValueEntry__000009_COMMAND_PLAY.Identifier = `ref_models.GongsimCommandType.COMMAND_PLAY`
+	//gong:ident [ref_models.CommandType.COMMAND_PLAY] comment added to overcome the problem with the comment map association
+	__GongEnumValueEntry__000009_COMMAND_PLAY.Identifier = `ref_models.CommandType.COMMAND_PLAY`
 
 	__GongEnumValueEntry__000010_COMMAND_RESET.Name = `COMMAND_RESET`
 
-	//gong:ident [ref_models.GongsimCommandType.COMMAND_RESET] comment added to overcome the problem with the comment map association
-	__GongEnumValueEntry__000010_COMMAND_RESET.Identifier = `ref_models.GongsimCommandType.COMMAND_RESET`
+	//gong:ident [ref_models.CommandType.COMMAND_RESET] comment added to overcome the problem with the comment map association
+	__GongEnumValueEntry__000010_COMMAND_RESET.Identifier = `ref_models.CommandType.COMMAND_RESET`
 
 	__GongEnumValueEntry__000011_COMMAND_SPEED_STEADY.Name = `COMMAND_SPEED_STEADY`
 
@@ -487,30 +487,30 @@ func _(stage *models.StageStruct) {
 	__GongStructShape__000002_NewDiagram_Event.Height = 93.000000
 	__GongStructShape__000002_NewDiagram_Event.IsSelected = false
 
-	__GongStructShape__000003_NewDiagram_GongsimCommand.Name = `NewDiagram-GongsimCommand`
+	__GongStructShape__000003_NewDiagram_GongsimCommand.Name = `NewDiagram-Command`
 
-	//gong:ident [ref_models.GongsimCommand] comment added to overcome the problem with the comment map association
-	__GongStructShape__000003_NewDiagram_GongsimCommand.Identifier = `ref_models.GongsimCommand`
+	//gong:ident [ref_models.Command] comment added to overcome the problem with the comment map association
+	__GongStructShape__000003_NewDiagram_GongsimCommand.Identifier = `ref_models.Command`
 	__GongStructShape__000003_NewDiagram_GongsimCommand.ShowNbInstances = false
 	__GongStructShape__000003_NewDiagram_GongsimCommand.NbInstances = 1
 	__GongStructShape__000003_NewDiagram_GongsimCommand.Width = 389.000000
 	__GongStructShape__000003_NewDiagram_GongsimCommand.Height = 138.000000
 	__GongStructShape__000003_NewDiagram_GongsimCommand.IsSelected = false
 
-	__GongStructShape__000004_NewDiagram_GongsimStatus.Name = `NewDiagram-GongsimStatus`
+	__GongStructShape__000004_NewDiagram_Status.Name = `NewDiagram-Status`
 
-	//gong:ident [ref_models.GongsimStatus] comment added to overcome the problem with the comment map association
-	__GongStructShape__000004_NewDiagram_GongsimStatus.Identifier = `ref_models.GongsimStatus`
-	__GongStructShape__000004_NewDiagram_GongsimStatus.ShowNbInstances = false
-	__GongStructShape__000004_NewDiagram_GongsimStatus.NbInstances = 1
-	__GongStructShape__000004_NewDiagram_GongsimStatus.Width = 365.000000
-	__GongStructShape__000004_NewDiagram_GongsimStatus.Height = 138.000000
-	__GongStructShape__000004_NewDiagram_GongsimStatus.IsSelected = false
+	//gong:ident [ref_models.Status] comment added to overcome the problem with the comment map association
+	__GongStructShape__000004_NewDiagram_Status.Identifier = `ref_models.Status`
+	__GongStructShape__000004_NewDiagram_Status.ShowNbInstances = false
+	__GongStructShape__000004_NewDiagram_Status.NbInstances = 1
+	__GongStructShape__000004_NewDiagram_Status.Width = 365.000000
+	__GongStructShape__000004_NewDiagram_Status.Height = 138.000000
+	__GongStructShape__000004_NewDiagram_Status.IsSelected = false
 
 	__Link__000000_Engine.Name = `Engine`
 
-	//gong:ident [ref_models.GongsimCommand.Engine] comment added to overcome the problem with the comment map association
-	__Link__000000_Engine.Identifier = `ref_models.GongsimCommand.Engine`
+	//gong:ident [ref_models.Command.Engine] comment added to overcome the problem with the comment map association
+	__Link__000000_Engine.Identifier = `ref_models.Command.Engine`
 
 	//gong:ident [ref_models.Engine] comment added to overcome the problem with the comment map association
 	__Link__000000_Engine.Fieldtypename = `ref_models.Engine`
@@ -562,15 +562,15 @@ func _(stage *models.StageStruct) {
 
 	__Position__000008_Pos_NewDiagram_GongsimCommand.X = 29.000000
 	__Position__000008_Pos_NewDiagram_GongsimCommand.Y = 318.000000
-	__Position__000008_Pos_NewDiagram_GongsimCommand.Name = `Pos-NewDiagram-GongsimCommand`
+	__Position__000008_Pos_NewDiagram_GongsimCommand.Name = `Pos-NewDiagram-Command`
 
 	__Position__000009_Pos_NewDiagram_GongsimCommandType.X = 778.000000
 	__Position__000009_Pos_NewDiagram_GongsimCommandType.Y = 236.000000
 	__Position__000009_Pos_NewDiagram_GongsimCommandType.Name = `Pos-NewDiagram-GongsimCommandType`
 
-	__Position__000010_Pos_NewDiagram_GongsimStatus.X = 367.000000
-	__Position__000010_Pos_NewDiagram_GongsimStatus.Y = 534.000000
-	__Position__000010_Pos_NewDiagram_GongsimStatus.Name = `Pos-NewDiagram-GongsimStatus`
+	__Position__000010_Pos_NewDiagram_Status.X = 367.000000
+	__Position__000010_Pos_NewDiagram_Status.Y = 534.000000
+	__Position__000010_Pos_NewDiagram_Status.Name = `Pos-NewDiagram-Status`
 
 	__Position__000011_Pos_NewDiagram_SpeedCommandType.X = 777.000000
 	__Position__000011_Pos_NewDiagram_SpeedCommandType.Y = 83.000000
@@ -578,12 +578,12 @@ func _(stage *models.StageStruct) {
 
 	__Vertice__000000_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_GongsimCommand_and_NewDiagram_Engine.X = 644.500000
 	__Vertice__000000_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_GongsimCommand_and_NewDiagram_Engine.Y = 274.000000
-	__Vertice__000000_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_GongsimCommand_and_NewDiagram_Engine.Name = `Verticle in class diagram NewDiagram in middle between NewDiagram-GongsimCommand and NewDiagram-Engine`
+	__Vertice__000000_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_GongsimCommand_and_NewDiagram_Engine.Name = `Verticle in class diagram NewDiagram in middle between NewDiagram-Command and NewDiagram-Engine`
 
 	// Setup of pointers
 	__Classdiagram__000000_NewDiagram.GongStructShapes = append(__Classdiagram__000000_NewDiagram.GongStructShapes, __GongStructShape__000001_NewDiagram_Engine)
 	__Classdiagram__000000_NewDiagram.GongStructShapes = append(__Classdiagram__000000_NewDiagram.GongStructShapes, __GongStructShape__000003_NewDiagram_GongsimCommand)
-	__Classdiagram__000000_NewDiagram.GongStructShapes = append(__Classdiagram__000000_NewDiagram.GongStructShapes, __GongStructShape__000004_NewDiagram_GongsimStatus)
+	__Classdiagram__000000_NewDiagram.GongStructShapes = append(__Classdiagram__000000_NewDiagram.GongStructShapes, __GongStructShape__000004_NewDiagram_Status)
 	__Classdiagram__000000_NewDiagram.GongStructShapes = append(__Classdiagram__000000_NewDiagram.GongStructShapes, __GongStructShape__000000_NewDiagram_DummyAgent)
 	__Classdiagram__000000_NewDiagram.GongStructShapes = append(__Classdiagram__000000_NewDiagram.GongStructShapes, __GongStructShape__000002_NewDiagram_Event)
 	__Classdiagram__000000_NewDiagram.GongEnumShapes = append(__Classdiagram__000000_NewDiagram.GongEnumShapes, __GongEnumShape__000003_NewDiagram_EngineState)
@@ -646,11 +646,11 @@ func _(stage *models.StageStruct) {
 	__GongStructShape__000003_NewDiagram_GongsimCommand.Fields = append(__GongStructShape__000003_NewDiagram_GongsimCommand.Fields, __Field__000019_SpeedCommandType)
 	__GongStructShape__000003_NewDiagram_GongsimCommand.Fields = append(__GongStructShape__000003_NewDiagram_GongsimCommand.Fields, __Field__000007_DateSpeedCommand)
 	__GongStructShape__000003_NewDiagram_GongsimCommand.Links = append(__GongStructShape__000003_NewDiagram_GongsimCommand.Links, __Link__000000_Engine)
-	__GongStructShape__000004_NewDiagram_GongsimStatus.Position = __Position__000010_Pos_NewDiagram_GongsimStatus
-	__GongStructShape__000004_NewDiagram_GongsimStatus.Fields = append(__GongStructShape__000004_NewDiagram_GongsimStatus.Fields, __Field__000013_Name)
-	__GongStructShape__000004_NewDiagram_GongsimStatus.Fields = append(__GongStructShape__000004_NewDiagram_GongsimStatus.Fields, __Field__000004_CurrentCommand)
-	__GongStructShape__000004_NewDiagram_GongsimStatus.Fields = append(__GongStructShape__000004_NewDiagram_GongsimStatus.Fields, __Field__000002_CompletionDate)
-	__GongStructShape__000004_NewDiagram_GongsimStatus.Fields = append(__GongStructShape__000004_NewDiagram_GongsimStatus.Fields, __Field__000005_CurrentSpeedCommand)
-	__GongStructShape__000004_NewDiagram_GongsimStatus.Fields = append(__GongStructShape__000004_NewDiagram_GongsimStatus.Fields, __Field__000018_SpeedCommandCompletionDate)
+	__GongStructShape__000004_NewDiagram_Status.Position = __Position__000010_Pos_NewDiagram_Status
+	__GongStructShape__000004_NewDiagram_Status.Fields = append(__GongStructShape__000004_NewDiagram_Status.Fields, __Field__000013_Name)
+	__GongStructShape__000004_NewDiagram_Status.Fields = append(__GongStructShape__000004_NewDiagram_Status.Fields, __Field__000004_CurrentCommand)
+	__GongStructShape__000004_NewDiagram_Status.Fields = append(__GongStructShape__000004_NewDiagram_Status.Fields, __Field__000002_CompletionDate)
+	__GongStructShape__000004_NewDiagram_Status.Fields = append(__GongStructShape__000004_NewDiagram_Status.Fields, __Field__000005_CurrentSpeedCommand)
+	__GongStructShape__000004_NewDiagram_Status.Fields = append(__GongStructShape__000004_NewDiagram_Status.Fields, __Field__000018_SpeedCommandCompletionDate)
 	__Link__000000_Engine.Middlevertice = __Vertice__000000_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_GongsimCommand_and_NewDiagram_Engine
 }

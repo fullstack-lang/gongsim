@@ -129,14 +129,14 @@ func main() {
 
 	engine := new(gongsim_models.Engine)
 	engine.Name = "Simulation Engine"
-	engine.DisplayFormat = "Jan 2006"
+	engine.DisplayFormat = "02 Jan 2006"
 	engine.Stage(stage)
 
 	// the gongsim command orchestrates the simulation engine regarding to the
 	// the rest of the stack. It manages when the stage has to be commited to the
 	// back repo or when the back repo has to be checked out to the stage
-	gongsimCommand := gongsim_models.NewGongSimCommand(stage, engine)
-	_ = gongsimCommand
+	command := gongsim_models.NewCommand(stage, engine)
+	_ = command
 
 	// seven days of simulation
 	engine.SetStartTime(time.Date(1676, time.January, 1, 0, 0, 0, 0, time.UTC))
@@ -166,7 +166,7 @@ func main() {
 
 	// start right away
 	if *play {
-		gongsimCommand.Command = gongsim_models.COMMAND_PLAY
+		command.Command = gongsim_models.COMMAND_PLAY
 	}
 	if *displayWatch {
 		gongsim_models.DisplayWatch = true
