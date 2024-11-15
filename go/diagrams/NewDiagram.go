@@ -325,8 +325,8 @@ func _(stage *models.StageStruct) {
 
 	__GongEnumShape__000005_NewDiagram_GongsimCommandType.Name = `NewDiagram-GongsimCommandType`
 
-	//gong:ident [ref_models.GongsimCommandType] comment added to overcome the problem with the comment map association
-	__GongEnumShape__000005_NewDiagram_GongsimCommandType.Identifier = `ref_models.GongsimCommandType`
+	//gong:ident [ref_models.CommandType] comment added to overcome the problem with the comment map association
+	__GongEnumShape__000005_NewDiagram_GongsimCommandType.Identifier = `ref_models.CommandType`
 	__GongEnumShape__000005_NewDiagram_GongsimCommandType.Width = 450.999939
 	__GongEnumShape__000005_NewDiagram_GongsimCommandType.Height = 153.000000
 
@@ -354,8 +354,8 @@ func _(stage *models.StageStruct) {
 
 	__GongEnumValueEntry__000003_COMMAND_ADVANCE_10_MIN.Name = `COMMAND_ADVANCE_10_MIN`
 
-	//gong:ident [ref_models.GongsimCommandType.COMMAND_ADVANCE_10_MIN] comment added to overcome the problem with the comment map association
-	__GongEnumValueEntry__000003_COMMAND_ADVANCE_10_MIN.Identifier = `ref_models.GongsimCommandType.COMMAND_ADVANCE_10_MIN`
+	//gong:ident [ref_models.CommandType.COMMAND_ADVANCE_10_MIN] comment added to overcome the problem with the comment map association
+	__GongEnumValueEntry__000003_COMMAND_ADVANCE_10_MIN.Identifier = `ref_models.CommandType.COMMAND_ADVANCE_10_MIN`
 
 	__GongEnumValueEntry__000004_COMMAND_DECREASE_SPEED_50_PERCENTS.Name = `COMMAND_DECREASE_SPEED_50_PERCENTS`
 
@@ -364,13 +364,13 @@ func _(stage *models.StageStruct) {
 
 	__GongEnumValueEntry__000005_COMMAND_FIRE_EVENT_TILL_STATES_CHANGE.Name = `COMMAND_FIRE_EVENT_TILL_STATES_CHANGE`
 
-	//gong:ident [ref_models.GongsimCommandType.COMMAND_FIRE_EVENT_TILL_STATES_CHANGE] comment added to overcome the problem with the comment map association
-	__GongEnumValueEntry__000005_COMMAND_FIRE_EVENT_TILL_STATES_CHANGE.Identifier = `ref_models.GongsimCommandType.COMMAND_FIRE_EVENT_TILL_STATES_CHANGE`
+	//gong:ident [ref_models.CommandType.COMMAND_FIRE_EVENT_TILL_STATES_CHANGE] comment added to overcome the problem with the comment map association
+	__GongEnumValueEntry__000005_COMMAND_FIRE_EVENT_TILL_STATES_CHANGE.Identifier = `ref_models.CommandType.COMMAND_FIRE_EVENT_TILL_STATES_CHANGE`
 
 	__GongEnumValueEntry__000006_COMMAND_FIRE_NEXT_EVENT.Name = `COMMAND_FIRE_NEXT_EVENT`
 
-	//gong:ident [ref_models.GongsimCommandType.COMMAND_FIRE_NEXT_EVENT] comment added to overcome the problem with the comment map association
-	__GongEnumValueEntry__000006_COMMAND_FIRE_NEXT_EVENT.Identifier = `ref_models.GongsimCommandType.COMMAND_FIRE_NEXT_EVENT`
+	//gong:ident [ref_models.CommandType.COMMAND_FIRE_NEXT_EVENT] comment added to overcome the problem with the comment map association
+	__GongEnumValueEntry__000006_COMMAND_FIRE_NEXT_EVENT.Identifier = `ref_models.CommandType.COMMAND_FIRE_NEXT_EVENT`
 
 	__GongEnumValueEntry__000007_COMMAND_INCREASE_SPEED_100_PERCENTS.Name = `COMMAND_INCREASE_SPEED_100_PERCENTS`
 
@@ -379,18 +379,18 @@ func _(stage *models.StageStruct) {
 
 	__GongEnumValueEntry__000008_COMMAND_PAUSE.Name = `COMMAND_PAUSE`
 
-	//gong:ident [ref_models.GongsimCommandType.COMMAND_PAUSE] comment added to overcome the problem with the comment map association
-	__GongEnumValueEntry__000008_COMMAND_PAUSE.Identifier = `ref_models.GongsimCommandType.COMMAND_PAUSE`
+	//gong:ident [ref_models.CommandType.COMMAND_PAUSE] comment added to overcome the problem with the comment map association
+	__GongEnumValueEntry__000008_COMMAND_PAUSE.Identifier = `ref_models.CommandType.COMMAND_PAUSE`
 
 	__GongEnumValueEntry__000009_COMMAND_PLAY.Name = `COMMAND_PLAY`
 
-	//gong:ident [ref_models.GongsimCommandType.COMMAND_PLAY] comment added to overcome the problem with the comment map association
-	__GongEnumValueEntry__000009_COMMAND_PLAY.Identifier = `ref_models.GongsimCommandType.COMMAND_PLAY`
+	//gong:ident [ref_models.CommandType.COMMAND_PLAY] comment added to overcome the problem with the comment map association
+	__GongEnumValueEntry__000009_COMMAND_PLAY.Identifier = `ref_models.CommandType.COMMAND_PLAY`
 
 	__GongEnumValueEntry__000010_COMMAND_RESET.Name = `COMMAND_RESET`
 
-	//gong:ident [ref_models.GongsimCommandType.COMMAND_RESET] comment added to overcome the problem with the comment map association
-	__GongEnumValueEntry__000010_COMMAND_RESET.Identifier = `ref_models.GongsimCommandType.COMMAND_RESET`
+	//gong:ident [ref_models.CommandType.COMMAND_RESET] comment added to overcome the problem with the comment map association
+	__GongEnumValueEntry__000010_COMMAND_RESET.Identifier = `ref_models.CommandType.COMMAND_RESET`
 
 	__GongEnumValueEntry__000011_COMMAND_SPEED_STEADY.Name = `COMMAND_SPEED_STEADY`
 
