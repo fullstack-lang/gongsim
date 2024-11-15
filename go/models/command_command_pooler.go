@@ -9,7 +9,7 @@ import (
 // of the current command from the back repo to the stage. If the front client writes a "PLAY" or "PAUSE"
 // command, it is written to the back repo and the command pooler retrieves this command to the stage where it
 // can be read by the "engine driver". The "command pooler" is a scheduled task
-func (gongsimCommand *Command) commandPooler() {
+func (command *Command) commandPooler() {
 
 	// commandPoolerPeriod is the period of the "command pooler"
 	//
@@ -20,29 +20,29 @@ func (gongsimCommand *Command) commandPooler() {
 		select {
 		case t := <-CommandPoolerPeriod.C:
 
-			gongsimCommand.Checkout(gongsimCommand.stage)
-			if gongsimCommand.gongsimStatus.CompletionDate != gongsimCommand.CommandDate {
-				log.Println("commandPooler reads new command ", gongsimCommand.Command, "  timestamp ", gongsimCommand.CommandDate, " at ", t)
+			command.Checkout(command.stage)
+			if command.gongsimStatus.CompletionDate != command.CommandDate {
+				log.Println("commandPooler reads new command ", command.Command, "  timestamp ", command.CommandDate, " at ", t)
 
-				gongsimCommand.gongsimStatus.CurrentCommand = gongsimCommand.Command
-				gongsimCommand.gongsimStatus.CompletionDate = gongsimCommand.CommandDate
-				gongsimCommand.stage.Commit()
+				command.gongsimStatus.CurrentCommand = command.Command
+				command.gongsimStatus.CompletionDate = command.CommandDate
+				command.stage.Commit()
 			}
-			if gongsimCommand.gongsimStatus.SpeedCommandCompletionDate != gongsimCommand.DateSpeedCommand {
-				log.Println("commandPooler reads new speed command ", gongsimCommand.SpeedCommandType, "  timestamp ", gongsimCommand.CommandDate, " at ", t)
+			if command.gongsimStatus.SpeedCommandCompletionDate != command.DateSpeedCommand {
+				log.Println("commandPooler reads new speed command ", command.SpeedCommandType, "  timestamp ", command.CommandDate, " at ", t)
 
-				switch gongsimCommand.SpeedCommandType {
+				switch command.SpeedCommandType {
 				case COMMAND_DECREASE_SPEED_50_PERCENTS:
-					gongsimCommand.Engine.Speed *= 0.5
-					gongsimCommand.stage.Commit()
+					command.Engine.Speed *= 0.5
+					command.stage.Commit()
 				case COMMAND_INCREASE_SPEED_100_PERCENTS:
-					gongsimCommand.Engine.Speed *= 2.0
-					gongsimCommand.stage.Commit()
+					command.Engine.Speed *= 2.0
+					command.stage.Commit()
 				}
 
-				gongsimCommand.gongsimStatus.CurrentSpeedCommand = gongsimCommand.SpeedCommandType
-				gongsimCommand.gongsimStatus.SpeedCommandCompletionDate = gongsimCommand.DateSpeedCommand
-				gongsimCommand.stage.Commit()
+				command.gongsimStatus.CurrentSpeedCommand = command.SpeedCommandType
+				command.gongsimStatus.SpeedCommandCompletionDate = command.DateSpeedCommand
+				command.stage.Commit()
 			}
 		}
 	}
