@@ -22,7 +22,7 @@ require (
 	github.com/fullstack-lang/gong v0.0.0-20250204140536-9b58f68f73b8
 	github.com/fullstack-lang/gongdoc v0.0.0-20250122020233-c09b99161356
 	github.com/fullstack-lang/gongtable v0.0.0-20250210172415-c00082e756fe
-	github.com/fullstack-lang/gongtree v0.0.0-20250131164534-16327a85fa35
+	github.com/fullstack-lang/gongtree v0.0.0-20250211023854-6a055011abfb
 	github.com/fullstack-lang/maticons v0.0.0-20240913013021-27a7b8fd9369
 	github.com/glebarez/sqlite v1.11.0
 	github.com/gorilla/websocket v1.5.3
