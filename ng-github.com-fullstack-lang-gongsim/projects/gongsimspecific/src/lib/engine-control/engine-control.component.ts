@@ -15,20 +15,18 @@ import { CommonModule } from '@angular/common';
 import { AngularSplitModule } from 'angular-split';
 
 @Component({
-  selector: 'lib-engine-control',
-  templateUrl: './engine-control.component.html',
-  styleUrls: ['./engine-control.component.css'],
-  standalone: true,
-  imports: [
-    MatToolbarModule,
-    MatIconModule,
-    MatButtonModule,
-    FormsModule,
-    CommonModule,
-
-    AngularSplitModule,
-  ],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'lib-engine-control',
+    templateUrl: './engine-control.component.html',
+    styleUrls: ['./engine-control.component.css'],
+    imports: [
+        MatToolbarModule,
+        MatIconModule,
+        MatButtonModule,
+        FormsModule,
+        CommonModule,
+        AngularSplitModule,
+    ],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EngineControlComponent implements OnInit {
 
