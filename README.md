@@ -1,3 +1,5 @@
+Repo archived, function is no as a lib in gong
+
 A gong stack for developping simulations
 
 ### compile application
